@@ -48,7 +48,6 @@ class TreeTrainer(object):
         self._logger_on = logger_on
         self._y_preds = None  # this will be populated in the run_test method
 
-    @tree_logger
     def fit_model(self, model_name, X_train, y_train, size_limit=None,
                   match_indices=False, **kwargs):
         """ Fit a single model (with model_name) to data y against X
@@ -67,7 +66,6 @@ class TreeTrainer(object):
         self._models[model_name].fit(X_train.tail(size_limit),
                                      y_train.tail(size_limit).values.ravel(), **kwargs)
 
-    @tree_logger
     def fit_all(self, X_train, y_train, size_limit=None, match_indices=False, **kwargs):
         """ Fit all the models to data y against X
         ..note: X_train and y_train should contain the dates of data
@@ -113,7 +111,6 @@ class TreeTrainer(object):
         else:
             return self._y_preds
 
-    @tree_logger
     def create_predictions(self, X_test, store_indices=False):
         """ Create model predictions for given set of data
         :param X_test: the independent variables of the test data
