@@ -3,9 +3,11 @@
         Methods for analyzing tree nodes following the Scikit-Learn API
 
     breakdown_tree : function
+    access_data_in_node : function
+
+    Not sure if I want the below functions
     conditional_count : function
     conditional_mean : function
-    access_data_in_node : function
 
     @author: Ricky
 """
@@ -43,7 +45,7 @@ def breakdown_tree(sk_tree, feature_names=None, display_relation=False, base_adj
         feature_names = np.arange(features.max())
 
     visit_tracker = []  # a stack to track if all the children of a node is visited
-    node_ptr, node_path = 0, []  # ptr_stack keeps track of nodes I
+    node_ptr, node_path = 0, []  # ptr_stack keeps track of nodes
     for node_ptr in range(n_splits):
         if len(visit_tracker) != 0:
             visit_tracker[-1] += 1  # visiting the child of the latest node
