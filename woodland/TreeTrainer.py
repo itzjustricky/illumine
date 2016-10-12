@@ -4,32 +4,16 @@
             storing the predictions run on test data
 
     ..notes:
-        * only properly handles sklearn models
+        * only properly handles Scikit-Learn API
+
+    TODO: insert a logger here
+
 """
 
-from functools import wraps
+# from functools import wraps
 
 import numpy as np
 import pandas as pd
-
-from ..utils import logstamp
-
-
-def tree_logger(func):
-    """ Decorator that prints some of the information about the fitting process
-        This logger is created for debugging. Will only work for class objects.
-    """
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        result = func(*args, **kwargs)
-        self = args[0]  # gets the class instance
-        if self._logger_on:
-            func_modname = func.__module__
-            func_name = func.__name__
-            print("{} function {} from module {} is called"
-                  .format(logstamp(), func_name, func_modname))
-        return result
-    return wrapper
 
 
 class TreeTrainer(object):
