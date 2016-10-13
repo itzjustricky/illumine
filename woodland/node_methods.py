@@ -9,29 +9,86 @@
     conditional_count : function
     conditional_mean : function
 
+    TODO:
+        * add a function to see which nodes are activated for
+            a certain datarow
+        * consider using Cython for creating breakdown_tree
+            function since there can be a lot of overhead for
+            trees with more depth
+
     @author: Ricky
 """
 
+from collections import OrderedDict
 import numpy as np
 
 
-def breakdown_tree(sk_tree, feature_names=None, display_relation=False, base_adjustment=0):
-    """ Breakdown a tree's splits and returns the value of every leaf along with the path of
-        splits that led to the leaf
+class SKTreeNode(object):
+    """ Object representation a single node of a decision tree """
+
+    def __init__(self, path, value, n_samples, node_index):
+        """
+        :params path (list): the decision path to the node
+        :params value (numeric): the value associated with the node
+        :params n_samples (int): the number of samples that reach the node
+        :params node_index (int): the index of the node in the pre-order
+            traversal of the decision tree;
+            node_index in [0, k-1] where k is the # of nodes (inner & leaf)
+        """
+        self._node_repr = OrderedDict()
+
+        self._node_repr['path'] = path
+        self._node_repr['value'] = value
+        self._node_repr['n_samples'] = n_samples
+
+        self._node_index = node_index
+
+    def __str__(self):
+        node_strings = []
+        for key, val in self._node_repr.items():
+            node_strings.append("{}: {}".format(key, val))
+        node_str = '\n'.join(node_strings)
+        return node_str
+
+    def __repr__(self):
+        return self.__str__()
+
+    def get_path(self):
+        return self._node_repr['path'].__str__()
+
+    def get_value(self):
+        return self._node_repr['value']
+
+    def get_n_samples(self):
+        return self._node_repr['n_samples']
+
+    def index(self):
+        return self._node_index
+
+
+def breakdown_tree(sk_tree, feature_names=None, display_relation=False,
+                   base_adjustment=0, float_precision=3):
+    """ Breakdown a tree's splits and returns the value of every leaf along
+        with the path of splits that led to the leaf
 
     ..note:
-        Scikit-learn represent their trees with nodes (represented by numbers) printed by
-        preorder-traversal; number of -2 represents a leaf, the other numbers are by the index
-        of the column for the feature
+        Scikit-learn represent their trees with nodes (represented by numbers) printed
+        by preorder-traversal; number of -2 represents a leaf, the other numbers are by
+        the index of the column for the feature
 
-    :param feature_names: names of the features that were used to split the tree
+    :param feature_names (list): list of names (strings) of the features that were used
+        to split the tree
     :param sk_tree: scikit-learn tree object
-    :param display_relation: boolean flag, if marked false then only display feature else
-        display the relation as well
-    :param base_adjustment: shift all the values with a base value
-    :returns: tuple of ("path to leaf", leaf value, leaf sample size)
+    :param display_relation (bool): if marked false then only display feature else display
+        the relation as well; if marked true, the path
+    :param base_adjustment (numeric): shift all the values with a base value
+    :param float_precision (int): to determine what number the node values, thresholds are
+        rounded to
+
+    :returns: list of SKTreeNode objects
     """
     all_nodes = []
+
     values = sk_tree.tree_.value
     features = sk_tree.tree_.feature
     node_samples = sk_tree.tree_.n_node_samples
@@ -45,22 +102,27 @@ def breakdown_tree(sk_tree, feature_names=None, display_relation=False, base_adj
         feature_names = np.arange(features.max())
 
     visit_tracker = []  # a stack to track if all the children of a node is visited
-    node_ptr, node_path = 0, []  # ptr_stack keeps track of nodes
-    for node_ptr in range(n_splits):
+    node_index, node_path = 0, []  # ptr_stack keeps track of nodes
+    for node_index in range(n_splits):
         if len(visit_tracker) != 0:
             visit_tracker[-1] += 1  # visiting the child of the latest node
 
-        if features[node_ptr] != -2:  # visiting node
+        if features[node_index] != -2:  # visiting node
             visit_tracker.append(0)
             if display_relation:
-                append_str = "{}<={}".format(feature_names[features[node_ptr]], thresholds[node_ptr])
+                append_str = "{}<={}".format(feature_names[features[node_index]],
+                                             round(thresholds[node_index], float_precision))
             else:
-                append_str = feature_names[features[node_ptr]]
+                append_str = feature_names[features[node_index]]
             node_path.append(append_str)
         else:  # visiting leaf
-            all_nodes.append((node_path.copy(), base_adjustment + values[node_ptr][0][0],
-                             node_samples[node_ptr]))
-            if node_ptr in sk_tree.tree_.children_right:
+            all_nodes.append(
+                SKTreeNode(node_path.copy(),
+                           base_adjustment + round(values[node_index][0][0], float_precision),
+                           node_samples[node_index],
+                           node_index))
+
+            if node_index in sk_tree.tree_.children_right:
                 # pop out nodes that I am completely done with
                 while(len(visit_tracker) > 0 and visit_tracker[-1] == 2):
                     node_path.pop()
@@ -71,47 +133,45 @@ def breakdown_tree(sk_tree, feature_names=None, display_relation=False, base_adj
     return all_nodes
 
 
-def access_data_in_node(split_strings, data_df):
-    """ Access the data that satisfy the conditions of tree splits within a pandas DataFrame
-        The pandas DataFrame should contain the feature names inside the split_strings
+def get_tree_leaves(sk_tree, X):
+    """ Retrieve the index, values of all the leaf nodes that
+        the decision tree arrives at.
 
-    :param split_strings: a list of the conditions/splits that characterize a single node
-        split_strings should be outputted from breakdown_tree with display_relation=True
-    :param data_df: pandas DataFrame that contains data and columns labeled by the feature names
+        the index above refers to index of the node in the pre-order
+        traversal of the decision tree
+
+    :param sk_tree: scikit-learn tree object
+    :param X: array_like or sparse matrix, shape = [n_samples, n_features]
     """
-    samples_in_node = data_df.query(' and '.join(split_strings)).copy()
-    return samples_in_node
+    leaf_indices, leaf_values = np.zeros(X.shape[0]), np.zeros(X.shape[0])
+
+    decision_path = sk_tree.decision_path(X)
+    for i, row in enumerate(decision_path):
+        leaf_indices[i] = row.nonzero()[1][-1]
+        leaf_values[i] = sk_tree.tree_.value[leaf_indices[i]]
+
+    return leaf_indices, leaf_values
 
 
-def conditional_count(split_strings_list, data_df):
-    """ Count all data that satisfy any of the conditions of tree splits within a DataFrame
+def get_ensemble_leaf_values(sk_ensemble, X):
+    """ Retrieve the index, values of all the leaf nodes that
+        the decision tree arrives at for each decision tree in
+        an ensemble
 
-    :param split_strings_list: a list of lists of the conditions/splits that characterize the nodes;
-        the rules of many nodes are described in split_strings_list;
-        each split_strings should be outputted from breakdown_tree with display_relation=True
-    :param data_df: pandas DataFrame that contains data and columns labeled by the feature names
+        the index above refers to index of the node in the pre-order
+        traversal of the decision tree
+
+    :param sk_tree: scikit-learn tree object
+    :param X: array_like or sparse matrix, shape = [n_samples, n_features]
     """
-    cnt = 0
-    for split_strings in split_strings_list:
-        tmp_samples = data_df.query(' and '.join(split_strings))
-        cnt += tmp_samples.shape[0]
-    return cnt
 
+    leaf_indices = np.zeros((X.shape[0], sk_ensemble.n_estimators))
+    leaf_values = np.zeros((X.shape[0], sk_ensemble.n_estimators))
 
-def conditional_mean(node_rules, node_values, data_df):
-    """ Access the data that satisfy the conditions of tree splits within a DataFrame
+    for estimator in sk_ensemble.estimators:
+        estimator = estimator[0][0]
 
-    :param split_strings_list: a list of lists of the conditions/splits that characterize the nodes;
-        the rules of many nodes are described in split_strings_list;
-        each split_strings should be outputted from breakdown_tree with display_relation=True
-    :param data_df: pandas DataFrame that contains data and columns labeled by the feature names;
-    :param mean_label: the label of the column to take the mean over
-    """
-    cnts = []
-    for split_strings, val in zip(node_rules, node_values):
-        tmp_samples = data_df.query(' and '.join(split_strings))
-        cnts.append(tmp_samples.shape[0])
-    cnts = np.array(cnts)
-    cnts = cnts / np.sum(cnts)
+        leaf_indices[0, :] = get_tree_leaves(estimator, X)
+        leaf_values[0, :] = get_tree_leaves(estimator, X)
 
-    return np.dot(cnts, np.array(node_values))
+    return leaf_indices, leaf_values
