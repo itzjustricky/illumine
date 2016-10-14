@@ -1,6 +1,6 @@
-__all__ = ['dates', 'func']
+__all__ = ['date', 'func', 'file']
 
-from .dates import split_by
-
+from .date import split_by
 from .func import logstamp
-from . import func
+
+from .file import *
