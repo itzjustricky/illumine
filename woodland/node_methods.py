@@ -10,6 +10,8 @@
     conditional_mean : function
 
     TODO:
+        * I don't think get_tree_leaves and get_ensemble_leaf_values methods
+            are very useful right now ... I need to change them
         * add a function to see which nodes are activated for
             a certain datarow
         * consider using Cython for creating breakdown_tree
@@ -47,8 +49,7 @@ class SKTreeNode(object):
         node_strings = []
         for key, val in self._node_repr.items():
             node_strings.append("{}: {}".format(key, val))
-        node_str = '\n'.join(node_strings)
-        return node_str
+        return '\n'.join(node_strings)
 
     def __repr__(self):
         return self.__str__()
@@ -107,7 +108,7 @@ def breakdown_tree(sk_tree, feature_names=None, display_relation=False,
         if len(visit_tracker) != 0:
             visit_tracker[-1] += 1  # visiting the child of the latest node
 
-        if features[node_index] != -2:  # visiting node
+        if features[node_index] != -2:  # visiting inner node
             visit_tracker.append(0)
             if display_relation:
                 append_str = "{}<={}".format(feature_names[features[node_index]],

@@ -79,7 +79,7 @@ class TreeTrainer(object):
         if append:
             self._y_preds.to_csv(file_path, mode='a', header=False, **kwargs)
         else:
-            self._y_preds.to_csv(file_path, **kwargs)
+            self._y_preds.to_csv(file_path, mode='w', **kwargs)
         if wipe_data:  # wipe the data
             self._y_preds = None
 

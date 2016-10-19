@@ -15,7 +15,7 @@ import pickle
 from ..core import IPynbCreationManager
 
 
-class ModelManager(object):
+class IPynbEnsembleManager(object):
     """ Manage the creation of an IPython Notebook for
         analyzing a model
     """

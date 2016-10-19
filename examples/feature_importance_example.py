@@ -6,15 +6,14 @@
     @author: Ricky Chang
 """
 
-import inspect
-
 import os
+import inspect
 
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.datasets.california_housing import fetch_california_housing
 
-from illumine.woodland import (ModelManager, FeatureImportanceSnippet)
+from illumine.woodland import (IPynbEnsembleManager, FeatureImportanceSnippet)
 
 
 def main():
@@ -36,20 +35,13 @@ def main():
                                     random_state=1)
     clf.fit(X_train, y_train)
 
-    manager = ModelManager(clf, output_dir, 'clf_pickle.pkl')
+    manager = IPynbEnsembleManager(clf, output_dir, 'clf_pickle.pkl')
     fi_snippet = FeatureImportanceSnippet(manager.get_pickle_file(), names,
-                                          features_to_display=[0, 3, 5, 6])
+                                          features_to_display=[0, 3, 5, 6], run_flag=True)
 
     manager.add_snippet(fi_snippet)
     manager.save(notebook_name="fi_notebook.ipynb", version=4)
 
 
-# Set main function for debugging if error
-import bpdb, sys, traceback
 if __name__ == "__main__":
-    try:
-        main()
-    except:
-        type, value, tb = sys.exc_info()
-        traceback.print_exc()
-        bpdb.post_mortem(tb)
+    main()

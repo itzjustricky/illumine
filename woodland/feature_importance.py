@@ -12,89 +12,95 @@ from collections import OrderedDict
 from ..core import (BaseSnippet, format_snippet)
 
 
-FI_SNIPPET = OrderedDict()
+class FeatureImportanceTemplate(object):
+    """ A wrapper around the snippet_dict to adhere to a more Pythonic coding style.
+        The snippet_dict describes the template of which the Feature Importance
+        snippet will take.
+    """
 
-FI_SNIPPET['snippet-title'] = ('markdown', "#{}")
+    snippet_dict = OrderedDict()
 
-FI_SNIPPET['import-cell'] = \
-    ('code',
-     """
-        %matplotlib inline
+    snippet_dict['snippet-title'] = ('markdown', "#{}")
 
-        import math
-        import pickle
-        import numpy as np
-        import matplotlib.pyplot as plt
-     """)
+    snippet_dict['import-cell'] = \
+        ('code',
+         """
+            %matplotlib inline
 
-FI_SNIPPET['load-cell'] = \
-    ('code',
-     """
-        {0} = pickle.load(open('pickles/{1}', 'rb'))
-        all_feature_importances = {0}.feature_importances_
-        params = {0}.get_params()
+            import math
+            import pickle
+            import numpy as np
+            import matplotlib.pyplot as plt
+         """)
 
-        feature_names = np.array({2})
-     """)
+    snippet_dict['load-cell'] = \
+        ('code',
+         """
+            {0} = pickle.load(open('pickles/{1}', 'rb'))
+            all_feature_importances = {0}.feature_importances_
+            params = {0}.get_params()
 
-FI_SNIPPET['adjust-cell'] = \
-    ('code',
-     """
-         # Parameters passed into function here
-         features_to_display = {}
-         n_features_to_display = len(features_to_display)
-         max_per_plot = {}
+            feature_names = np.array({2})
+         """)
 
-         # limit to 10 features per plot and 3 plots per row
-         n_ax_cols = min(3, math.ceil(n_features_to_display / max_per_plot))
-         n_ax_rows = math.ceil(n_features_to_display / max_per_plot / n_ax_cols)
-     """)
+    snippet_dict['adjust-cell'] = \
+        ('code',
+         """
+             # Parameters passed into function here
+             features_to_display = {}
+             n_features_to_display = len(features_to_display)
+             max_per_plot = {}
 
-FI_SNIPPET['plots-title'] = \
-    ('markdown',
-     """
-         <font color="blue">
-         ## {}
-     """)
+             # limit to 10 features per plot and 3 plots per row
+             n_ax_cols = min(3, math.ceil(n_features_to_display / max_per_plot))
+             n_ax_rows = math.ceil(n_features_to_display / max_per_plot / n_ax_cols)
+         """)
 
-FI_SNIPPET['plot-cell'] = \
-    ('code',
-     """
-         # make importances relative to max importance
-         feature_importance = 100.0 * (all_feature_importances / all_feature_importances.max())
-         sorted_idx = np.argsort(feature_importance)[::-1]
-         pos = np.arange(max_per_plot) + .5
-         fig, (all_axes) = plt.subplots(n_ax_rows, n_ax_cols)
+    snippet_dict['plots-title'] = \
+        ('markdown',
+         """
+             <font color="blue">
+             ## {}
+         """)
 
-         if not isinstance(all_axes, np.ndarray):
-             all_axes = np.array([all_axes])
+    snippet_dict['plot-cell'] = \
+        ('code',
+         """
+             # make importances relative to max importance
+             feature_importance = 100.0 * (all_feature_importances / all_feature_importances.max())
+             sorted_idx = np.argsort(feature_importance)[::-1]
+             pos = np.arange(max_per_plot) + .5
+             fig, (all_axes) = plt.subplots(n_ax_rows, n_ax_cols)
 
-         for ax_ind, ax in enumerate(all_axes):
-             start_ind = ax_ind * max_per_plot
-             end_ind = min(start_ind + max_per_plot, n_features_to_display)
-             feature_inds = sorted_idx[start_ind:end_ind][::-1]
-             amount_to_fill = max_per_plot - len(feature_inds)
+             if not isinstance(all_axes, np.ndarray):
+                 all_axes = np.array([all_axes])
 
-             features_to_plot = feature_importance[feature_inds]
-             if amount_to_fill > 0:
-                 features_to_plot = \
-                     np.append(features_to_plot, np.zeros(amount_to_fill))
+             for ax_ind, ax in enumerate(all_axes):
+                 start_ind = ax_ind * max_per_plot
+                 end_ind = min(start_ind + max_per_plot, n_features_to_display)
+                 feature_inds = sorted_idx[start_ind:end_ind][::-1]
+                 amount_to_fill = max_per_plot - len(feature_inds)
 
-
-             ax.barh(pos, features_to_plot, align='center', color='#A2F789')
-             ax.set_yticks(pos)
-             ax.set_yticklabels(feature_names[feature_inds])
-             ax.set_xticks(np.linspace(0, 100, 6))
-             ax.set_xlabel('Relative Importance')
-
-         fig.tight_layout()
-         plt.show()
-     """)
+                 features_to_plot = feature_importance[feature_inds]
+                 if amount_to_fill > 0:
+                     features_to_plot = np.append(features_to_plot, np.zeros(amount_to_fill))
 
 
-def get_feature_importance_snippet():
-    snip = deepcopy(FI_SNIPPET)
-    return snip
+                 ax.barh(pos, features_to_plot, align='center', color='#A2F789')
+                 ax.set_yticks(pos)
+                 ax.set_yticklabels(feature_names[feature_inds])
+                 ax.set_xticks(np.linspace(0, 100, 6))
+                 ax.set_xlabel('Relative Importance')
+
+             fig.tight_layout()
+             plt.show()
+         """)
+
+    @classmethod
+    def get_snippet(cls):
+        """ This method should be the only means of accessing snippet_dict """
+        snip = deepcopy(cls.snippet_dict)
+        return snip
 
 
 def format_pair(pair, format_index, *format_args):
@@ -110,7 +116,7 @@ def format_pair(pair, format_index, *format_args):
 
 
 class FeatureImportanceSnippet(BaseSnippet):
-    """ Object to represent the snippet of FeatureImportance """
+    """ Object to handle the preparation of the snippet for FeatureImportance """
 
     def __init__(self, pickle_file, feature_names, features_to_display,
                  model_id='sk_model', max_per_plot=10, run_flag=False,
@@ -125,13 +131,14 @@ class FeatureImportanceSnippet(BaseSnippet):
             features to display
         :param model_id (string): the identifier used for the Sklearn model
         :param max_per_plot (int): the number of bars to graph per plot
-        :param run_flag (bool): if True, run all the cells. Note it will take longer for program to run
+        :param run_flag (bool): if True, run all the code cells in the snippet;
+            NOTE it will take LONGER for program to run
         :param snippetmd_title (string): the title to be placed at the top of the snippet
             as a markdown cell; if None then no cell will be inserted
         :param plotsmd_title (string): the title to be placed before the cell plot;
             if None then no cell will be inserted
         """
-        fi_snippet = get_feature_importance_snippet()
+        fi_snippet = FeatureImportanceTemplate.get_snippet()
 
         # Delete the markdown cells if no title is provided
         if snippetmd_title is None:
