@@ -3,10 +3,10 @@
     ensemble models.
 """
 
-__all__ = ['TreeTrainer', 'IPynbEnsembleManager', 'feature_importance', 'node_methods']
+__all__ = ['TreeTrainer', 'IPynbEnsembleManager', 'node_methods', 'snippets']
 
 from .TreeTrainer import TreeTrainer
 from .IPynbEnsembleManager import IPynbEnsembleManager
-from .feature_importance import FeatureImportanceSnippet
 
+from .snippets import FeatureImportanceSnippet
 from .node_methods import *

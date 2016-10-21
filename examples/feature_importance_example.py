@@ -36,12 +36,17 @@ def main():
     clf.fit(X_train, y_train)
 
     manager = IPynbEnsembleManager(clf, output_dir, 'clf_pickle.pkl')
-    fi_snippet = FeatureImportanceSnippet(manager.get_pickle_file(), names,
-                                          features_to_display=[0, 3, 5, 6], run_flag=True)
-
-    manager.add_snippet(fi_snippet)
+    fi_snippet_kw = {'feature_names': names, 'features_to_display': [0, 3, 5, 6], 'run_flag': True}
+    manager.add_snippet(FeatureImportanceSnippet, **fi_snippet_kw)
     manager.save(notebook_name="fi_notebook.ipynb", version=4)
 
 
+# Set main function for debugging if error
+import bpdb, sys, traceback
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except:
+        type, value, tb = sys.exc_info()
+        traceback.print_exc()
+        bpdb.post_mortem(tb)
