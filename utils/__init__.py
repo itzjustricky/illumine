@@ -1,4 +1,5 @@
-__all__ = ['date', 'func']
+__all__ = ['date', 'func', 'statistical']
 
-from .date_tools import split_by
-from .func import logstamp
+from .date_tools import *
+from .func import *
+from .statistical import *

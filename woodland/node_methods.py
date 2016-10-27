@@ -14,11 +14,15 @@
             function since there can be a lot of overhead for
             trees with more depth
         * write a __reduce__ function for SKTreeNode
+        * extend base_adjustment for dismantle_tree to allow vector
 
     @author: Ricky
 """
 
+
+from copy import deepcopy
 from collections import OrderedDict
+
 import numpy as np
 
 
@@ -91,7 +95,7 @@ def dismantle_tree(sk_tree, feature_names=None, display_relation=False,
     :param float_precision (int): to determine what number the node values, thresholds are
         rounded to
 
-    :returns: dictionary of SKTreeNode objects indexed by their order in the
+    :returns: OrderedDict of SKTreeNode objects indexed by their order in the
         pre-order traversal of the Decision Tree
     """
     all_leaves = OrderedDict()
@@ -169,7 +173,7 @@ def dismantle_ensemble(sk_ensemble, **kwargs):
     return ensemble_of_leaves
 
 
-def get_tree_predictions(sk_ensemble, X, adjust_with_base=True):
+def get_tree_predictions(sk_ensemble, X, adjust_with_base=False):
     """ Retrieve the tree predictions of each tree in the ensemble
 
     :param sk_ensemble: scikit-learn tree object
@@ -189,4 +193,76 @@ def get_tree_predictions(sk_ensemble, X, adjust_with_base=True):
         estimator = estimator[0]
         leaf_values[:, ind] = estimator.predict(X)
 
-    return leaf_values + adjustment
+    return leaf_values + adjustment[:, np.newaxis]
+
+
+def node_relevance(sk_ensemble, X, y, feature_names, top_perc=0.3, error_thres=0.20,
+                   n_most_relevant=100):
+    """ Find the relevance of a certain node of a tree
+
+    :param sk_ensemble: scikit-learn tree object
+    :param top_perc: helps decide which nodes are relevant
+    :param error_thres (float): the error threshold (%) used to judge whether
+        or not a node is relevant
+    """
+    # dismantle all trees of ensemble to get inner workings
+    leaf_counts, leaf_scores = [], []  # this will be used later
+    ensemble_estimator_leaves = []
+
+    for estimator in sk_ensemble.estimators_:
+        estimator = estimator[0]
+        estimator_nodes = \
+            dismantle_tree(estimator, feature_names, display_relation=True)
+
+        n_nodes = len(estimator_nodes)
+        ensemble_estimator_leaves.append(estimator_nodes)
+        leaf_counts.append(
+            dict(zip(estimator_nodes.keys(), np.zeros(n_nodes))))
+    leaf_scores = deepcopy(leaf_counts)
+
+    tree_predictions = get_tree_predictions(sk_ensemble, X, adjust_with_base=False)
+    leaves_used = sk_ensemble.apply(X)
+
+    # shift by the initial value of ensemble (defaulted to average of training set in sklearn)
+    adjusted_y = y - sk_ensemble.init_.predict(X).ravel()
+    errs = np.abs(tree_predictions - adjusted_y[:, np.newaxis])
+
+    n_top = top_perc * sk_ensemble.n_estimators
+    for sample_ind, err_row in enumerate(errs):
+        curr_leaves = leaves_used[sample_ind, :]
+
+        # iterate the leaf counts for those that are activated in the data
+        for estimator_ind, estimator_leaf in enumerate(curr_leaves):
+            leaf_counts[estimator_ind][int(estimator_leaf)] += 1
+
+        relevant_nodes = np.argsort(err_row)
+        # find the "relevant" nodes
+        for estimator_ind in relevant_nodes[:n_top]:
+            # stop if error is greater than some threshold
+            if err_row[estimator_ind] > (error_thres * y[sample_ind]):
+                break
+            estimator_leaf = curr_leaves[estimator_ind]
+            leaf_scores[estimator_ind][estimator_leaf] += 1
+
+    key_ind_tuples, key_ind_scores, key_ind_counts = [], [], []
+    # change to percentages and record tuples (ind, key) with highest values
+    for ind in range(len(leaf_scores)):
+        for key in leaf_scores[ind].keys():
+            key_ind_tuples.append((ind, key))
+            key_ind_scores.append(leaf_scores[ind][key])
+            key_ind_counts.append(leaf_counts[ind][key])
+
+    key_ind_scores = np.array(key_ind_scores)
+    key_ind_counts = np.array(key_ind_counts)
+
+    top_scoring_inds = np.argsort(key_ind_scores)[::-1]
+    top_scoring_paths = []
+    # get the paths of the n_most_relevant features
+    for ind in top_scoring_inds[:n_most_relevant]:
+        estimator_ind, leaf_ind = key_ind_tuples[ind]
+        top_scoring_paths.append(
+            ensemble_estimator_leaves[estimator_ind][leaf_ind].path)
+
+    return (top_scoring_paths,
+            key_ind_scores[top_scoring_inds[:n_most_relevant]],
+            key_ind_counts[top_scoring_inds[:n_most_relevant]])

@@ -1,2 +1,5 @@
 # things to exclude
+
 tags
+*.txt
+# experiments/
