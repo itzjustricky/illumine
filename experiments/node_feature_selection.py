@@ -31,9 +31,9 @@ def main():
     clf = ensemble.GradientBoostingRegressor(**params)
     clf.fit(X_train, y_train)
 
-    mse = mean_squared_error(y_test, clf.predict(X_test))
-    print("MSE: %.4f" % mse)
-    woodland.node_relevance(clf, X_test, y_test, boston.feature_names)
+    unraveled_ensemble = woodland.unravel_ensemble(clf, feature_names=boston.feature_names, display_relation=True)
+    activated_leaves = woodland.aggregate_activated_leaves(clf, X_test, boston.feature_names)
+    # woodland.node_relevance(clf, X_test, y_test, boston.feature_names)
 
     bpdb.set_trace()  # ------------------------------ Breakpoint ------------------------------ #
     print("Done!")

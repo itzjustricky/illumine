@@ -2,7 +2,7 @@
     Description:
         Methods for analyzing tree nodes following the Scikit-Learn API
 
-    dismantle_tree : function
+    unravel_tree : function
     access_data_in_node : function
 
     Not sure if I want the below functions
@@ -10,74 +10,27 @@
     conditional_mean : function
 
     TODO:
-        * consider using Cython for doing the heavy load in dismantle_tree
+        * consider using Cython for doing the heavy load in unravel_tree
             function since there can be a lot of overhead for
             trees with more depth
         * write a __reduce__ function for SKTreeNode
-        * extend base_adjustment for dismantle_tree to allow vector
+        * extend base_adjustment for unravel_tree to allow vector
+        * might be better to build with a regular python dict for unravel_ensemble function;
+            less overhead, etc.
 
     @author: Ricky
 """
-
 
 from copy import deepcopy
 from collections import OrderedDict
 
 import numpy as np
 
-
-class SKTreeNode(object):
-    """ Object representation a single node of a decision tree
-
-    ..note: a big reason I decided to store path, value, n_samples in a
-         dictionary is so I have a nice and easy loop to return a representation
-    """
-
-    def __init__(self, path, value, n_samples, node_index):
-        """
-        :params path (list): the decision path to the node
-        :params value (numeric): the value associated with the node
-        :params n_samples (int): the number of samples that reach the node
-        :params node_index (int): the index of the node in the pre-order
-            traversal of the decision tree;
-            node_index in [0, k-1] where k is the # of nodes (inner & leaf)
-        """
-        self._node_repr = OrderedDict()
-
-        self._node_repr['path'] = path
-        self._node_repr['value'] = value
-        self._node_repr['n_samples'] = n_samples
-
-        self.__node_index = node_index
-
-    def __str__(self):
-        node_strings = []
-        for key, val in self._node_repr.items():
-            node_strings.append("{}: {}".format(key, val))
-        return '\n'.join(node_strings)
-
-    def __repr__(self):
-        return self.__str__()
-
-    @property
-    def path(self):
-        return self._node_repr['path']
-
-    @property
-    def value(self):
-        return self._node_repr['value']
-
-    @property
-    def n_samples(self):
-        return self._node_repr['n_samples']
-
-    @property
-    def index(self):
-        return self.__node_index
+from .leaf_objects import (SKTreeNode, LucidSKTree)
 
 
-def dismantle_tree(sk_tree, feature_names=None, display_relation=False,
-                   base_adjustment=0, float_precision=3):
+def unravel_tree(sk_tree, feature_names=None, display_relation=True,
+                 base_adjustment=0, float_precision=3, sort_by_index=True):
     """ Breakdown a tree's splits and returns the value of every leaf along
         with the path of splits that led to the leaf
 
@@ -95,10 +48,10 @@ def dismantle_tree(sk_tree, feature_names=None, display_relation=False,
     :param float_precision (int): to determine what number the node values, thresholds are
         rounded to
 
-    :returns: OrderedDict of SKTreeNode objects indexed by their order in the
+    :returns: LucidSKTree object indexed by their order in the
         pre-order traversal of the Decision Tree
     """
-    all_leaves = OrderedDict()
+    tree_leaves = OrderedDict()
 
     values = sk_tree.tree_.value
     features = sk_tree.tree_.feature
@@ -127,11 +80,10 @@ def dismantle_tree(sk_tree, feature_names=None, display_relation=False,
                 append_str = feature_names[features[node_index]]
             node_path.append(append_str)
         else:  # visiting leaf
-            all_leaves[node_index] = \
+            tree_leaves[node_index] = \
                 SKTreeNode(node_path.copy(),
                            base_adjustment + round(values[node_index][0][0], float_precision),
-                           node_samples[node_index],
-                           node_index)
+                           node_samples[node_index])
 
             if node_index in sk_tree.tree_.children_right:
                 # pop out nodes that I am completely done with
@@ -141,10 +93,10 @@ def dismantle_tree(sk_tree, feature_names=None, display_relation=False,
             if display_relation and len(node_path) != 0:
                 node_path[-1] = node_path[-1].replace("<=", ">")
 
-    return all_leaves
+    return LucidSKTree(tree_leaves)
 
 
-def dismantle_ensemble(sk_ensemble, **kwargs):
+def unravel_ensemble(sk_ensemble, **kwargs):
     """ Breakdown a tree's splits and returns the value of every leaf along
         with the path of splits that led to the leaf
 
@@ -153,9 +105,9 @@ def dismantle_ensemble(sk_ensemble, **kwargs):
         by preorder-traversal; number of -2 represents a leaf, the other numbers are by
         the index of the column for the feature
 
+    :param sk_ensemble: scikit-learn ensemble model object
     :param feature_names (list): list of names (strings) of the features that were used
         to split the tree
-    :param sk_tree: scikit-learn tree object
     :param display_relation (bool): if marked false then only display feature else display
         the relation as well; if marked true, the path
     :param base_adjustment (numeric): shift all the values with a base value
@@ -168,7 +120,7 @@ def dismantle_ensemble(sk_ensemble, **kwargs):
     ensemble_of_leaves = []
     for estimator in sk_ensemble.estimators_:
         estimator = estimator[0]
-        ensemble_of_leaves.append(dismantle_tree(estimator, **kwargs))
+        ensemble_of_leaves.append(unravel_tree(estimator, **kwargs))
 
     return ensemble_of_leaves
 
@@ -196,6 +148,72 @@ def get_tree_predictions(sk_ensemble, X, adjust_with_base=False):
     return leaf_values + adjustment[:, np.newaxis]
 
 
+def aggregate_all_leaves(sk_ensemble, feature_names):
+    """ Iterate through all the leaves from the trees in an ensemble and
+        aggregate their values according to their paths as key values
+    """
+    unique_leaf_values = dict()
+
+    for estimator in sk_ensemble.estimators_:
+        estimator = estimator.ravel()[0]
+        estimator_leaves = unravel_tree(estimator, feature_names,
+                                        display_relation=True)
+
+        for leaf in estimator_leaves:
+            unique_leaf_values.setdefault(leaf.path.__str__(), []) \
+                              .append(leaf.value)
+
+    return unique_leaf_values
+
+
+def aggregate_activated_leaves(sk_ensemble, X, feature_names):
+    """ Iterate through the leaves activated from the data X and aggregate their
+        values according to their paths as key values
+    """
+    unique_leaf_values = dict()
+
+    # Get a matrix of all the leaves activated
+    all_activated_leaves = sk_ensemble.apply(X)
+    unraveled_ensemble = \
+        unravel_ensemble(sk_ensemble, feature_names=feature_names, display_relation=True)
+
+    # Iterate through the activated leaves for each data sample
+    for active_leaves in all_activated_leaves:
+
+        for estimator_ind, active_leaf_ind in enumerate(active_leaves):
+            active_leaf = unraveled_ensemble[estimator_ind][active_leaf_ind]
+            unique_leaf_values.setdefault(active_leaf.path.__str__(), []) \
+                              .append(active_leaf.value)
+
+    return unique_leaf_values
+
+
+# TODO
+def get_top_leafpaths(aggr_object, top=50, rank='abs_mean'):
+    """ Gather the top n leaves according to some rank function """
+
+    valid_rank = {
+        'abs_mean': lambda x: np.mean(abs(x)),
+        'mean': np.mean,
+        'std': np.std}
+
+    if isinstance(rank, str):
+        if rank not in valid_rank.keys():
+            raise ValueError("The passed rank ({}) argument is not a valid str {}"
+                             .format(rank, list(valid_rank.keys())))
+        rank = valid_rank[rank]
+    elif not callable(rank):
+        raise ValueError("The passed rank argument should be a callable function ",
+                         "taking a vector as an argument or a valid str {}"
+                         .format(list(valid_rank.keys())))
+
+    aggregated_ranks = dict()
+    # Gather the ranks
+    for key, values in aggr_object.items():
+        aggregated_ranks[key] = rank(values)
+    pass
+
+
 def node_relevance(sk_ensemble, X, y, feature_names, top_perc=0.3, error_thres=0.20,
                    n_most_relevant=100):
     """ Find the relevance of a certain node of a tree
@@ -205,14 +223,14 @@ def node_relevance(sk_ensemble, X, y, feature_names, top_perc=0.3, error_thres=0
     :param error_thres (float): the error threshold (%) used to judge whether
         or not a node is relevant
     """
-    # dismantle all trees of ensemble to get inner workings
+    # unravel all trees of ensemble to get inner workings
     leaf_counts, leaf_scores = [], []  # this will be used later
     ensemble_estimator_leaves = []
 
     for estimator in sk_ensemble.estimators_:
         estimator = estimator[0]
         estimator_nodes = \
-            dismantle_tree(estimator, feature_names, display_relation=True)
+            unravel_tree(estimator, feature_names, display_relation=True)
 
         n_nodes = len(estimator_nodes)
         ensemble_estimator_leaves.append(estimator_nodes)
