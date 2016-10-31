@@ -3,21 +3,8 @@
 
 """
 
-import time
 import logging
 from functools import wraps
-
-
-def timethis(func):
-    """ Decorator that reports the execution time """
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        start = time.time()
-        result = func(*args, **kwargs)
-        end = time.time()
-        print(func.__name__, end - start)
-        return result
-    return wrapper
 
 
 # I need to take the time to understand this sometime
@@ -65,12 +52,3 @@ def static_var(**kwargs):
             setattr(func, k, kwargs[k])
         return func
     return decorate
-
-
-@static_var(counter=0)
-def logstamp():
-    """ Returns a timestamp for the current time using time module
-    :returns: (string) timestamp of HH:MM:SS
-    """
-    logstamp.counter += 1
-    return "({}) [{}]".format(logstamp.counter, time.strftime('%D %H:%M:%S'))

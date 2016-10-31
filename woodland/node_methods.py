@@ -1,3 +1,4 @@
+import bpdb
 """
     Description:
         Methods for analyzing tree nodes following the Scikit-Learn API
@@ -148,11 +149,12 @@ def get_tree_predictions(sk_ensemble, X, adjust_with_base=False):
     return leaf_values + adjustment[:, np.newaxis]
 
 
-def aggregate_all_leaves(sk_ensemble, feature_names):
-    """ Iterate through all the leaves from the trees in an ensemble and
-        aggregate their values according to their paths as key values
+def aggregate_trained_leaves(sk_ensemble, feature_names):
+    """ Iterate through all the leaves from the trained trees in an ensemble
+        and aggregate their values according to their paths as key values
     """
-    unique_leaf_values = dict()
+    # dictionary with path as the key mapped to a list of values
+    leaf_dict = dict()
 
     for estimator in sk_ensemble.estimators_:
         estimator = estimator.ravel()[0]
@@ -160,17 +162,17 @@ def aggregate_all_leaves(sk_ensemble, feature_names):
                                         display_relation=True)
 
         for leaf in estimator_leaves:
-            unique_leaf_values.setdefault(leaf.path.__str__(), []) \
-                              .append(leaf.value)
+            leaf_dict.setdefault(leaf.path.__str__(), []) \
+                     .append(leaf.value)
 
-    return unique_leaf_values
+    return leaf_dict
 
 
 def aggregate_activated_leaves(sk_ensemble, X, feature_names):
     """ Iterate through the leaves activated from the data X and aggregate their
         values according to their paths as key values
     """
-    unique_leaf_values = dict()
+    leaf_dict = dict()
 
     # Get a matrix of all the leaves activated
     all_activated_leaves = sk_ensemble.apply(X)
@@ -182,10 +184,10 @@ def aggregate_activated_leaves(sk_ensemble, X, feature_names):
 
         for estimator_ind, active_leaf_ind in enumerate(active_leaves):
             active_leaf = unraveled_ensemble[estimator_ind][active_leaf_ind]
-            unique_leaf_values.setdefault(active_leaf.path.__str__(), []) \
-                              .append(active_leaf.value)
+            leaf_dict.setdefault(active_leaf.path.__str__(), []) \
+                     .append(active_leaf.value)
 
-    return unique_leaf_values
+    return leaf_dict
 
 
 # TODO
@@ -211,7 +213,7 @@ def get_top_leafpaths(aggr_object, top=50, rank='abs_mean'):
     # Gather the ranks
     for key, values in aggr_object.items():
         aggregated_ranks[key] = rank(values)
-    pass
+    bpdb.set_trace()  # ------------------------------ Breakpoint ------------------------------ #
 
 
 def node_relevance(sk_ensemble, X, y, feature_names, top_perc=0.3, error_thres=0.20,

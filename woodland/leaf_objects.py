@@ -19,8 +19,9 @@
     @author: Ricky
 """
 
-from copy import deepcopy
-from collections import OrderedDict
+import collections
+
+from ..core import LeafDictionary
 
 
 class SKTreeNode(object):
@@ -36,19 +37,22 @@ class SKTreeNode(object):
         :param value (numeric): the value associated with the node
         :param n_samples (int): the number of samples that reach the node
         """
-        self._node_repr = OrderedDict()
-        self._node_repr['path'] = path
-        self._node_repr['value'] = value
-        self._node_repr['n_samples'] = n_samples
+        self.__path = path
+        self.__value = value
+        self.__n_samples = n_samples
 
         self.__str_cache = None  # used to cache the string representation later
 
     def __str__(self):
         if self.__str_cache is None:
             node_strings = []
-            for key, val in self._node_repr.items():
+            keys = ["path", "value", "n_samples"]
+            values = [self.path, self.value, self.n_samples]
+
+            for key, val in zip(keys, values):
                 node_strings.append("{}: {}".format(key, val))
             self.__str_cache = "({})".format(', '.join(node_strings))
+
         return self.__str_cache
 
     def __repr__(self):
@@ -56,18 +60,18 @@ class SKTreeNode(object):
 
     @property
     def path(self):
-        return self._node_repr['path']
+        return self.__path
 
     @property
     def value(self):
-        return self._node_repr['value']
+        return self.__value
 
     @property
     def n_samples(self):
-        return self._node_repr['n_samples']
+        return self.__n_samples
 
 
-class LucidSKTree(object):
+class LucidSKTree(LeafDictionary):
     """ Object representation of the unraveled leaf nodes of a decision tree
         It is essentially a wrapper around a dictionary.
 
@@ -76,8 +80,9 @@ class LucidSKTree(object):
     ..note:
         The index of the leaf in the passed dictionary (tree_leaves) should be the index of
         the leaf in the pre-order traversal of the decision tree.
-
         The leaf's index is in set [0, k-1] where k is the # of nodes (inner & leaf nodes)
+
+        Shouldn't inherit from this class
     """
 
     def __init__(self, tree_leaves, print_limit=30):
@@ -89,54 +94,28 @@ class LucidSKTree(object):
         if not isinstance(tree_leaves, dict):
             raise ValueError("A dictionary object with keys mapped to SKTreeNodes should ",
                              "be passed into the constructor.")
+        # Check all the values mapped are SKTreeNodes
+        assert all(map(lambda x: isinstance(x, SKTreeNode), tree_leaves.values()))
+        super(LucidSKTree, self).__init__(tree_leaves, print_limit)
 
-        self.__dict = deepcopy(tree_leaves)
-        self.__str_cache = None  # used to cache the string representation later
-        self.__print_limit = print_limit  # limit for how many SKTreeNode objects to print
-        self.__len = len(tree_leaves)
 
-    def set_print_limit(self, print_limit):
-        if not isinstance(print_limit, int):
-            raise ValueError("The print_limit passed should be an integer.")
-        self.__print_limit = print_limit
-        self.__str_cache = None  # reset string cache
+class SKFoliage(LeafDictionary):
+    """ SKFoliage is an object to represent the aggregated leaves returned by
+        one of the aggregate functions ...
+        (i.e. aggregate_activated_leaves, aggregate_trained_leaves)
 
-    def keys(self):
-        return self.__dict.keys()
+    ..note: Shouldn't inherit from this class
+    """
 
-    def values(self):
-        return self.__dict.values()
+    def __init__(self, tree_leaves, print_limit=30):
+        """ Construct the LucidSKTree object using a dictionary object indexed
+            by the leaf's index in the pre-order traversal of the decision tree.
 
-    def items(self):
-        return self.__dict.items()
+            The leaf's index is in set [0, k-1] where k is the # of nodes (inner & leaf nodes)
+        """
+        if not isinstance(tree_leaves, dict):
+            raise ValueError("A dictionary object with keys mapped to lists of values should ",
+                             "be passed into the constructor.")
+        assert all(map(lambda x: isinstance(x, collections.Iterable), tree_leaves.values()))
 
-    def __getitem__(self, index):
-        self.__str_cache = None  # reset string cache
-        return self.__dict[index]
-
-    def __repr__(self):
-        return self.__str__()
-
-    def __len__(self):
-        return self.__len
-
-    def __str__(self):
-        if self.__str_cache is None:
-            dict_len = len(self.__dict)
-            n_top_display, n_bottom_display = dict_len, dict_len
-
-            # if limit violated, print half of print_limit at top and bottom
-            if len(self.__dict) > self.__print_limit:
-                n_top_display = self.__print_limit // 2
-                n_bottom_display = self.__print_limit - n_top_display
-
-            str_list = []
-            for cnt, item in enumerate(self.__dict.items()):
-                key, val = item
-                if cnt < n_top_display or cnt >= dict_len - n_bottom_display:
-                    str_list.append("[{}] {}".format(key, val))
-                elif cnt == n_top_display:
-                    str_list.append("...")
-            self.__str_cache = "\n".join(str_list)
-
-        return self.__str_cache
+        super(LucidSKTree, self).__init__(tree_leaves, print_limit)
