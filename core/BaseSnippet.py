@@ -8,7 +8,6 @@
 
 import six
 from abc import ABCMeta, abstractmethod
-from .ipynb_build import CellUnit
 
 
 def format_snippet(cell_tuples, run_flag):
@@ -20,6 +19,8 @@ def format_snippet(cell_tuples, run_flag):
     :param run_flag (bool): if True, run all the cells. Note it will take
         longer for program to run
     """
+    from .ipynb_build import CellUnit
+
     cell_units = []
     for tag, source in cell_tuples:
         if tag == 'code':
@@ -41,10 +42,13 @@ class BaseSnippet(object, six.with_metaclass(ABCMeta)):
 
 
 class ModelSnippet(BaseSnippet):
-    """ Base class to represent a snippet object """
+    """ Base class to represent a snippet object for a model;
+        The main difference is a ModelSnippet requires a model and
+        a path to access the pickle file containing the model.
+    """
 
     def pickle_file():
-        doc = "The pickle_file property."
+        doc = " The pickle_file property "
 
         def fget(self):
             """ The get function for retrieving pickle_file property """
@@ -60,6 +64,7 @@ class ModelSnippet(BaseSnippet):
             else:
                 raise ValueError("The pickle_file must be set as a string type.")
 
+        # Not sure if defining this function is a good idea
         def fdel(self):
             del self._pickle_file
 

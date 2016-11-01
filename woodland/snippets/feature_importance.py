@@ -124,13 +124,14 @@ class FeatureImportanceSnippet(ModelSnippet):
 
     @classmethod
     def display_info(cls):
-        """ Print out the parameters needed for the generate_snippet function """
-        print(cls.generate_snippet.__doc__)
+        """ Print out the parameters needed for the _generate_snippet function """
+        print(cls._generate_snippet.__doc__)
 
-    def generate_snippet(self, feature_names, features_to_display,
-                         model_id='sk_model', max_per_plot=10, run_flag=False,
-                         snippetmd_title='Feature Importance Analysis',
-                         plotsmd_title='Bar Plots'):
+    # The _generate_snippet function should not be called directly
+    def _generate_snippet(self, feature_names, features_to_display,
+                          model_id='sk_model', max_per_plot=10, run_flag=False,
+                          snippetmd_title='Feature Importance Analysis',
+                          plotsmd_title='Bar Plots'):
         """
         Details about the parameters needed for generating a FeatureImportanceSnippet:
 

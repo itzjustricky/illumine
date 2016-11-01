@@ -1,7 +1,6 @@
-import bpdb
 """
     Description:
-
+        Test the get_top_leaves method.
 
 
     @author: Ricky Chang
@@ -12,7 +11,6 @@ import numpy as np
 from sklearn import ensemble
 from sklearn import datasets
 from sklearn.utils import shuffle
-from sklearn.metrics import mean_squared_error
 
 from illumine import woodland
 
@@ -31,12 +29,10 @@ def main():
     clf = ensemble.GradientBoostingRegressor(**params)
     clf.fit(X_train, y_train)
 
-    unraveled_ensemble = woodland.unravel_ensemble(clf, feature_names=boston.feature_names, display_relation=True)
-    activated_leaves = woodland.aggregate_activated_leaves(clf, X_test, boston.feature_names)
-    # woodland.node_relevance(clf, X_test, y_test, boston.feature_names)
-
-    bpdb.set_trace()  # ------------------------------ Breakpoint ------------------------------ #
-    print("Done!")
+    trained_foliage = \
+        woodland.aggregate_trained_leaves(clf, feature_names=boston.feature_names)
+    top_leaves = woodland.get_top_leaves(trained_foliage, rank='count', n_top=50)
+    print(top_leaves)
 
 
 # Set main function for debugging if error

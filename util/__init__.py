@@ -1,5 +1,5 @@
 __all__ = ['date', 'func', 'statistical']
 
-from .date_tools import *
-from .func import *
+from .time_tools import *
+from .decorators import *
 from .statistical import *

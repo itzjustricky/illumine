@@ -39,21 +39,22 @@ class IPynbEnsembleManager(object):
     def pickle_file(self):
         return self._pickle_file
 
-    def add_snippet(self, snippet_cls, **kwargs):
+    def add_snippet(self, snippet_instance, **kwargs):
         """ Add a snippet or a cluster of pre-prepared cells.
 
-        :param snippet_cls: the class of the snippet, not an instance
+        :param snippet_instance: the instance of a snippet object
         """
-        if not issubclass(snippet_cls, BaseSnippet):
+        if not isinstance(snippet_instance, BaseSnippet):
             raise ValueError("An invalid snippet class was passed, the snippet class passed"
                              " should be derived from the BaseSnippet.")
-
-        snippet_instance = snippet_cls()
         # if it is a ModelSnippet, then it needs a pickle file
-        if issubclass(snippet_cls, ModelSnippet):
+        if isinstance(snippet_instance, ModelSnippet):
             snippet_instance.pickle_file = self._pickle_file
-        self._ipynb_manager.process_multiple_cells(snippet_instance.generate_snippet(**kwargs))
+
+        self._ipynb_manager.process_multiple_cells(
+            snippet_instance._generate_snippet(**kwargs))
 
     def save(self, notebook_name, version, **kwargs):
+        """ Save the IPython notebook """
         self._ipynb_manager.save("{}/{}".format(self._output_dir, notebook_name),
                                  version, **kwargs)

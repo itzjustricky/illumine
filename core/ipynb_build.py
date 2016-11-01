@@ -23,8 +23,6 @@ from IPython.nbformat.v4.nbbase import (
     new_code_cell, new_markdown_cell, new_notebook, new_raw_cell
 )
 
-from runipy.notebook_runner import (NotebookRunner, NotebookError)
-
 
 # control the possible cells the user can create
 CELLMAP = {
@@ -144,6 +142,8 @@ class IPynbCreationManager(object):
         :param write_kwargs: the key-word arguments to be passed to the
             IPython.nbformat.write method
         """
+        from runipy.notebook_runner import (NotebookRunner, NotebookError)
+
         nb_obj = new_notebook(cells=self.__cells, metadata={'language': 'python'})
         with codecs.open(output_path, mode='w') as fil:
             nbf.write(nb_obj, fil, version, **write_kwargs)
