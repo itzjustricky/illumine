@@ -7,7 +7,6 @@ import logging
 from functools import wraps
 
 
-# I need to take the time to understand this sometime
 def logged(level, name=None, message=None):
     """ Logging decorator for a function
 

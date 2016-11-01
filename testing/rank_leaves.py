@@ -31,8 +31,19 @@ def main():
 
     trained_foliage = \
         woodland.aggregate_trained_leaves(clf, feature_names=boston.feature_names)
-    top_leaves = woodland.get_top_leaves(trained_foliage, rank='count', n_top=50)
-    print(top_leaves)
+    activated_foliage = \
+        woodland.aggregate_activated_leaves(clf, X_test, feature_names=boston.feature_names)
+
+    n_unique_nodes = len(trained_foliage)
+    top_trained_leaves = woodland.get_top_leaves(trained_foliage, rank='count', n_top=50)
+    top_activated_leaves = woodland.get_top_leaves(activated_foliage, rank='count', n_top=len(trained_foliage))
+    print("Top Trained Leaves")
+    print(top_trained_leaves)
+    print("Top Activated Leaves")
+    print(top_activated_leaves)
+
+    unique_leaves = woodland.unique_leaves_per_sample(clf, X_train, boston.feature_names)
+    print(unique_leaves / n_unique_nodes)
 
 
 # Set main function for debugging if error

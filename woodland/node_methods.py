@@ -67,14 +67,14 @@ def unravel_tree(sk_tree, feature_names=None, display_relation=True,
     if feature_names is None:
         feature_names = np.arange(features.max() + 1)
 
-    visit_tracker = []  # a stack to track if all the children of a node is visited
+    tracker_stack = []  # a stack to track if all the children of a node is visited
     node_index, node_path = 0, []  # ptr_stack keeps track of nodes
     for node_index in range(n_splits):
-        if len(visit_tracker) != 0:
-            visit_tracker[-1] += 1  # visiting the child of the latest node
+        if len(tracker_stack) != 0:
+            tracker_stack[-1] += 1  # visiting the child of the latest node
 
         if features[node_index] != -2:  # visiting inner node
-            visit_tracker.append(0)
+            tracker_stack.append(0)
             if display_relation:
                 append_str = "{}<={}".format(feature_names[features[node_index]],
                                              float(round(thresholds[node_index], float_precision)))
@@ -89,9 +89,9 @@ def unravel_tree(sk_tree, feature_names=None, display_relation=True,
 
             if node_index in sk_tree.tree_.children_right:
                 # pop out nodes that I am completely done with
-                while(len(visit_tracker) > 0 and visit_tracker[-1] == 2):
+                while(len(tracker_stack) > 0 and tracker_stack[-1] == 2):
                     node_path.pop()
-                    visit_tracker.pop()
+                    tracker_stack.pop()
             if display_relation and len(node_path) != 0:
                 node_path[-1] = node_path[-1].replace("<=", ">")
 
@@ -202,9 +202,46 @@ def aggregate_activated_leaves(sk_ensemble, X, feature_names):
     return SKFoliage(leaf_dict)
 
 
+# I want to generalize this to get any measure per sample
+def unique_leaves_per_sample(sk_ensemble, X, feature_names, scale_by_total=True):
+    """ Iterate through the samples of data X and count the number
+        of unique leaf paths activated
+
+    :param sk_ensemble: scikit-learn ensemble model object
+    :param X: the feature matrix (Nxp) where N and p is the # of samples and
+        features, respectively
+    :param feature_names (list): list of names (strings) of the features that were used
+        to split the tree
+    :param scale_by_total (bool): indicate whether or not to scale by the total number
+        of unique leaves in the sk_ensemble
+    """
+    leaf_dict = dict()
+
+    # Get a matrix of all the leaves activated
+    all_activated_leaves = sk_ensemble.apply(X)
+    unraveled_ensemble = \
+        unravel_ensemble(sk_ensemble, feature_names=feature_names, display_relation=True)
+
+    # Nx1 matrix (where N is the # of samples) with counts of unique leaves per sample
+    X_leaf_counts = []
+    # Iterate through the activated leaves for each data sample
+    for active_leaves in all_activated_leaves:
+
+        tmp_leaf_set = set()
+        for estimator_ind, active_leaf_ind in enumerate(active_leaves):
+            active_leaf = unraveled_ensemble[estimator_ind][active_leaf_ind]
+            tmp_leaf_set.add(active_leaf.path.__str__())
+        X_leaf_counts.append(len(tmp_leaf_set))
+
+    return np.array(X_leaf_counts)
+
+
 def get_top_leaves(foliage_obj, n_top=50, rank='abs_sum'):
     """ Gather the top n leaves according to some rank function
 
+    :param sk_ensemble: scikit-learn ensemble model object
+    :param feature_names (list): list of names (strings) of the features that were used
+        to split the tree
     :param foliage_obj: an instance of SKFoliage that is outputted from
         aggregate_trained_leaves or aggregate_activated_leaves methods
     :param n_top: the number of leaves to display
