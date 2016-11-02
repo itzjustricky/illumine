@@ -6,8 +6,8 @@
     @author: Ricky Chang
 """
 
-import six
-from abc import ABCMeta, abstractmethod
+# import six
+# from abc import ABCMeta, abstractmethod
 
 
 def format_snippet(cell_tuples, run_flag):
@@ -31,14 +31,12 @@ def format_snippet(cell_tuples, run_flag):
     return cell_units
 
 
-class BaseSnippet(object, six.with_metaclass(ABCMeta)):
+# TODO: Want to make all BaseSnippet Derived classes have generate_snippet method
+# might do through hasattr way
+# class BaseSnippet(object, six.with_metaclass(ABCMeta)):
+class BaseSnippet(object):
     """ Base class to represent a snippet object """
-
-    @abstractmethod
-    def generate_snippet(self):
-        """ A method that should generate a snippet given
-            the unique arguments required by a Snippet object """
-        pass
+    pass
 
 
 class ModelSnippet(BaseSnippet):

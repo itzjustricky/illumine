@@ -37,7 +37,7 @@ def main():
 
     manager = IPynbEnsembleManager(clf, output_dir, 'clf_pickle.pkl')
     fi_snippet_kw = {'feature_names': names, 'features_to_display': [0, 3, 5, 6], 'run_flag': True}
-    manager.add_snippet(FeatureImportanceSnippet, **fi_snippet_kw)
+    manager.add_snippet(FeatureImportanceSnippet(), **fi_snippet_kw)
     manager.save(notebook_name="fi_notebook.ipynb", version=4)
 
 
