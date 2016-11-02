@@ -6,9 +6,7 @@
 import time
 import datetime
 import collections
-
 from numbers import Number
-from functools import wraps
 
 import numpy as np
 
@@ -62,18 +60,6 @@ def dates_by_year(date):
     :return: YYYY
     """
     return date // 10000
-
-
-def timethis(func):
-    """ Decorator that reports the execution time """
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        start = time.time()
-        result = func(*args, **kwargs)
-        end = time.time()
-        print(func.__name__, end - start)
-        return result
-    return wrapper
 
 
 @static_var(counter=0)

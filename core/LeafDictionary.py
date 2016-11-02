@@ -46,7 +46,7 @@ class LeafDictionary(object):
         the same underlying structure.
     """
 
-    def __init__(self, tree_leaves, print_limit=30, str_kw=None):
+    def __init__(self, tree_leaves, print_limit, create_deepcopy, str_kw=None):
         """ Construct the LucidSKTree object using a dictionary object indexed
             by the leaf's index in the pre-order traversal of the decision tree.
 
@@ -54,8 +54,10 @@ class LeafDictionary(object):
         """
         if not isinstance(tree_leaves, collections.Iterable):
             raise ValueError("The passed type {} is not iterable".format(type(tree_leaves)))
-
-        self._seq = deepcopy(tree_leaves)
+        if create_deepcopy:
+            self._seq = deepcopy(tree_leaves)
+        else:
+            self._seq = tree_leaves
         self.__str_cache = None  # used to cache the string representation later
         self.__len = len(tree_leaves)
         self.__print_limit = print_limit  # limit for how many SKTreeNode objects to print

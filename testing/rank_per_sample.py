@@ -1,6 +1,6 @@
 """
     Description:
-
+        Test the get_top_leaves method.
 
 
     @author: Ricky Chang
@@ -29,13 +29,9 @@ def main():
     clf = ensemble.GradientBoostingRegressor(**params)
     clf.fit(X_train, y_train)
 
-    trained_foliage = \
-        woodland.aggregate_trained_leaves(clf, feature_names=boston.feature_names)
-    activated_foliage = \
-        woodland.aggregate_activated_leaves(clf, X_train, feature_names=boston.feature_names)
-
-    print(trained_foliage)
-    print(activated_foliage)
+    top_leaf_samples = \
+        woodland.rank_per_sample(clf, X_train, boston.feature_names, n_top=3)
+    print(top_leaf_samples[0])
 
 
 # Set main function for debugging if error

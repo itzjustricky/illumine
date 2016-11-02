@@ -22,7 +22,8 @@ from .leaf_objects import LucidSKTree
 from .leaf_objects import LucidSKEnsemble
 
 __all__ = ['unravel_tree', 'unravel_ensemble', 'get_tree_predictions',
-           'aggregate_trained_leaves', 'aggregate_activated_leaves', 'get_top_leaves']
+           'aggregate_trained_leaves', 'aggregate_activated_leaves',
+           'rank_leaves', 'rank_per_sample']
 
 
 def unravel_tree(sk_tree, feature_names=None, display_relation=True,
@@ -68,7 +69,7 @@ def unravel_tree(sk_tree, feature_names=None, display_relation=True,
         feature_names = np.arange(features.max() + 1)
 
     tracker_stack = []  # a stack to track if all the children of a node is visited
-    node_index, node_path = 0, []  # ptr_stack keeps track of nodes
+    node_path = []  # ptr_stack keeps track of nodes
     for node_index in range(n_splits):
         if len(tracker_stack) != 0:
             tracker_stack[-1] += 1  # visiting the child of the latest node
@@ -161,9 +162,60 @@ def get_tree_predictions(sk_ensemble, X, adjust_with_base=False):
     return leaf_values + adjustment[:, np.newaxis]
 
 
-def aggregate_trained_leaves(sk_ensemble, feature_names):
+def _aggregate_activated_leaves(lucid_ensemble, X_activated, **foliage_kw):
+    """ Iterate through the leaves activated from the data X and aggregate their
+        values according to their paths as key values
+
+        The unravel_ensemble function is an expensive function to call, so
+        this part of the function was separated away.
+
+    :param X_activated: (N x k) matrix
+        where N, k are the # of samples, estimators respectively
+        It represents the leaves activated per data sample
+    :param lucid_ensemble: LucidSKEnsemble object which maps the tree index
+        number to a LucidSKTree object; this tree is used to access data
+        on the activated leaf nodes
+    """
+    leaf_dict = dict()
+
+    # Iterate through the activated leaves for each data sample
+    for active_leaves in X_activated:
+
+        for estimator_ind, active_leaf_ind in enumerate(active_leaves):
+            active_leaf = lucid_ensemble[estimator_ind][active_leaf_ind]
+            leaf_dict.setdefault(active_leaf.path.__str__(), []) \
+                     .append(active_leaf.value)
+
+    return SKFoliage(leaf_dict, **foliage_kw)
+
+
+def aggregate_activated_leaves(sk_ensemble, X, feature_names, **foliage_kw):
+    """ This method is used to abstract _aggregate_activated_leaves method.
+        Iterate through all the leaves from the trained trees in an ensemble
+        and aggregate their values according to their paths as key values
+
+    :param sk_ensemble: scikit-learn ensemble model object
+    :param feature_names (list): list of names (strings) of the features that
+        were used to split the tree
+    :param foliage_kw: TODO
+    """
+    # Get a matrix of all the leaves activated
+    all_activated_leaves = sk_ensemble.apply(X)
+    lucid_ensemble = \
+        unravel_ensemble(sk_ensemble, feature_names=feature_names, display_relation=True)
+
+    return _aggregate_activated_leaves(
+        lucid_ensemble, all_activated_leaves, **foliage_kw)
+
+
+def aggregate_trained_leaves(sk_ensemble, feature_names, **foliage_kw):
     """ Iterate through all the leaves from the trained trees in an ensemble
         and aggregate their values according to their paths as key values
+
+    :param sk_ensemble: scikit-learn ensemble model object
+    :param feature_names (list): list of names (strings) of the features that
+        were used to split the tree
+    :param foliage_kw: TODO
     """
     # dictionary with path as the key mapped to a list of values
     leaf_dict = dict()
@@ -177,32 +229,9 @@ def aggregate_trained_leaves(sk_ensemble, feature_names):
             leaf_dict.setdefault(leaf.path.__str__(), []) \
                      .append(leaf.value)
 
-    return SKFoliage(leaf_dict)
+    return SKFoliage(leaf_dict, **foliage_kw)
 
 
-def aggregate_activated_leaves(sk_ensemble, X, feature_names):
-    """ Iterate through the leaves activated from the data X and aggregate their
-        values according to their paths as key values
-    """
-    leaf_dict = dict()
-
-    # Get a matrix of all the leaves activated
-    all_activated_leaves = sk_ensemble.apply(X)
-    unraveled_ensemble = \
-        unravel_ensemble(sk_ensemble, feature_names=feature_names, display_relation=True)
-
-    # Iterate through the activated leaves for each data sample
-    for active_leaves in all_activated_leaves:
-
-        for estimator_ind, active_leaf_ind in enumerate(active_leaves):
-            active_leaf = unraveled_ensemble[estimator_ind][active_leaf_ind]
-            leaf_dict.setdefault(active_leaf.path.__str__(), []) \
-                     .append(active_leaf.value)
-
-    return SKFoliage(leaf_dict)
-
-
-# I want to generalize this to get any measure per sample
 def unique_leaves_per_sample(sk_ensemble, X, feature_names, scale_by_total=True):
     """ Iterate through the samples of data X and count the number
         of unique leaf paths activated
@@ -210,12 +239,11 @@ def unique_leaves_per_sample(sk_ensemble, X, feature_names, scale_by_total=True)
     :param sk_ensemble: scikit-learn ensemble model object
     :param X: the feature matrix (Nxp) where N and p is the # of samples and
         features, respectively
-    :param feature_names (list): list of names (strings) of the features that were used
-        to split the tree
-    :param scale_by_total (bool): indicate whether or not to scale by the total number
-        of unique leaves in the sk_ensemble
+    :param feature_names (list): list of names (strings) of the features that
+        were used to split the tree
+    :param scale_by_total (bool): indicate whether or not to scale by the
+        total number of unique leaves in the sk_ensemble
     """
-    leaf_dict = dict()
 
     # Get a matrix of all the leaves activated
     all_activated_leaves = sk_ensemble.apply(X)
@@ -236,45 +264,98 @@ def unique_leaves_per_sample(sk_ensemble, X, feature_names, scale_by_total=True)
     return np.array(X_leaf_counts)
 
 
-def get_top_leaves(foliage_obj, n_top=50, rank='abs_sum'):
-    """ Gather the top n leaves according to some rank function
+# TODO
+def gather_leaf_data(leaf_path, X, separate_by_sample=True):
+    """ Gather information about a leaf by leaf_path name instead of rank
+        from a SKFoliage object about a leaf_path
+    """
+    # Get a matrix of all the leaves activated
+    all_activated_leaves = sk_ensemble.apply(X)
+    lucid_ensemble = \
+        unravel_ensemble(sk_ensemble, feature_names=feature_names, display_relation=True)
+
+    for active_leaves in all_activated_leaves:
+        sample_foliage = \
+            _aggregate_activated_leaves(lucid_ensemble, active_leaves.reshape(1, -1),
+                                        create_deepcopy=False)
+    pass
+
+
+def rank_leaves(foliage_obj, n_top=50, rank_method='abs_sum', return_type='rank'):
+    """ Gather the n_top leaves according to some rank_method function
 
     :param sk_ensemble: scikit-learn ensemble model object
-    :param feature_names (list): list of names (strings) of the features that were used
-        to split the tree
+    :param feature_names (list): list of names (strings) of the features that
+        were used to split the tree
     :param foliage_obj: an instance of SKFoliage that is outputted from
         aggregate_trained_leaves or aggregate_activated_leaves methods
     :param n_top: the number of leaves to display
-    :param rank: the ranking method for the leafpaths
+    :param rank_method: the ranking method for the leafpaths
+    :param return_type (str): describes the value returned
     """
     if not isinstance(foliage_obj, SKFoliage):
         raise ValueError("The foliage_obj passed is of type {}".format(type(foliage_obj)),
                          "; it should be an instance of SKFoliage")
-    valid_rank = {
+    valid_rank_methods = {
         'abs_sum': lambda x: np.sum(np.abs(x)),
         'abs_mean': lambda x: np.mean(np.abs(x)),
         'mean': np.mean,
         'sum': np.sum,
         'std': np.std,
         'count': len}
+    valid_return_types = ['rank', 'values']
+    if return_type not in valid_return_types:
+        raise ValueError("The passed return_type ({}) is not valid".format(return_type),
+                         " must be one of the following {}".format(valid_return_types))
 
-    if isinstance(rank, str):
-        if rank not in valid_rank.keys():
-            raise ValueError("The passed rank ({}) argument is not a valid str {}"
-                             .format(rank, list(valid_rank.keys())))
-        rank = valid_rank[rank]
-    elif not callable(rank):
-        raise ValueError("The passed rank argument should be a callable function ",
+    if isinstance(rank_method, str):
+        if rank_method not in valid_rank_methods.keys():
+            raise ValueError("The passed rank_method ({}) argument is not a valid str {}"
+                             .format(rank_method, list(valid_rank_methods.keys())))
+        rank_method = valid_rank_methods[rank_method]
+    elif not callable(rank_method):
+        raise ValueError("The passed rank_method argument should be a callable function ",
                          "taking a vector as an argument or a valid str {}"
-                         .format(list(valid_rank.keys())))
+                         .format(list(valid_rank_methods.keys())))
 
     aggregated_ranks = []
     # Gather the ranks
     for leaf_path, values in foliage_obj.items():
         aggregated_ranks.append(
-            (leaf_path, rank(values)))
+            (leaf_path, rank_method(values)))
+    aggregated_rank = sorted(aggregated_ranks, key=operator.itemgetter(1), reverse=True)
 
-    top_leaf_paths = \
-        map(operator.itemgetter(0),
-            sorted(aggregated_ranks, key=operator.itemgetter(1), reverse=True))
-    return SKFoliage(OrderedDict(((path, foliage_obj[path]) for path in itertools.islice(top_leaf_paths, n_top))))
+    if return_type == 'rank':
+        return SKFoliage(OrderedDict(
+            ((path, rank) for path, rank in aggregated_rank[:n_top])))
+    else:  # return_type == 'values'
+        top_leaf_paths = map(operator.itemgetter(0), aggregated_rank)
+        return SKFoliage(OrderedDict(
+            ((path, foliage_obj[path]) for path in itertools.islice(top_leaf_paths, n_top))))
+
+
+def rank_per_sample(sk_ensemble, X, feature_names, **kwargs):
+    """ Gather and rank the leaves activated per sample in the X dataset
+
+    :param sk_ensemble: scikit-learn ensemble model object
+    :param feature_names (list): list of names (strings) of the features that
+        were used to split the tree
+    :param X: array_like or sparse matrix, shape = [n_samples, n_features]
+    :param n_top: the number of leaves to display
+    :param rank_method: the ranking method for the leafpaths
+    :returns: a list of SKFoliage objects that contain the n_top
+        leaf nodes per sample according to some rank_method
+    """
+    # Get a matrix of all the leaves activated
+    all_activated_leaves = sk_ensemble.apply(X)
+    lucid_ensemble = \
+        unravel_ensemble(sk_ensemble, feature_names=feature_names, display_relation=True)
+
+    top_leaf_samples = []
+    for active_leaves in all_activated_leaves:
+        sample_foliage = \
+            _aggregate_activated_leaves(lucid_ensemble, active_leaves.reshape(1, -1),
+                                        create_deepcopy=False)
+        top_leaf_samples.append(rank_leaves(foliage_obj=sample_foliage,
+                                            return_type='rank', **kwargs))
+    return top_leaf_samples

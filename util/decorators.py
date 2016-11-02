@@ -3,6 +3,7 @@
 
 """
 
+import time
 import logging
 from functools import wraps
 
@@ -35,6 +36,18 @@ def logged(level, name=None, message=None):
             return func(*args, **kwargs)
         return wrapper
     return decorate
+
+
+def timethis(func):
+    """ Decorator that reports the execution time """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        end = time.time()
+        print(func.__name__, end - start)
+        return result
+    return wrapper
 
 
 def static_var(**kwargs):
