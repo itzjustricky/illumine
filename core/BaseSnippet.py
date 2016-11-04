@@ -6,10 +6,11 @@
     @author: Ricky Chang
 """
 
-# import six
-# from abc import ABCMeta, abstractmethod
+import six
+from ..util.class_tools import AccessMeta
 
 
+# I should move this away from this module
 def format_snippet(cell_tuples, run_flag):
     """
 
@@ -31,12 +32,22 @@ def format_snippet(cell_tuples, run_flag):
     return cell_units
 
 
-# TODO: Want to make all BaseSnippet Derived classes have generate_snippet method
-# might do through hasattr way
-# class BaseSnippet(object, six.with_metaclass(ABCMeta)):
-class BaseSnippet(object):
-    """ Base class to represent a snippet object """
-    pass
+class BaseSnippet(object, six.with_metaclass(AccessMeta)):
+    """ Base class to represent a snippet object.
+        The derived classes should not override the __init__ function.
+    """
+
+    # The __init__ function here makes sure the generate_snippet is defined
+    @AccessMeta.final
+    def __init__(self):
+        if not hasattr(self, "generate_snippet"):
+            raise RuntimeError("Derived classes of BaseSnippet must have the"
+                               " generate_snippet method defined.")
+
+    @classmethod
+    def display_info(cls):
+        """ Print out the parameters needed for the generate_snippet function """
+        print(cls.generate_snippet.__doc__)
 
 
 class ModelSnippet(BaseSnippet):

@@ -52,7 +52,7 @@ class IPynbEnsembleManager(object):
             snippet_instance.pickle_file = self._pickle_file
 
         self._ipynb_manager.process_multiple_cells(
-            snippet_instance._generate_snippet(**kwargs))
+            snippet_instance.generate_snippet(**kwargs))
 
     def save(self, notebook_name, version, **kwargs):
         """ Save the IPython notebook """

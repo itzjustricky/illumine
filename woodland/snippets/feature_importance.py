@@ -122,16 +122,11 @@ class FeatureImportanceTemplate(object):
 class FeatureImportanceSnippet(ModelSnippet):
     """ Object to handle the preparation of the snippet for FeatureImportance """
 
-    @classmethod
-    def display_info(cls):
-        """ Print out the parameters needed for the _generate_snippet function """
-        print(cls._generate_snippet.__doc__)
-
-    # The _generate_snippet function should not be called directly
-    def _generate_snippet(self, feature_names, features_to_display,
-                          model_id='sk_model', max_per_plot=10, run_flag=False,
-                          snippetmd_title='Feature Importance Analysis',
-                          plotsmd_title='Bar Plots'):
+    # The generate_snippet function should not be called directly
+    def generate_snippet(self, feature_names, features_to_display,
+                         model_id='sk_model', max_per_plot=10, run_flag=False,
+                         snippetmd_title='Feature Importance Analysis',
+                         plotsmd_title='Bar Plots'):
         """
         Details about the parameters needed for generating a FeatureImportanceSnippet:
 
@@ -157,21 +152,24 @@ class FeatureImportanceSnippet(ModelSnippet):
         pickle_file = self._pickle_file
         fi_template = FeatureImportanceTemplate.get_template()
 
+        def formatter(pair, *format_args):
+            return format_pair(pair, format_index=1, *format_args)
+
         # Delete the markdown cells if no title is provided
         if snippetmd_title is None:
             fi_template.pop('snippet-title')
         else:
-            fi_template['snippet-title'] = format_pair(fi_template['snippet-title'], 1,
-                                                       snippetmd_title)
+            fi_template['snippet-title'] = \
+                formatter(fi_template['snippet-title'], snippetmd_title)
         if plotsmd_title is None:
             fi_template.pop('plots-title')
         else:
-            fi_template['plots-title'] = format_pair(fi_template['plots-title'], 1,
-                                                     plotsmd_title)
+            fi_template['plots-title'] = \
+                formatter(fi_template['plots-title'], plotsmd_title)
 
-        fi_template['load-cell'] = format_pair(fi_template['load-cell'], 1, model_id,
-                                               pickle_file, feature_names.__str__().replace('\n', ''))
-        fi_template['adjust-cell'] = format_pair(fi_template['adjust-cell'], 1,
-                                                 features_to_display, max_per_plot)
+        fi_template['load-cell'] = \
+            formatter(fi_template['load-cell'], model_id, pickle_file, feature_names.__str__().replace('\n', ''))
+        fi_template['adjust-cell'] = \
+            formatter(fi_template['adjust-cell'], features_to_display, max_per_plot)
 
         return format_snippet(list(fi_template.values()), run_flag)
