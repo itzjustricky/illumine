@@ -23,7 +23,7 @@ from .leaf_objects import LucidSKTree
 from .leaf_objects import LucidSKEnsemble
 
 __all__ = ['unravel_tree', 'unravel_ensemble', 'get_tree_predictions',
-           'aggregate_trained_leaves', 'aggregate_activated_leaves',
+           'aggregate_trained_leaves', 'aggregate_tested_leaves',
            'rank_leaves', 'rank_per_sample']
 
 
@@ -163,7 +163,7 @@ def get_tree_predictions(sk_ensemble, X, adjust_with_base=False):
     return leaf_values + adjustment[:, np.newaxis]
 
 
-def _aggregate_activated_leaves(lucid_ensemble, X_activated, considered_leaves=None, **foliage_kw):
+def _aggregate_tested_leaves(lucid_ensemble, X_activated, considered_leaves=None, **foliage_kw):
     """ Iterate through the leaves activated from the data X and aggregate their
         values according to their paths as key values
 
@@ -195,8 +195,8 @@ def _aggregate_activated_leaves(lucid_ensemble, X_activated, considered_leaves=N
         return SKFoliage(dict(leaf_dict[key] for key in considered_leaves), **foliage_kw)
 
 
-def aggregate_activated_leaves(sk_ensemble, X, feature_names, considered_leaves=None, **foliage_kw):
-    """ This method is used to abstract _aggregate_activated_leaves method.
+def aggregate_tested_leaves(sk_ensemble, X, feature_names, considered_leaves=None, **foliage_kw):
+    """ This method is used to abstract _aggregate_tested_leaves method.
         Iterate through all the leaves from the trained trees in an ensemble
         and aggregate their values according to their paths as key values
 
@@ -212,7 +212,7 @@ def aggregate_activated_leaves(sk_ensemble, X, feature_names, considered_leaves=
     lucid_ensemble = \
         unravel_ensemble(sk_ensemble, feature_names=feature_names, display_relation=True)
 
-    return _aggregate_activated_leaves(
+    return _aggregate_tested_leaves(
         lucid_ensemble, all_activated_leaves, considered_leaves, **foliage_kw)
 
 
@@ -285,7 +285,7 @@ def rank_leaves(foliage_obj, n_top=50, rank_method='abs_sum', return_type='rank'
     :param feature_names (list): list of names (strings) of the features that
         were used to split the tree
     :param foliage_obj: an instance of SKFoliage that is outputted from
-        aggregate_trained_leaves or aggregate_activated_leaves methods
+        aggregate_trained_leaves or aggregate_tested_leaves methods
     :param n_top: the number of leaves to display
     :param rank_method: the ranking method for the leafpaths
     :param return_type (str): describes the value returned
@@ -355,8 +355,8 @@ def rank_per_sample(sk_ensemble, X, feature_names, considered_leaves=None, **kwa
     top_leaf_samples = []
     for active_leaves in all_activated_leaves:
         sample_foliage = \
-            _aggregate_activated_leaves(lucid_ensemble, active_leaves.reshape(1, -1),
-                                        considered_leaves=considered_leaves, create_deepcopy=False)
+            _aggregate_tested_leaves(lucid_ensemble, active_leaves.reshape(1, -1),
+                                     considered_leaves=considered_leaves, create_deepcopy=False)
         top_leaf_samples.append(rank_leaves(foliage_obj=sample_foliage,
                                             return_type='rank', **kwargs))
     return top_leaf_samples
