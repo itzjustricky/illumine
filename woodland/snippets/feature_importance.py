@@ -4,8 +4,7 @@
         into an IPython notebook.
 
     TODO:
-        * Change it so that the get_snippet function is done as a class method;
-            should probably just combine the two classes below
+        * Create a class for holding the items in the snippet_dict
 
     @author: Ricky Chang
 """
@@ -14,18 +13,6 @@ from copy import deepcopy
 from collections import OrderedDict
 
 from ...core import (ModelSnippet, format_snippet)
-
-
-def format_pair(pair, format_index, *format_args):
-    if len(pair) != 2:
-        raise ValueError("The length > 2, this is not a pair.")
-
-    formatted_item = pair[format_index].format(*format_args)
-
-    if format_index == 0:
-        return (formatted_item, pair[1])
-    else:
-        return (pair[0], formatted_item)
 
 
 class FeatureImportanceTemplate(object):
@@ -152,8 +139,12 @@ class FeatureImportanceSnippet(ModelSnippet):
         pickle_file = self._pickle_file
         fi_template = FeatureImportanceTemplate.get_template()
 
+        # Use to format the items in the template
         def formatter(pair, *format_args):
-            return format_pair(pair, format_index=1, *format_args)
+            if len(pair) != 2:
+                raise ValueError("The length > 2, this is not a pair.")
+            formatted_item = pair[1].format(*format_args)
+            return (pair[0], formatted_item)
 
         # Delete the markdown cells if no title is provided
         if snippetmd_title is None:

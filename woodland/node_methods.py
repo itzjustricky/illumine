@@ -149,10 +149,8 @@ def get_tree_predictions(sk_ensemble, X, adjust_with_base=False):
         estimator; by default, in most sklearn ensemble objects, the first prediction
         is the mean of the target in the training data
     """
-    if adjust_with_base:
-        adjustment = sk_ensemble.init_.predict(X).ravel()
-    else:
-        adjustment = np.zeros(X.shape[0])
+    if adjust_with_base: adjustment = sk_ensemble.init_.predict(X).ravel()
+    else: adjustment = np.zeros(X.shape[0])
 
     leaf_values = np.zeros((X.shape[0], sk_ensemble.n_estimators))
 

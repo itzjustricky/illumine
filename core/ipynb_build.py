@@ -9,6 +9,7 @@
         * I can only save as v3 ... conflict of attributes
             - should make own ipython notebook runner only for v4
             - runipy seems to be poorly written
+        * Make requirement of v4 IPython notebooks
 
     @author: Ricky
 """
@@ -18,8 +19,8 @@ import codecs
 
 from textwrap import dedent
 
-import IPython.nbformat as nbf
-from IPython.nbformat.v4.nbbase import (
+import nbformat as nbf
+from nbformat.v4.nbbase import (
     new_code_cell, new_markdown_cell, new_notebook, new_raw_cell
 )
 
