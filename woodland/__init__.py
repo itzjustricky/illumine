@@ -3,9 +3,8 @@
     ensemble models.
 """
 
-__all__ = ['TreeTrainer', 'IPynbEnsembleManager', 'node_methods', 'snippets']
+__all__ = ['IPynbEnsembleManager', 'node_methods', 'snippets']
 
-from .TreeTrainer import TreeTrainer
 from .IPynbEnsembleManager import IPynbEnsembleManager
 
 from .snippets import FeatureImportanceSnippet
