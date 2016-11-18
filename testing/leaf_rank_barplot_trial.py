@@ -34,7 +34,8 @@ def main():
     trained_foliage = \
         woodland.aggregate_trained_leaves(clf, feature_names=boston.feature_names)
 
-    illumine.visual.plot_leaf_rank(trained_foliage)
+    illumine.visual.leaf_rank_barplot(trained_foliage, n_top=10,
+                                      path_output_file="top_leaf_paths.txt")
     plt.show()
 
 

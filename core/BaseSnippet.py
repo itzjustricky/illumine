@@ -73,10 +73,6 @@ class ModelSnippet(BaseSnippet):
             else:
                 raise ValueError("The pickle_file must be set as a string type.")
 
-        # Not sure if defining this function is a good idea
-        def fdel(self):
-            del self._pickle_file
-
         return locals()
 
     pickle_file = property(**pickle_file())

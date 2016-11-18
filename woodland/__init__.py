@@ -12,9 +12,9 @@ from .snippets import FeatureImportanceSnippet
 from .node_methods import unravel_tree
 from .node_methods import unravel_ensemble
 from .node_methods import get_tree_predictions
-from .node_methods import aggregate_trained_leaves
-from .node_methods import aggregate_tested_leaves
 from .node_methods import unique_leaves_per_sample
-from .node_methods import rank_leaves
-from .node_methods import rank_per_sample
-# from .node_methods import *
+
+from .leaf_analysis import rank_leaves
+from .leaf_analysis import aggregate_trained_leaves
+from .leaf_analysis import aggregate_tested_leaves
+from .leaf_analysis import rank_per_sample
