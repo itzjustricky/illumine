@@ -3,4 +3,6 @@
 tags
 *.txt
 
-# __pycache__/
+# Python cache files
+__pycache__/
+*.pyc
