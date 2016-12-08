@@ -7,7 +7,6 @@
 """
 
 import operator
-from textwrap import dedent
 
 import numpy as np
 

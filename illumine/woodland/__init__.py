@@ -7,7 +7,7 @@ __all__ = ['IPynbEnsembleManager', 'node_methods', 'snippets']
 
 from .IPynbEnsembleManager import IPynbEnsembleManager
 
-from .snippets import FeatureImportanceSnippet
+# from .snippets import FeatureImportanceSnippet
 
 from .node_methods import unravel_tree
 from .node_methods import unravel_ensemble

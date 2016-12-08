@@ -40,9 +40,13 @@ class BaseSnippet(object, six.with_metaclass(AccessMeta)):
     # The __init__ function here makes sure the generate_snippet is defined
     @AccessMeta.final
     def __init__(self):
+        # check to see Snippet has a generate_snippet function
         if not hasattr(self, "generate_snippet"):
-            raise RuntimeError("Derived classes of BaseSnippet must have the"
-                               " generate_snippet method defined.")
+            raise AttributeError("Derived classes of BaseSnippet must have the "
+                                 "generate_snippet method defined.")
+            # check it is callable
+            if not getattr(self, "generate_snippet"):
+                raise AttributeError("generate_snippet should be callable")
 
     @classmethod
     def display_info(cls):

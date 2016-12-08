@@ -17,6 +17,7 @@
 import os
 import codecs
 
+from copy import deepcopy
 from textwrap import dedent
 
 import nbformat as nbf
@@ -33,6 +34,10 @@ CELLMAP = {
 }
 
 
+def get_cellmap():
+    return deepcopy(CELLMAP)
+
+
 class CellUnit(object):
     """ Object to store the information of a cell
         before it is created as
@@ -44,10 +49,10 @@ class CellUnit(object):
             :param source (string): the source to be outputted in the cell
             :param run_flag (bool): whether or not to capture the output with the cell
         """
-        global CELLMAP
-        if tag not in CELLMAP.keys():
+        cellmap = get_cellmap()
+        if tag not in cellmap.keys():
             raise ValueError("An invalid tag {} was passed. tag must be one of the following {}"
-                             .format(tag, list(CELLMAP.keys())))
+                             .format(tag, list(cellmap.keys())))
         if not isinstance(source, str):
             raise ValueError("source ({}) should be a string".format(source))
         if not isinstance(run_flag, bool):
@@ -106,12 +111,12 @@ class IPynbCreationManager(object):
             raise ValueError("The cell_unit needs to be an instance of CellUnit object")
         cell_tag, cell_source, run_flag = cell_unit.get_attributes()
 
-        global CELLMAP
-        if cell_tag not in CELLMAP.keys():
+        cellmap = get_cellmap()
+        if cell_tag not in cellmap.keys():
             raise ValueError("An invalid cell_tag {} was passed. cell_tag must be one of the following {}"
-                             .format(cell_tag, list(CELLMAP.keys())))
+                             .format(cell_tag, list(cellmap.keys())))
         cell_source = dedent(cell_source).strip()  # format the cell
-        self.__cells.append(CELLMAP[cell_tag](source=cell_source, **cell_kws))
+        self.__cells.append(cellmap[cell_tag](source=cell_source, **cell_kws))
 
         # Only run the code cells should be run
         if run_flag is True and cell_tag != 'code':
@@ -123,17 +128,19 @@ class IPynbCreationManager(object):
         for cell_unit in cell_units:
             self.process_cell(cell_unit)
 
-    def iterate_run_cells(self):
+    def _iterate_run_cells(self):
         """ Iterate through the cells where the run_flags were set to True """
         if self._nb_runner is None:
-            raise AttributeError("Trying to reference NotebookRunner object was referenced before creation")
+            raise AttributeError(
+                "Trying to reference NotebookRunner object "
+                "was referenced before creation")
 
-        for ws in self._nb_runner.nb.worksheets:
-            for run_flag, cell in zip(self.__cell_run_flags, ws.cells):
-                if run_flag is True:  # more aligned with English language
-                    yield cell
+        # for ws in self._nb_runner.nb.worksheets:
+        for run_flag, cell in zip(self.__cell_run_flags, self._nb_runner.nb.cells):
+            if run_flag is True:
+                yield cell
 
-    def save(self, output_path, version, skip_exceptions=False, write_kwargs=dict()):
+    def save(self, output_path, version, skip_exceptions=False, write_kwargs=None):
         """ Save the ipython notebook object into a file
 
         :param output_path (string): the string of the path of where to output
@@ -143,19 +150,22 @@ class IPynbCreationManager(object):
         :param write_kwargs: the key-word arguments to be passed to the
             IPython.nbformat.write method
         """
-        from runipy.notebook_runner import (NotebookRunner, NotebookError)
+        from ..externals.runipy.notebook_runner import NotebookRunner
+        from ..externals.runipy.notebook_runner import NotebookError
+
+        if write_kwargs is None:
+            write_kwargs = dict()
 
         nb_obj = new_notebook(cells=self.__cells, metadata={'language': 'python'})
         with codecs.open(output_path, mode='w') as fil:
             nbf.write(nb_obj, fil, version, **write_kwargs)
 
         # run the cells with run_cells set to True
-        if sum(self.__cell_run_flags) != 0:  # if not all run_cells are set to False
-            # temporarily change the working directory
-
-            self._nb_runner = NotebookRunner(nb=nbf.read(open(output_path), as_version=3),
-                                             working_dir=os.path.dirname(output_path))
-            for i, cell in enumerate(self.iterate_run_cells()):
+        if any(self.__cell_run_flags):
+            self._nb_runner = NotebookRunner(
+                nb=nbf.read(open(output_path), as_version=4),
+                working_dir=os.path.dirname(output_path))
+            for i, cell in enumerate(self._iterate_run_cells()):
                 try:
                     self._nb_runner.run_cell(cell)
                 except NotebookError as err:
@@ -163,5 +173,5 @@ class IPynbCreationManager(object):
                         raise NotebookError(err)
             nbf.write(self._nb_runner.nb,
                       codecs.open(output_path, mode='w'),
-                      version=3)
+                      version=4)
             self._nb_runner.shutdown_kernel()

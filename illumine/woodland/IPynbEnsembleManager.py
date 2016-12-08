@@ -11,8 +11,8 @@
 import os
 import pickle
 
-from ..core import (BaseSnippet, ModelSnippet)
-from ..core import IPynbCreationManager
+from ..ipy_admin import (BaseSnippet, ModelSnippet)
+from ..ipy_admin import IPynbCreationManager
 
 
 class IPynbEnsembleManager(object):
