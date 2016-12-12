@@ -13,8 +13,8 @@ from collections import OrderedDict
 import numpy as np
 
 from .leaf_objects import SKFoliage
-from .node_methods import make_LucidSKTree
-from .node_methods import make_LucidSKEnsemble
+from .factory_methods import make_LucidSKTree
+from .factory_methods import make_LucidSKEnsemble
 
 __all__ = ['aggregate_trained_leaves', 'aggregate_tested_leaves',
            'rank_leaves', 'rank_per_sample']

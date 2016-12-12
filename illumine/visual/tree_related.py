@@ -11,7 +11,7 @@ import operator
 import numpy as np
 
 from ..woodland.leaf_objects import SKFoliage
-from ..woodland.node_methods import get_tree_predictions
+from ..woodland.factory_methods import get_tree_predictions
 from ..woodland.leaf_analysis import rank_leaves
 
 
