@@ -17,7 +17,8 @@ from .factory_methods import make_LucidSKTree
 from .factory_methods import make_LucidSKEnsemble
 
 __all__ = ['aggregate_trained_leaves', 'aggregate_tested_leaves',
-           'rank_leaves', 'rank_per_sample']
+           'rank_leaves', 'rank_per_sample',
+           'get_tree_predictions', 'unique_leaves_per_sample']
 
 
 def _aggregate_tested_leaves(lucid_ensemble, X_activated, considered_leaves=None, **foliage_kw):
@@ -187,3 +188,56 @@ def rank_per_sample(sk_ensemble, X, feature_names, considered_leaves=None, **kwa
         top_leaf_samples.append(rank_leaves(foliage_obj=sample_foliage,
                                             return_type='rank', **kwargs))
     return top_leaf_samples
+
+
+def get_tree_predictions(sk_ensemble, X, adjust_with_base=False):
+    """ Retrieve the tree predictions of each tree in the ensemble
+
+    :param sk_ensemble: scikit-learn tree object
+    :param X: array_like or sparse matrix, shape = [n_samples, n_features]
+    :param adjust_with_init (bool): whether or not to adjust with the base/initial
+        estimator; by default, in most sklearn ensemble objects, the first prediction
+        is the mean of the target in the training data
+    """
+    if adjust_with_base: adjustment = sk_ensemble.init_.predict(X).ravel()
+    else: adjustment = np.zeros(X.shape[0])
+
+    leaf_values = np.zeros((X.shape[0], sk_ensemble.n_estimators))
+
+    for ind, estimator in enumerate(sk_ensemble.estimators_):
+        estimator = estimator[0]
+        leaf_values[:, ind] = estimator.predict(X)
+
+    return leaf_values + adjustment[:, np.newaxis]
+
+
+def unique_leaves_per_sample(sk_ensemble, X, feature_names, scale_by_total=True):
+    """ Iterate through the samples of data X and count the number
+        of unique leaf paths activated
+
+    :param sk_ensemble: scikit-learn ensemble model object
+    :param X: the feature matrix (Nxp) where N and p is the # of samples and
+        features, respectively
+    :param feature_names (list): list of names (strings) of the features that
+        were used to split the tree
+    :param scale_by_total (bool): indicate whether or not to scale by the
+        total number of unique leaves in the sk_ensemble
+    """
+
+    # Get a matrix of all the leaves activated
+    all_activated_leaves = sk_ensemble.apply(X)
+    unraveled_ensemble = \
+        make_LucidSKEnsemble(sk_ensemble, feature_names=feature_names, display_relation=True)
+
+    # Nx1 matrix (where N is the # of samples) with counts of unique leaves per sample
+    X_leaf_counts = []
+    # Iterate through the activated leaves for each data sample
+    for active_leaves in all_activated_leaves:
+
+        tmp_leaf_set = set()
+        for estimator_ind, active_leaf_ind in enumerate(active_leaves):
+            active_leaf = unraveled_ensemble[estimator_ind][active_leaf_ind]
+            tmp_leaf_set.add(active_leaf.path.__str__())
+        X_leaf_counts.append(len(tmp_leaf_set))
+
+    return np.array(X_leaf_counts)

@@ -6,9 +6,9 @@
 
 from .factory_methods import make_LucidSKTree
 from .factory_methods import make_LucidSKEnsemble
-from .factory_methods import get_tree_predictions
-from .factory_methods import unique_leaves_per_sample
 
+from .leaf_analysis import get_tree_predictions
+from .leaf_analysis import unique_leaves_per_sample
 from .leaf_analysis import rank_leaves
 from .leaf_analysis import aggregate_trained_leaves
 from .leaf_analysis import aggregate_tested_leaves

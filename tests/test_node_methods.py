@@ -14,6 +14,7 @@ from sklearn.ensemble import GradientBoostingRegressor
 
 from illumine.woodland import make_LucidSKTree
 from illumine.woodland import make_LucidSKEnsemble
+from illumine.util import StopWatch
 
 
 def test_LucidSKTree():
@@ -27,6 +28,7 @@ def test_LucidSKTree():
     clf = DecisionTreeRegressor()
     clf.fit(X_df, y)
 
+    # test prediction outputted from LucidSKTree
     lucid_tree = make_LucidSKTree(
         clf, feature_names=X_df.columns, float_precision=8)
     lucid_pred = lucid_tree.predict(X_df)
@@ -48,23 +50,25 @@ def test_LucidSKEnsemble():
 
     lucid_ensemble = make_LucidSKEnsemble(
         clf, feature_names=X_df.columns, float_precision=8)
-    lucid_pred = lucid_ensemble.predict(X_df)
-    sk_pred = clf.predict(X_df)
+
+    with StopWatch("Scikit-learn session"):
+        sk_pred = clf.predict(X_df)
+    with StopWatch("Lucid session (non-compressed)"):
+        lucid_pred = lucid_ensemble.predict(X_df)
+    # test prediction outputted from LucidSKEnsemble
+    np.testing.assert_almost_equal(lucid_pred.values, sk_pred)
+
+    lucid_ensemble.compress()
+    print("{} unique nodes and {} tree estimators"
+          .format(len(lucid_ensemble._compressed_ensemble),
+                  len(lucid_ensemble)))
+
+    with StopWatch("Lucid session (compressed)"):
+        lucid_pred = lucid_ensemble.predict(X_df)
+    # test the compressed prediction
     np.testing.assert_almost_equal(lucid_pred.values, sk_pred)
 
 
-# Set main function for debugging if error
-import bpdb, sys, traceback
-if __name__ == "__main__":
-    try:
-        test_LucidSKTree()
-        test_LucidSKEnsemble()
-    except:
-        type, value, tb = sys.exc_info()
-        traceback.print_exc()
-        bpdb.post_mortem(tb)
-"""
 if __name__ == "__main__":
     test_LucidSKTree()
     test_LucidSKEnsemble()
-"""

@@ -8,7 +8,6 @@
     @author: Ricky
 """
 
-from copy import deepcopy
 from collections import Iterable
 from collections import OrderedDict
 
@@ -114,10 +113,10 @@ class LucidSKTree(LeafDictionary):
         if not all(X_df.columns == self.feature_names):
             raise ValueError("The passed dataframe should")
 
-        pred_df = deepcopy(X_df)
+        X_df_copy = X_df.reset_index(drop=True)
         y_pred = Series(np.zeros(X_df.shape[0]))
-        for leaf_ind, leaf_node in self.items():
-            inds_to_set = pred_df.query(' & '.join(leaf_node.path)).index
+        for leaf_node in self.values():
+            inds_to_set = X_df_copy.query(' & '.join(leaf_node.path)).index
             y_pred.loc[inds_to_set] += leaf_node.value
         return y_pred
 
@@ -175,6 +174,10 @@ class LucidSKEnsemble(LeafDictionary):
         super(LucidSKEnsemble, self).__init__(
             tree_ensemble, print_limit, create_deepcopy, str_kw)
 
+    @property
+    def feature_names(self):
+        return self._feature_names
+
     def predict(self, X_df):
         y_pred = Series(np.zeros(X_df.shape[0]))
 
@@ -196,9 +199,13 @@ class LucidSKEnsemble(LeafDictionary):
         """
         unique_leaves = OrderedDict()
         for lucid_tree in self:
-            leaf_path = lucid_tree.path
-            unique_leaves[leaf_path] = \
-                unique_leaves.get(leaf_path, 0) + lucid_tree.value
+            for leaf_node in lucid_tree.values():
+                # sort to make path uniques since splits in different
+                # orders are still equivalent decision trees
+                leaf_path = ' & '.join(sorted(leaf_node.path))
+                unique_leaves[leaf_path] = \
+                    unique_leaves.get(leaf_path, 0) \
+                    + self._learning_rate * leaf_node.value
 
         self._compressed_ensemble = CompressedEnsemble(
             unique_leaves, self.feature_names, **kwargs)
@@ -243,7 +250,6 @@ class SKFoliage(LeafDictionary):
             tree_leaves, print_limit, create_deepcopy, str_kw)
 
 
-# TODO
 class CompressedEnsemble(LeafDictionary):
     """ Compressed Ensemble Tree created from
         LucidSKEnsemble.compress() method
@@ -272,6 +278,18 @@ class CompressedEnsemble(LeafDictionary):
     def feature_names(self):
         return self._feature_names
 
-    # TODO
     def predict(self, X_df):
-        pass
+        """ Create predictions from a pandas DataFrame.
+            The DataFrame should have the same.
+        """
+        if not isinstance(X_df, DataFrame):
+            raise ValueError("Predictions must be done on a Pandas dataframe")
+        if not all(X_df.columns == self.feature_names):
+            raise ValueError("The passed dataframe should")
+
+        X_df_copy = X_df.reset_index(drop=True)
+        y_pred = Series(np.zeros(X_df_copy.shape[0]))
+        for leaf_path, leaf_value in self.items():
+            inds_to_set = X_df_copy.query(leaf_path).index
+            y_pred.loc[inds_to_set] += leaf_value
+        return y_pred
