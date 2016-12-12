@@ -216,9 +216,14 @@ class SKFoliage(LeafDictionary):
             to some data associated with the leaf nodes.
         It is essentially a wrapper around a dict where the ...
 
-        key: Is the path to the unique leaf node, i.e.
-            string repr. of ['PTRATIO>18.75', 'DIS>1.301', 'AGE>44.9', 'TAX<=368.0']
-            where PTRATIO, DIS, AGE, & TAX are feature names
+        key: the path to the unique leaf node. Example:
+            The list representation might be
+            ['PTRATIO>18.75', 'DIS>1.301', 'AGE>44.9', 'TAX<=368.0'],
+            which will then be represented as a string in the following way
+            'AGE>44.9 & DIS>1.301 & PTRATIO>18.75 & TAX<=368.0'.
+
+            Where PTRATIO, DIS, AGE, & TAX are feature names
+
         value: Can be anything that describes some characteristics of the leaf node.
             For example, aggregate_trained_leaves finds all the instances of a certain leaf path
                 of a trained ensemble and aggregates the leaf values. The aggregate_activated_leaves
@@ -242,7 +247,7 @@ class SKFoliage(LeafDictionary):
             (inner & leaf nodes)
         """
         if not isinstance(tree_leaves, dict):
-            raise ValueError("A dictionary object with keys mapped to lists ",
+            raise ValueError("A dictionary object with keys mapped to lists "
                              "of values should be passed into the constructor.")
         str_kw = {"print_format": "path: {}\n{}"}
 

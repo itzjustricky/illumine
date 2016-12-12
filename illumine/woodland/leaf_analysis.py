@@ -7,23 +7,23 @@
 """
 
 import operator
-import itertools
+from collections import Iterable
 from collections import OrderedDict
 
 import numpy as np
 
 from .leaf_objects import SKFoliage
-from .factory_methods import make_LucidSKTree
+from .leaf_objects import LucidSKEnsemble
 from .factory_methods import make_LucidSKEnsemble
 
-__all__ = ['aggregate_trained_leaves', 'aggregate_tested_leaves',
-           'rank_leaves', 'rank_per_sample',
+__all__ = ['gather_leaf_values', 'rank_leaves', 'rank_leaves_per_point',
            'get_tree_predictions', 'unique_leaves_per_sample']
 
 
-def _aggregate_tested_leaves(lucid_ensemble, X_activated, considered_leaves=None, **foliage_kw):
-    """ Iterate through the leaves activated from the data X and aggregate their
-        values according to their paths as key values
+# this method is not meant to be called outside this module
+def _gather_leaf_values(lucid_ensemble, X_activated, considered_leaves=None, **foliage_kw):
+    """ Iterate through the leaves activated from the data X and gather
+        their values according to their paths as key values
 
         The make_LucidSKEnsemble function is an expensive function to call, so
         this part of the function was separated away.
@@ -35,28 +35,33 @@ def _aggregate_tested_leaves(lucid_ensemble, X_activated, considered_leaves=None
         where N, k are the # of samples, estimators respectively
         It represents the leaves activated per data sample
     :param considered_leaves: Default to None
-        a list of the leaves to be considered; if None then all leaves will be considered
+        a list of the leaves to be considered; if None then all leaves
+        will be considered
     """
-    # considered_leaves_declared = !(considered_leaves is None)
-    leaf_dict = dict()
+    if not isinstance(lucid_ensemble, LucidSKEnsemble):
+        raise ValueError("Argument lucid_ensemble should be an instance of LucidSKEnsemble")
 
+    leaf_dict = dict()
     # Iterate through the activated leaves for each data sample
     for active_leaves in X_activated:
 
         for estimator_ind, active_leaf_ind in enumerate(active_leaves):
             active_leaf = lucid_ensemble[estimator_ind][active_leaf_ind]
-            leaf_dict.setdefault(active_leaf.path.__str__(), []) \
+            path_str = ' & '.join(sorted(active_leaf.path))
+            leaf_dict.setdefault(path_str, []) \
                      .append(active_leaf.value)
+
     if considered_leaves is None:
         return SKFoliage(leaf_dict, **foliage_kw)
     else:
-        return SKFoliage(dict(leaf_dict[key] for key in considered_leaves), **foliage_kw)
+        return SKFoliage(dict((key, leaf_dict[key]) for key in considered_leaves),
+                         **foliage_kw)
 
 
-def aggregate_tested_leaves(sk_ensemble, X, feature_names, considered_leaves=None, **foliage_kw):
-    """ This method is used to abstract _aggregate_tested_leaves method.
-        Iterate through all the leaves from the trained trees in an ensemble
-        and aggregate their values according to their paths as key values
+def gather_leaf_values(sk_ensemble, X, feature_names, considered_leaves=None,
+                       gather_method='aggregate', **foliage_kw):
+    """ This method is used to abstract away the _gather_leaf_values function so
+        that a sk_ensemble and the original matrix data X is passed as arguments instead.
 
     :param sk_ensemble: scikit-learn ensemble model object
     :param feature_names (list): list of names (strings) of the features that
@@ -65,42 +70,31 @@ def aggregate_tested_leaves(sk_ensemble, X, feature_names, considered_leaves=Non
         a list of the leaves to be considered; if None then all leaves will be considered
     :param foliage_kw: TODO
     """
+    valid_gather_methods = ['aggregate',  # aggregate indicates to gather across all data samples
+                            'per-point']  # per-sample indicates to gather values per point
+    if gather_method not in valid_gather_methods:
+        raise ValueError(' '.join((
+            "The gather_method argument passed was not valid."
+            "Valid arguments include [{}]"
+            .format(' '.join(valid_gather_methods))
+        )))
+
     # Get a matrix of all the leaves activated
     all_activated_leaves = sk_ensemble.apply(X)
     lucid_ensemble = make_LucidSKEnsemble(
         sk_ensemble, feature_names=feature_names, display_relation=True)
 
-    return _aggregate_tested_leaves(
-        lucid_ensemble, all_activated_leaves, considered_leaves, **foliage_kw)
-
-
-def aggregate_trained_leaves(sk_ensemble, feature_names, considered_leaves=None, **foliage_kw):
-    """ Iterate through all the leaves from the trained trees in an ensemble
-        and aggregate their values according to their paths as key values
-
-    :param sk_ensemble: scikit-learn ensemble model object
-    :param feature_names (list): list of names (strings) of the features that
-        were used to split the tree
-    :param considered_leaves: Default to None
-        a list of the leaves to be considered; if None then all leaves will be considered
-    :param foliage_kw: TODO
-    """
-    # dictionary with path as the key mapped to a list of values
-    leaf_dict = dict()
-
-    for estimator in sk_ensemble.estimators_:
-        estimator = estimator.ravel()[0]
-        estimator_leaves = make_LucidSKTree(estimator, feature_names,
-                                            display_relation=True)
-
-        for leaf in estimator_leaves.values():
-            leaf_dict.setdefault(leaf.path.__str__(), []) \
-                     .append(leaf.value)
-
-    if considered_leaves is None:
-        return SKFoliage(leaf_dict, **foliage_kw)
-    else:
-        return SKFoliage(dict(leaf_dict[key] for key in considered_leaves), **foliage_kw)
+    if gather_method == 'aggregate':
+        return _gather_leaf_values(
+            lucid_ensemble, all_activated_leaves, considered_leaves, **foliage_kw)
+    else:  # gather_method == 'per-point'
+        foliage_list = []
+        for active_leaves in all_activated_leaves:
+            point_foliage = \
+                _gather_leaf_values(lucid_ensemble, active_leaves.reshape(1, -1),
+                                    considered_leaves, create_deepcopy=False)
+            foliage_list.append(point_foliage)
+        return foliage_list
 
 
 valid_rank_methods = {
@@ -109,35 +103,25 @@ valid_rank_methods = {
     'count': len}
 
 
-def rank_leaves(foliage_obj, n_top=10, rank_method='abs_sum', return_type='rank',
-                considered_leaves=None):
+def rank_leaves(foliage_obj, rank_method='abs_sum', n_top=10):
     """ Gather the n_top leaves according to some rank_method function
 
-    :param sk_ensemble: scikit-learn ensemble model object
-    :param feature_names (list): list of names (strings) of the features that
-        were used to split the tree
     :param foliage_obj: an instance of SKFoliage that is outputted from
         aggregate_trained_leaves or aggregate_tested_leaves methods
     :param n_top: the number of leaves to display
     :param rank_method: the ranking method for the leafpaths
-    :param return_type (str): describes the value returned
-    :param considered_leaves: Default to None
-        a list of the leaves to be considered; if None then all leaves will be considered
     """
     if not isinstance(foliage_obj, SKFoliage):
         raise ValueError("The foliage_obj passed is of type {}".format(type(foliage_obj)),
                          "; it should be an instance of SKFoliage")
 
-    valid_return_types = ['rank', 'values']
-    if return_type not in valid_return_types:
-        raise ValueError("The passed return_type ({}) is not valid".format(return_type),
-                         " must be one of the following {}".format(valid_return_types))
-
     if isinstance(rank_method, str):
         if rank_method not in valid_rank_methods.keys():
-            raise ValueError("The passed rank_method ({}) argument is not a valid str {}"
-                             .format(rank_method, list(valid_rank_methods.keys())))
+            raise ValueError(
+                "The passed rank_method ({}) argument is not a valid string argument {}"
+                .format(rank_method, list(valid_rank_methods.keys())))
         rank_method = valid_rank_methods[rank_method]
+
     elif not callable(rank_method):
         raise ValueError(' '.join((
             "The passed rank_method argument should be a callable function",
@@ -152,42 +136,33 @@ def rank_leaves(foliage_obj, n_top=10, rank_method='abs_sum', return_type='rank'
             (leaf_path, rank_method(values)))
     aggregated_rank = sorted(aggregated_ranks, key=operator.itemgetter(1), reverse=True)
 
-    if return_type == 'rank':
-        return SKFoliage(OrderedDict(
-            ((path, rank) for path, rank in aggregated_rank[:n_top])))
-    else:  # return_type == 'values'
-        top_leaf_paths = map(operator.itemgetter(0), aggregated_rank)
-        return SKFoliage(OrderedDict(
-            ((path, foliage_obj[path]) for path in itertools.islice(top_leaf_paths, n_top))))
+    return SKFoliage(OrderedDict(
+        ((path, rank) for path, rank in aggregated_rank[:n_top])))
 
 
-def rank_per_sample(sk_ensemble, X, feature_names, considered_leaves=None, **kwargs):
-    """ Gather and rank the leaves activated per sample in the X dataset
+def rank_leaves_per_point(foliage_list, n_top, rank_method):
+    """ Gather the n_top leaves according to some rank_method function
+        per data-point
 
-    :param sk_ensemble: scikit-learn ensemble model object
-    :param feature_names (list): list of names (strings) of the features that
-        were used to split the tree
-    :param X: array_like or sparse matrix, shape = [n_samples, n_features]
+    :param foliage_obj: an instance of SKFoliage that is outputted from
+        aggregate_trained_leaves or aggregate_tested_leaves methods
     :param n_top: the number of leaves to display
     :param rank_method: the ranking method for the leafpaths
-    :param considered_leaves: Default to None
-        a list of the leaves to be considered; if None then all leaves will be considered
-    :returns: a list of SKFoliage objects that contain the n_top
-        leaf nodes per sample according to some rank_method
+    :param considered_leaves: a list of the leaves to be considered
+        defaults to None; if None then all leaves will be considered
     """
-    # Get a matrix of all the leaves activated
-    all_activated_leaves = sk_ensemble.apply(X)
-    lucid_ensemble = make_LucidSKEnsemble(
-        sk_ensemble, feature_names=feature_names, display_relation=True)
+    if not isinstance(foliage_list, Iterable):
+        raise ValueError("The passed argument for foliage_list "
+                         "must be an iterable object")
+    if not all(map(lambda x: isinstance(x, SKFoliage), foliage_list)):
+        raise ValueError("The passed argument for foliage_list must "
+                         "be a list of SKFoliage objects.")
 
-    top_leaf_samples = []
-    for active_leaves in all_activated_leaves:
-        sample_foliage = \
-            _aggregate_tested_leaves(lucid_ensemble, active_leaves.reshape(1, -1),
-                                     considered_leaves=considered_leaves, create_deepcopy=False)
-        top_leaf_samples.append(rank_leaves(foliage_obj=sample_foliage,
-                                            return_type='rank', **kwargs))
-    return top_leaf_samples
+    rank_list = []
+    for foliage_obj in foliage_list:
+        rank_list.append(
+            rank_leaves(foliage_obj, rank_method, n_top))
+    return rank_list
 
 
 def get_tree_predictions(sk_ensemble, X, adjust_with_base=False):
