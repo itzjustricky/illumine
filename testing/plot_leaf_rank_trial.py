@@ -47,3 +47,8 @@ if __name__ == "__main__":
         type, value, tb = sys.exc_info()
         traceback.print_exc()
         bpdb.post_mortem(tb)
+
+"""
+if __name__ == "__main__":
+    main()
+"""

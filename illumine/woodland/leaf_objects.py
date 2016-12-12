@@ -8,6 +8,14 @@
     @author: Ricky
 """
 
+from copy import deepcopy
+from collections import Iterable
+from collections import OrderedDict
+
+import numpy as np
+from pandas import DataFrame
+from pandas import Series
+
 from ..core import LeafDictionary
 
 
@@ -68,11 +76,11 @@ class LucidSKTree(LeafDictionary):
         value: The value is an SKTreeNode object
 
     ..note:
-        This object is intended to be created through unravel_tree only.
+        This object is intended to be created through make_LucidSKTree only.
         This class is NOT meant to be INHERITED from.
     """
 
-    def __init__(self, tree_leaves, print_limit=30, create_deepcopy=True):
+    def __init__(self, tree_leaves, feature_names, print_limit=30, create_deepcopy=True):
         """ Construct the LucidSKTree object using a dictionary object indexed
             by the leaf's index in the pre-order traversal of the decision tree.
 
@@ -83,8 +91,35 @@ class LucidSKTree(LeafDictionary):
                              "be passed into the constructor.")
         # Check all the values mapped are SKTreeNodes
         assert all(map(lambda x: isinstance(x, SKTreeNode), tree_leaves.values()))
+
+        if not isinstance(feature_names, Iterable):
+            raise ValueError(
+                "feature_names should be an iterable object containing the "
+                "feature names that the tree was trained on")
+        self._feature_names = feature_names
+
         super(LucidSKTree, self).__init__(
             tree_leaves, print_limit, create_deepcopy)
+
+    @property
+    def feature_names(self):
+        return self._feature_names
+
+    def predict(self, X_df):
+        """ Create predictions from a pandas DataFrame.
+            The DataFrame should have the same.
+        """
+        if not isinstance(X_df, DataFrame):
+            raise ValueError("Predictions must be done on a Pandas dataframe")
+        if not all(X_df.columns == self.feature_names):
+            raise ValueError("The passed dataframe should")
+
+        pred_df = deepcopy(X_df)
+        y_pred = Series(np.zeros(X_df.shape[0]))
+        for leaf_ind, leaf_node in self.items():
+            inds_to_set = pred_df.query(' & '.join(leaf_node.path)).index
+            y_pred.loc[inds_to_set] += leaf_node.value
+        return y_pred
 
 
 class LucidSKEnsemble(LeafDictionary):
@@ -100,22 +135,73 @@ class LucidSKEnsemble(LeafDictionary):
         This class is NOT meant to be INHERITED from.
     """
 
-    def __init__(self, ensemble_trees, print_limit=5, create_deepcopy=True):
+    def __init__(self, tree_ensemble, feature_names, init_estimator, learning_rate,
+                 print_limit=5, create_deepcopy=True):
         """ Construct the LucidSKTree object using a dictionary object indexed
             by the leaf's index in the pre-order traversal of the decision tree.
 
             The leaf's index is in set [0, k-1] where k is the # of nodes (inner & leaf nodes)
+
+        :param tree_ensemble (list): a list of the LucidSKTree objects
+        :param feature_names (list): list of names (strings) of the features that
+            were used to split the tree
+        :param init_estimator (function): function that is the initial estimator of the ensemble
+        :param print_limit (int): configuration for how to print the LucidSKEnsemble
+            out to the console
+        :param deepcopy (bool): indicates whether or not to make a deepcopy of
+            the tree_ensemble argument passed into the __init__ function
         """
-        if not isinstance(ensemble_trees, list):
+        if not isinstance(tree_ensemble, list):
             raise ValueError("A list object with index (by order of Boosts) mapped to Tree Estimators ",
                              "should be passed into the constructor.")
         # Check all the values mapped are LucidSKTrees
-        assert all(map(lambda x: isinstance(x, LucidSKTree), ensemble_trees))
+        assert all(map(lambda x: isinstance(x, LucidSKTree), tree_ensemble))
+        self._feature_names = feature_names
+        self._learning_rate = learning_rate
+
+        # this object will be created if compress method is called
+        self._compressed_ensemble = None
+
+        if not callable(init_estimator):
+            raise ValueError(
+                "The init_estimator should be a callable function that "
+                "takes X (feature matrix) as an argument.")
+        else:
+            self._init_estimator = init_estimator
+
         str_kw = {"print_format": "Estimator {}\n============\n{}",
                   "print_with_index": True}
 
         super(LucidSKEnsemble, self).__init__(
-            ensemble_trees, print_limit, create_deepcopy, str_kw)
+            tree_ensemble, print_limit, create_deepcopy, str_kw)
+
+    def predict(self, X_df):
+        y_pred = Series(np.zeros(X_df.shape[0]))
+
+        if self._compressed_ensemble is None:
+            for lucid_tree in self:
+                y_pred += self._learning_rate * lucid_tree.predict(X_df)
+
+            return y_pred + self._init_estimator(X_df).ravel()
+        else:
+            return self._compressed_ensemble.predict(X_df) \
+                + self._init_estimator(X_df).ravel()
+
+    def compress(self, **kwargs):
+        """ Create a CompressedEnsemble object which aggregates all
+            the values of leaves with the same paths.
+
+            This is useful if the # of unique leaves is smaller
+            than the number of estimators.
+        """
+        unique_leaves = OrderedDict()
+        for lucid_tree in self:
+            leaf_path = lucid_tree.path
+            unique_leaves[leaf_path] = \
+                unique_leaves.get(leaf_path, 0) + lucid_tree.value
+
+        self._compressed_ensemble = CompressedEnsemble(
+            unique_leaves, self.feature_names, **kwargs)
 
 
 class SKFoliage(LeafDictionary):
@@ -145,12 +231,47 @@ class SKFoliage(LeafDictionary):
         """ Construct the LucidSKTree object using a dictionary object indexed
             by the leaf's index in the pre-order traversal of the decision tree.
 
-            The leaf's index is in set [0, k-1] where k is the # of nodes (inner & leaf nodes)
+            The leaf's index is in set [0, k-1] where k is the # of nodes
+            (inner & leaf nodes)
         """
         if not isinstance(tree_leaves, dict):
-            raise ValueError("A dictionary object with keys mapped to lists of values should ",
-                             "be passed into the constructor.")
+            raise ValueError("A dictionary object with keys mapped to lists ",
+                             "of values should be passed into the constructor.")
         str_kw = {"print_format": "path: {}\n{}"}
 
         super(SKFoliage, self).__init__(
             tree_leaves, print_limit, create_deepcopy, str_kw)
+
+
+# TODO
+class CompressedEnsemble(LeafDictionary):
+    """ Compressed Ensemble Tree created from
+        LucidSKEnsemble.compress() method
+    """
+
+    def __init__(self, tree_leaves, feature_names, print_limit=30, create_deepcopy=True):
+        """ Construct the LucidSKTree object using a dictionary object indexed
+            by the leaf's index in the pre-order traversal of the decision tree.
+
+            The leaf's index is in set [0, k-1] where k is the # of nodes (inner & leaf nodes)
+        """
+        if not isinstance(tree_leaves, dict):
+            raise ValueError("A dictionary object with keys mapped to SKTreeNodes should ",
+                             "be passed into the constructor.")
+
+        if not isinstance(feature_names, Iterable):
+            raise ValueError(
+                "feature_names should be an iterable object containing the "
+                "feature names that the tree was trained on")
+        self._feature_names = feature_names
+
+        super(CompressedEnsemble, self).__init__(
+            tree_leaves, print_limit, create_deepcopy)
+
+    @property
+    def feature_names(self):
+        return self._feature_names
+
+    # TODO
+    def predict(self, X_df):
+        pass

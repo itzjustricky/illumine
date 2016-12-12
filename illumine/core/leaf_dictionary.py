@@ -17,27 +17,6 @@ from copy import deepcopy
 from ..util.printing import print_seq
 
 
-def _get_dictionary_attr():
-    """ Used to return the attributes of a dictionary that wraps
-        a dictionary
-
-    READ HERE
-    ..note: Notice that it requires that the class variable be called self._seq.
-        Not meant to be used outside of this module.
-    """
-
-    def keys(self):
-        return self._seq.keys()
-
-    def values(self):
-        return self._seq.values()
-
-    def items(self):
-        return self._seq.items()
-
-    return locals()
-
-
 class LeafDictionary(object):
     """ This is to serve as a base class for classes that wrap iterative objects
         with leaf decision paths as keys (and anything for values).
@@ -71,8 +50,29 @@ class LeafDictionary(object):
 
         # If the passed sequence is a dictionary set dictionary attributes
         if isinstance(tree_leaves, dict):
-            for dict_func in _get_dictionary_attr().values():
-                setattr(self, dict_func.__name__, types.MethodType(dict_func, self))
+            self._set_dictionary_attr(self._seq)
+
+    def _get_dictionary_attr(self, cls_dict):
+        """ Method to create dictionary attributes to be set
+            for LeafDictionary. The attributes will point
+            get values from cls_dict.
+        """
+        def keys(self):
+            return cls_dict.keys()
+
+        def values(self):
+            return cls_dict.values()
+
+        def items(self):
+            return cls_dict.items()
+
+        return_attrs = ['keys', 'values', 'items']
+        return [val for key, val in locals().items() if key in return_attrs]
+
+    def _set_dictionary_attr(self, cls_dict):
+        """ Set dictionary attributes for LeafDictionary """
+        for dict_func in self._get_dictionary_attr(cls_dict):
+            setattr(self, dict_func.__name__, types.MethodType(dict_func, self))
 
     def set_print_limit(self, print_limit):
         if not isinstance(print_limit, int):
@@ -86,9 +86,9 @@ class LeafDictionary(object):
     def __iter__(self):
         return self._seq.__iter__()
 
-    def __getitem__(self, index):
+    def __getitem__(self, key):
         self.__str_cache = None  # reset string cache
-        return self._seq[index]
+        return self._seq[key]
 
     def __repr__(self):
         return self.__str__()

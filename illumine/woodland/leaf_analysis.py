@@ -13,8 +13,8 @@ from collections import OrderedDict
 import numpy as np
 
 from .leaf_objects import SKFoliage
-from .node_methods import unravel_tree
-from .node_methods import unravel_ensemble
+from .node_methods import make_LucidSKTree
+from .node_methods import make_LucidSKEnsemble
 
 __all__ = ['aggregate_trained_leaves', 'aggregate_tested_leaves',
            'rank_leaves', 'rank_per_sample']
@@ -24,7 +24,7 @@ def _aggregate_tested_leaves(lucid_ensemble, X_activated, considered_leaves=None
     """ Iterate through the leaves activated from the data X and aggregate their
         values according to their paths as key values
 
-        The unravel_ensemble function is an expensive function to call, so
+        The make_LucidSKEnsemble function is an expensive function to call, so
         this part of the function was separated away.
 
     :param lucid_ensemble: LucidSKEnsemble object which maps the tree index
@@ -66,8 +66,8 @@ def aggregate_tested_leaves(sk_ensemble, X, feature_names, considered_leaves=Non
     """
     # Get a matrix of all the leaves activated
     all_activated_leaves = sk_ensemble.apply(X)
-    lucid_ensemble = \
-        unravel_ensemble(sk_ensemble, feature_names=feature_names, display_relation=True)
+    lucid_ensemble = make_LucidSKEnsemble(
+        sk_ensemble, feature_names=feature_names, display_relation=True)
 
     return _aggregate_tested_leaves(
         lucid_ensemble, all_activated_leaves, considered_leaves, **foliage_kw)
@@ -89,8 +89,8 @@ def aggregate_trained_leaves(sk_ensemble, feature_names, considered_leaves=None,
 
     for estimator in sk_ensemble.estimators_:
         estimator = estimator.ravel()[0]
-        estimator_leaves = unravel_tree(estimator, feature_names,
-                                        display_relation=True)
+        estimator_leaves = make_LucidSKTree(estimator, feature_names,
+                                            display_relation=True)
 
         for leaf in estimator_leaves.values():
             leaf_dict.setdefault(leaf.path.__str__(), []) \
@@ -132,16 +132,17 @@ def rank_leaves(foliage_obj, n_top=10, rank_method='abs_sum', return_type='rank'
         raise ValueError("The passed return_type ({}) is not valid".format(return_type),
                          " must be one of the following {}".format(valid_return_types))
 
-    global valid_rank_methods
     if isinstance(rank_method, str):
         if rank_method not in valid_rank_methods.keys():
             raise ValueError("The passed rank_method ({}) argument is not a valid str {}"
                              .format(rank_method, list(valid_rank_methods.keys())))
         rank_method = valid_rank_methods[rank_method]
     elif not callable(rank_method):
-        raise ValueError("The passed rank_method argument should be a callable function ",
-                         "taking a vector as an argument or a valid str {}"
-                         .format(list(valid_rank_methods.keys())))
+        raise ValueError(' '.join((
+            "The passed rank_method argument should be a callable function",
+            "taking a vector as an argument or a valid str {}"
+            .format(list(valid_rank_methods.keys()))
+        )))
 
     aggregated_ranks = []
     # Gather the ranks
@@ -175,8 +176,8 @@ def rank_per_sample(sk_ensemble, X, feature_names, considered_leaves=None, **kwa
     """
     # Get a matrix of all the leaves activated
     all_activated_leaves = sk_ensemble.apply(X)
-    lucid_ensemble = \
-        unravel_ensemble(sk_ensemble, feature_names=feature_names, display_relation=True)
+    lucid_ensemble = make_LucidSKEnsemble(
+        sk_ensemble, feature_names=feature_names, display_relation=True)
 
     top_leaf_samples = []
     for active_leaves in all_activated_leaves:

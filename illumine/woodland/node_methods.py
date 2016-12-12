@@ -2,12 +2,16 @@
     Description:
         Methods for analyzing tree nodes following the Scikit-Learn API
 
+     make_LucidSKTree : factory method for LucidSKTree;
+     make_LucidSKEnsemble : factory method for LucidSKEnsemble;
+     unique_leaves_per_sample : function
+     get_tree_predictions : function
+
     TODO:
-        * consider allowing n_jobs parameter to send out independent jobs
-            to process the estimators separately
-        * extend base_adjustment for unravel_tree to allow vector
+        * if in the future, experience make_LucidSKEnsemble bottleneck use
+            multiprocessing library to unravel trees in parallel
+        * separate out leaf path retrieval algorithm from make_LucidSKTree
         * add an extra parameter to choose which leaves to consider
-        * use cython to replace path search algorithm in unravel_tree(...) method
 
     @author: Ricky
 """
@@ -21,29 +25,36 @@ from .leaf_objects import SKTreeNode
 from .leaf_objects import LucidSKTree
 from .leaf_objects import LucidSKEnsemble
 
-__all__ = ['unravel_tree', 'unravel_ensemble', 'get_tree_predictions']
+__all__ = ['make_LucidSKTree', 'make_LucidSKEnsemble', 'get_tree_predictions',
+           'unique_leaves_per_sample']
 
 
-def unravel_tree(sk_tree, feature_names, display_relation=True,
-                 base_adjustment=0, float_precision=3, sort_by_index=True,
-                 tree_kw=None):
+# TODO: separate the leaf path retrieval algorithm from make_LucidSKTree
+def _gather_leaf_paths():
+    """ This function is used to gather the paths to all the
+        leaves given some of the Scikit-learn attributes
+        of a decision tree.
+    """
+    pass
+
+
+def make_LucidSKTree(sk_tree, feature_names, float_precision=5,
+                     sort_by_index=True, tree_kw=None):
     """ Breakdown a tree's splits and returns the value of every leaf along
         with the path of splits that led to the leaf
 
     ..note:
-        Scikit-learn represent their trees with nodes (represented by numbers) printed
-        by preorder-traversal; number of -2 represents a leaf, the other numbers are by
-        the index of the column for the feature
+        Scikit-learn represent their trees with nodes (represented by numbers)
+        printed by preorder-traversal; number of -2 represents a leaf, the other
+        numbers are by the index of the column for the feature
 
-    :param feature_names (list): list of names (strings) of the features that were used
-        to split the tree
+    :param feature_names (list): list of names (strings) of the features that
+        were used to split the tree
     :param sk_tree: scikit-learn tree object
-    :param display_relation (bool): if marked false then only display feature else display
-        the relation as well; if marked true, the path
-    :param base_adjustment (numeric): shift all the values with a base value
-    :param float_precision (int): to determine what number the node values, thresholds are
-        rounded to
-    :param tree_kw (dict): key-word arguments to be passed into LucidSKTree's constructor
+    :param float_precision (int): to determine what number the node
+        values, thresholds are rounded to
+    :param tree_kw (dict): key-word arguments to be passed into
+        LucidSKTree's constructor
 
     :returns: LucidSKTree object indexed by their order in the
         pre-order traversal of the Decision Tree
@@ -54,48 +65,49 @@ def unravel_tree(sk_tree, feature_names, display_relation=True,
         raise ValueError("tree_kw should be of type dict")
     tree_leaves = OrderedDict()
 
+    # values & node_samples are only used in SKTreeNode init
     values = sk_tree.tree_.value
-    features = sk_tree.tree_.feature
     node_samples = sk_tree.tree_.n_node_samples
+    features = sk_tree.tree_.feature
     thresholds = sk_tree.tree_.threshold
 
     n_splits = len(features)
     if n_splits == 0:
         raise ValueError("The passed tree is empty!")
 
-    # TODO: place the algorithm below into a cython function
+    # leaf path retrieval algorithm
     tracker_stack = []  # a stack to track if all the children of a node is visited
-    node_path = []  # ptr_stack keeps track of nodes
+    leaf_path = []  # ptr_stack keeps track of nodes
     for node_index in range(n_splits):
         if len(tracker_stack) != 0:
             tracker_stack[-1] += 1  # visiting the child of the latest node
 
         if features[node_index] != -2:  # visiting inner node
             tracker_stack.append(0)
-            if display_relation:
-                append_str = "{}<={}".format(feature_names[features[node_index]],
-                                             float(round(thresholds[node_index], float_precision)))
-            else:
-                append_str = feature_names[features[node_index]]
-            node_path.append(append_str)
+            append_str = "{}<={}".format(
+                feature_names[features[node_index]],
+                float(round(thresholds[node_index], float_precision)))
+            leaf_path.append(append_str)
         else:  # visiting leaf
             tree_leaves[node_index] = \
-                SKTreeNode(node_path.copy(),
-                           base_adjustment + float(round(values[node_index][0][0], float_precision)),
+                SKTreeNode(leaf_path.copy(),
+                           float(round(values[node_index][0][0], float_precision)),
                            node_samples[node_index])
 
             if node_index in sk_tree.tree_.children_right:
                 # pop out nodes that I am completely done with
                 while(len(tracker_stack) > 0 and tracker_stack[-1] == 2):
-                    node_path.pop()
+                    leaf_path.pop()
                     tracker_stack.pop()
-            if display_relation and len(node_path) != 0:
-                node_path[-1] = node_path[-1].replace("<=", ">")
+            if len(leaf_path) != 0:
+                leaf_path[-1] = leaf_path[-1].replace("<=", ">")
+    # end of leaf path retrieval algorithm
 
-    return LucidSKTree(tree_leaves, **tree_kw)
+    return LucidSKTree(tree_leaves, feature_names, **tree_kw)
 
 
-def unravel_ensemble(sk_ensemble, tree_kw=None, ensemble_kw=None, **kwargs):
+def make_LucidSKEnsemble(sk_ensemble, feature_names, init_estimator=None,
+                         tree_kw=None, ensemble_kw=None, **kwargs):
     """ Breakdown a tree's splits and returns the value of every leaf along
         with the path of splits that led to the leaf
 
@@ -109,7 +121,8 @@ def unravel_ensemble(sk_ensemble, tree_kw=None, ensemble_kw=None, **kwargs):
         to split the tree
     :param display_relation (bool): if marked false then only display feature else display
         the relation as well; if marked true, the path
-    :param base_adjustment (numeric): shift all the values with a base value
+    :param init_estimator (function): function that is the initial estimator of the ensemble
+        defaults to None, if None then the Scikit-learn tree's initial estimator
     :param float_precision (int): to determine what number the node values, thresholds are
         rounded to
     :param tree_kw (dict): key-word arguments to be passed into LucidSKTree's constructor
@@ -130,9 +143,21 @@ def unravel_ensemble(sk_ensemble, tree_kw=None, ensemble_kw=None, **kwargs):
     ensemble_of_leaves = []
     for estimator in sk_ensemble.estimators_:
         estimator = estimator[0]
-        ensemble_of_leaves.append(unravel_tree(estimator, tree_kw=tree_kw, **kwargs))
+        ensemble_of_leaves.append(
+            make_LucidSKTree(estimator, feature_names, tree_kw=tree_kw, **kwargs))
 
-    return LucidSKEnsemble(ensemble_of_leaves, **ensemble_kw)
+    if init_estimator is None:
+        init_estimator = sk_ensemble._init_decision_function
+    elif not callable(init_estimator):
+        raise ValueError(
+            "The init_estimator should be a callable function that "
+            "takes X (feature matrix) as an argument.")
+
+    return LucidSKEnsemble(
+        ensemble_of_leaves, feature_names,
+        init_estimator=init_estimator,
+        learning_rate=sk_ensemble.learning_rate,
+        **ensemble_kw)
 
 
 def get_tree_predictions(sk_ensemble, X, adjust_with_base=False):
@@ -172,7 +197,7 @@ def unique_leaves_per_sample(sk_ensemble, X, feature_names, scale_by_total=True)
     # Get a matrix of all the leaves activated
     all_activated_leaves = sk_ensemble.apply(X)
     unraveled_ensemble = \
-        unravel_ensemble(sk_ensemble, feature_names=feature_names, display_relation=True)
+        make_LucidSKEnsemble(sk_ensemble, feature_names=feature_names, display_relation=True)
 
     # Nx1 matrix (where N is the # of samples) with counts of unique leaves per sample
     X_leaf_counts = []
