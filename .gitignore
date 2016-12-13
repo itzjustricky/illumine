@@ -7,4 +7,5 @@ tags
 __pycache__/
 *.pyc
 
-tmp/
+# IPython directory for state recording
+.ipynb_checkpoints/
