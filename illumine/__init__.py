@@ -1,5 +1,7 @@
-__all__ = ['woodland', 'feature', 'util']
 
 from . import woodland
+from . import visual
 from . import feature
 from . import util
+
+__all__ = ['woodland', 'visual', 'feature', 'util']

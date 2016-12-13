@@ -1,6 +1,15 @@
-__all__ = ['tree_related']
+"""
+    Package for visualization of analysis
+    using matplotlib
 
-from .tree_related import plot_leaf_rank
-from .tree_related import plot_step_improvement
-from .tree_related import active_leaves_boxplot
-from .tree_related import leaf_rank_barplot
+"""
+
+from .lucid_tree import leaf_rank_plot
+from .lucid_tree import leaf_rank_barplot
+
+from .plain_tree import active_leaves_boxplot
+from .plain_tree import feature_importance_barplot
+from .plain_tree import step_improvement_plot
+
+
+__all__ = ['plain_tree', 'lucid_tree']

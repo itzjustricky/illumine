@@ -17,4 +17,10 @@ from .leaf_analysis import rank_leaves_per_point
 from .leaf_analysis import get_tree_predictions
 from .leaf_analysis import unique_leaves_per_sample
 
-__all__ = ['factory_methods', 'leaf_analysis', 'leaf_objects']
+from .rank_methods import generate_error_rank
+
+
+__all__ = [
+    'factory_methods', 'leaf_analysis',
+    'leaf_objects', 'rank_methods'
+]
