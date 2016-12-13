@@ -6,7 +6,7 @@
 from .leaf_objects import SKTreeNode
 from .leaf_objects import LucidSKEnsemble
 from .leaf_objects import LucidSKTree
-from .leaf_objects import SKFoliage
+from .leaf_objects import LeafDataStore
 
 from .factory_methods import make_LucidSKTree
 from .factory_methods import make_LucidSKEnsemble

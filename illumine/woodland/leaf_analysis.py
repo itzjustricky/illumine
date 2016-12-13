@@ -12,7 +12,7 @@ from collections import OrderedDict
 
 import numpy as np
 
-from .leaf_objects import SKFoliage
+from .leaf_objects import LeafDataStore
 from .leaf_objects import LucidSKEnsemble
 from .factory_methods import make_LucidSKEnsemble
 
@@ -21,7 +21,7 @@ __all__ = ['gather_leaf_values', 'rank_leaves', 'rank_leaves_per_point',
 
 
 # this method is not meant to be called outside this module
-def _gather_leaf_values(lucid_ensemble, X_activated, considered_leaves=None, **foliage_kw):
+def _gather_leaf_values(lucid_ensemble, X_activated, considered_leaves=None, **lds_kw):
     """ Iterate through the leaves activated from the data X and gather
         their values according to their paths as key values
 
@@ -52,14 +52,14 @@ def _gather_leaf_values(lucid_ensemble, X_activated, considered_leaves=None, **f
                      .append(active_leaf.value)
 
     if considered_leaves is None:
-        return SKFoliage(leaf_dict, **foliage_kw)
+        return LeafDataStore(leaf_dict, **lds_kw)
     else:
-        return SKFoliage(dict((key, leaf_dict[key]) for key in considered_leaves),
-                         **foliage_kw)
+        return LeafDataStore(dict((key, leaf_dict[key]) for key in considered_leaves),
+                             **lds_kw)
 
 
 def gather_leaf_values(sk_ensemble, X, feature_names, considered_leaves=None,
-                       gather_method='aggregate', **foliage_kw):
+                       gather_method='aggregate', **lds_kw):
     """ This method is used to abstract away the _gather_leaf_values function so
         that a sk_ensemble and the original matrix data X is passed as arguments instead.
 
@@ -68,7 +68,7 @@ def gather_leaf_values(sk_ensemble, X, feature_names, considered_leaves=None,
         were used to split the tree
     :param considered_leaves: Default to None
         a list of the leaves to be considered; if None then all leaves will be considered
-    :param foliage_kw: TODO
+    :param lds_kw: TODO
     """
     valid_gather_methods = ['aggregate',  # aggregate indicates to gather across all data samples
                             'per-point']  # per-sample indicates to gather values per point
@@ -82,44 +82,46 @@ def gather_leaf_values(sk_ensemble, X, feature_names, considered_leaves=None,
     # Get a matrix of all the leaves activated
     all_activated_leaves = sk_ensemble.apply(X)
     lucid_ensemble = make_LucidSKEnsemble(
-        sk_ensemble, feature_names=feature_names, display_relation=True)
+        sk_ensemble, feature_names=feature_names,)
 
     if gather_method == 'aggregate':
         return _gather_leaf_values(
-            lucid_ensemble, all_activated_leaves, considered_leaves, **foliage_kw)
+            lucid_ensemble, all_activated_leaves, considered_leaves, **lds_kw)
     else:  # gather_method == 'per-point'
-        foliage_list = []
+        lds_list = []
         for active_leaves in all_activated_leaves:
-            point_foliage = \
+            point_lds = \
                 _gather_leaf_values(lucid_ensemble, active_leaves.reshape(1, -1),
                                     considered_leaves, create_deepcopy=False)
-            foliage_list.append(point_foliage)
-        return foliage_list
+            lds_list.append(point_lds)
+        return lds_list
 
 
 valid_rank_methods = {
-    'abs_sum': lambda x: np.sum(np.abs(x)),
-    'abs_mean': lambda x: np.mean(np.abs(x)),
+    'absolute-sum': lambda x: np.sum(np.abs(x)),
+    'abssolute-mean': lambda x: np.mean(np.abs(x)),
     'count': len}
 
 
-def rank_leaves(foliage_obj, rank_method='abs_sum', n_top=10):
+def rank_leaves(lds_obj, rank_method, float_precision=5, n_top=10):
     """ Gather the n_top leaves according to some rank_method function
 
-    :param foliage_obj: an instance of SKFoliage that is outputted from
+    :param lds_obj: an instance of LeafDataStore that is outputted from
         aggregate_trained_leaves or aggregate_tested_leaves methods
-    :param n_top: the number of leaves to display
+    :param n_top (int): the number of leaves to display
     :param rank_method: the ranking method for the leafpaths
     """
-    if not isinstance(foliage_obj, SKFoliage):
-        raise ValueError("The foliage_obj passed is of type {}".format(type(foliage_obj)),
-                         "; it should be an instance of SKFoliage")
+    if not isinstance(lds_obj, LeafDataStore):
+        raise ValueError("The lds_obj passed is of type {}".format(type(lds_obj)),
+                         "; it should be an instance of LeafDataStore")
 
     if isinstance(rank_method, str):
         if rank_method not in valid_rank_methods.keys():
-            raise ValueError(
-                "The passed rank_method ({}) argument is not a valid string argument {}"
-                .format(rank_method, list(valid_rank_methods.keys())))
+            raise ValueError(' '.join((
+                "The passed rank_method ({}) argument is not a valid string argument {}."
+                .format(rank_method, list(valid_rank_methods.keys())),
+                "A callable object can also be passed."))
+            )
         rank_method = valid_rank_methods[rank_method]
 
     elif not callable(rank_method):
@@ -131,37 +133,48 @@ def rank_leaves(foliage_obj, rank_method='abs_sum', n_top=10):
 
     aggregated_ranks = []
     # Gather the ranks
-    for leaf_path, values in foliage_obj.items():
+    for leaf_path, values in lds_obj.items():
         aggregated_ranks.append(
-            (leaf_path, rank_method(values)))
+            (leaf_path, round(rank_method(values), float_precision))
+        )
     aggregated_rank = sorted(aggregated_ranks, key=operator.itemgetter(1), reverse=True)
 
-    return SKFoliage(OrderedDict(
+    return LeafDataStore(OrderedDict(
         ((path, rank) for path, rank in aggregated_rank[:n_top])))
 
 
-def rank_leaves_per_point(foliage_list, n_top, rank_method):
+def rank_leaves_per_point(lds_list, rank_method, float_precision=5, n_top=10):
     """ Gather the n_top leaves according to some rank_method function
         per data-point
 
-    :param foliage_obj: an instance of SKFoliage that is outputted from
+    :param lds_obj: an instance of LeafDataStore that is outputted from
         aggregate_trained_leaves or aggregate_tested_leaves methods
     :param n_top: the number of leaves to display
     :param rank_method: the ranking method for the leafpaths
     :param considered_leaves: a list of the leaves to be considered
         defaults to None; if None then all leaves will be considered
     """
-    if not isinstance(foliage_list, Iterable):
-        raise ValueError("The passed argument for foliage_list "
+    if isinstance(lds_list, dict):
+        raise ValueError("The passed argument lds_list should not be a dict, "
+                         "it should be a list of LeafDataStore objects outputted "
+                         "by gather_leaf_values with gather_method=per-point.")
+
+    if not isinstance(lds_list, Iterable):
+        raise ValueError("The passed argument for lds_list "
                          "must be an iterable object")
-    if not all(map(lambda x: isinstance(x, SKFoliage), foliage_list)):
-        raise ValueError("The passed argument for foliage_list must "
-                         "be a list of SKFoliage objects.")
+    if not all(map(lambda x: isinstance(x, LeafDataStore), lds_list)):
+        raise ValueError("The passed argument for lds_list must "
+                         "be a list of LeafDataStore objects.")
 
     rank_list = []
-    for foliage_obj in foliage_list:
+    for lds_obj in lds_list:
         rank_list.append(
-            rank_leaves(foliage_obj, rank_method, n_top))
+            rank_leaves(
+                lds_obj=lds_obj,
+                rank_method=rank_method,
+                float_precision=float_precision,
+                n_top=n_top)
+        )
     return rank_list
 
 

@@ -10,7 +10,7 @@ import operator
 
 import numpy as np
 
-from ..woodland.leaf_objects import SKFoliage
+from ..woodland.leaf_objects import LeafDataStore
 from ..woodland.factory_methods import get_tree_predictions
 from ..woodland.leaf_analysis import rank_leaves
 
@@ -68,28 +68,28 @@ def feature_importance_barplot(sk_ensemble, feature_names, plt_title='',
     plt.show()
 
 
-def plot_leaf_rank(foliage_obj, rank_method='abs_sum', considered_leaves=None,
+def plot_leaf_rank(lds_obj, rank_method='abs_sum', considered_leaves=None,
                    plt_xlabel='Index of Sorted Leaves', plt_ylabel='',
                    plt_title='Plot of Ascending Rank'):
     """ Plot the ascending ranks of the unique leaf nodes of an ensemble
 
-    :param foliage_obj: an instance of SKFoliage that is outputted from
+    :param lds_obj: an instance of LeafDataStore that is outputted from
         aggregate_trained_leaves or aggregate_activated_leaves methods
     :param rank_method: the ranking method for the leafpaths
     :param considered_leaves: Default to None
         a list of the leaves to be considered; if None then all leaves will be considered
     """
-    if not isinstance(foliage_obj, SKFoliage):
-        raise ValueError("The foliage_obj passed is of type {}".format(type(foliage_obj)),
-                         "; it should be an instance of SKFoliage")
+    if not isinstance(lds_obj, LeafDataStore):
+        raise ValueError("The lds_obj passed is of type {}".format(type(lds_obj)),
+                         "; it should be an instance of LeafDataStore")
 
     if considered_leaves is None:
-        n_top = len(foliage_obj)
+        n_top = len(lds_obj)
     else:
         n_top = len(considered_leaves)
 
     # rank_leaves sorts leaf by rank internally (highest rank first)
-    leaf_ranks = rank_leaves(foliage_obj, n_top=n_top, rank_method=rank_method,
+    leaf_ranks = rank_leaves(lds_obj, n_top=n_top, rank_method=rank_method,
                              return_type='rank', considered_leaves=considered_leaves)
 
     # change order to smallest rank first
@@ -149,7 +149,7 @@ def plot_step_improvement(sk_ensemble, X, y, error_func=None,
     return fig, ax
 
 
-def leaf_rank_barplot(foliage_obj, n_top, rank_method='abs_sum', bar_color='#A2F789',
+def leaf_rank_barplot(lds_obj, n_top, rank_method='abs_sum', bar_color='#A2F789',
                       considered_leaves=None, path_output_file=None,
                       plt_xlabel='Index of Sorted Leaves', plt_ylabel='',
                       plt_title='Plot of Sorted Rank'):
@@ -158,12 +158,12 @@ def leaf_rank_barplot(foliage_obj, n_top, rank_method='abs_sum', bar_color='#A2F
     :param path_output_file:
     """
 
-    if not isinstance(foliage_obj, SKFoliage):
-        raise ValueError("The foliage_obj passed is of type {}".format(type(foliage_obj)),
-                         "; it should be an instance of SKFoliage")
+    if not isinstance(lds_obj, LeafDataStore):
+        raise ValueError("The lds_obj passed is of type {}".format(type(lds_obj)),
+                         "; it should be an instance of LeafDataStore")
 
     # rank_leaves sorts leaf by rank internally (highest rank first)
-    leaf_ranks = rank_leaves(foliage_obj, n_top=n_top, rank_method=rank_method,
+    leaf_ranks = rank_leaves(lds_obj, n_top=n_top, rank_method=rank_method,
                              return_type='rank', considered_leaves=considered_leaves)
 
     # change order to smallest rank first

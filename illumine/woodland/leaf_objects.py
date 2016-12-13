@@ -3,7 +3,12 @@
         Methods for analyzing tree nodes following the Scikit-Learn API
 
     TODO:
-
+        * add more to compress the LucidSKEnsemble;
+            there is a lot of inefficiency there
+            - compress by identical trees instead of
+                by unique nodes?
+            - map feature_names to column index and
+                convert DataFrame into a numpy matrix
 
     @author: Ricky
 """
@@ -13,7 +18,6 @@ from collections import OrderedDict
 
 import numpy as np
 from pandas import DataFrame
-from pandas import Series
 
 from ..core import LeafDictionary
 
@@ -98,7 +102,9 @@ class LucidSKTree(LeafDictionary):
         self._feature_names = feature_names
 
         super(LucidSKTree, self).__init__(
-            tree_leaves, print_limit, create_deepcopy)
+            tree_leaves,
+            print_limit=print_limit,
+            create_deepcopy=create_deepcopy)
 
     @property
     def feature_names(self):
@@ -108,16 +114,23 @@ class LucidSKTree(LeafDictionary):
         """ Create predictions from a pandas DataFrame.
             The DataFrame should have the same.
         """
+        y_pred = np.zeros(X_df.shape[0])
+        # this indicates the trained tree had no splits
+        # this is possible in Scikit-learn
+        if len(self) == 1:
+            return y_pred
+
         if not isinstance(X_df, DataFrame):
             raise ValueError("Predictions must be done on a Pandas dataframe")
         if not all(X_df.columns == self.feature_names):
             raise ValueError("The passed dataframe should")
 
         X_df_copy = X_df.reset_index(drop=True)
-        y_pred = Series(np.zeros(X_df.shape[0]))
         for leaf_node in self.values():
             inds_to_set = X_df_copy.query(' & '.join(leaf_node.path)).index
-            y_pred.loc[inds_to_set] += leaf_node.value
+            # update DataFrame to focus only on unused datapoints
+            X_df_copy[~X_df_copy.index.isin(inds_to_set)]
+            y_pred[inds_to_set] += leaf_node.value
         return y_pred
 
 
@@ -172,14 +185,17 @@ class LucidSKEnsemble(LeafDictionary):
                   "print_with_index": True}
 
         super(LucidSKEnsemble, self).__init__(
-            tree_ensemble, print_limit, create_deepcopy, str_kw)
+            tree_ensemble,
+            print_limit=print_limit,
+            create_deepcopy=create_deepcopy,
+            str_kw=str_kw)
 
     @property
     def feature_names(self):
         return self._feature_names
 
     def predict(self, X_df):
-        y_pred = Series(np.zeros(X_df.shape[0]))
+        y_pred = np.zeros(X_df.shape[0])
 
         if self._compressed_ensemble is None:
             for lucid_tree in self:
@@ -199,9 +215,15 @@ class LucidSKEnsemble(LeafDictionary):
         """
         unique_leaves = OrderedDict()
         for lucid_tree in self:
+
+            # this indicates the trained tree had no splits
+            # this is possible in Scikit-learn
+            if len(lucid_tree) == 1:
+                continue
+
             for leaf_node in lucid_tree.values():
-                # sort to make path uniques since splits in different
-                # orders are still equivalent decision trees
+                # sort to make path uniques since splits in
+                # different orders are still equivalent decision trees
                 leaf_path = ' & '.join(sorted(leaf_node.path))
                 unique_leaves[leaf_path] = \
                     unique_leaves.get(leaf_path, 0) \
@@ -211,7 +233,7 @@ class LucidSKEnsemble(LeafDictionary):
             unique_leaves, self.feature_names, **kwargs)
 
 
-class SKFoliage(LeafDictionary):
+class LeafDataStore(LeafDictionary):
     """ Object representation of unique leaf nodes in an ensemble/tree model mapped
             to some data associated with the leaf nodes.
         It is essentially a wrapper around a dict where the ...
@@ -233,7 +255,7 @@ class SKFoliage(LeafDictionary):
     ..note:
         This class is similar to LucidSKTree, but they are given different names to
             highlight the logical differences. LucidSKTree is a mapping to SKTreeNodes
-            while SKFoliage is a mapping to any attribute of a leaf node.
+            while LeafDataStore is a mapping to any attribute of a leaf node.
         The use of this class is largely for duck typing and for correct use of woodland methods.
 
         This class is NOT meant to be INHERITED from.
@@ -251,8 +273,11 @@ class SKFoliage(LeafDictionary):
                              "of values should be passed into the constructor.")
         str_kw = {"print_format": "path: {}\n{}"}
 
-        super(SKFoliage, self).__init__(
-            tree_leaves, print_limit, create_deepcopy, str_kw)
+        super(LeafDataStore, self).__init__(
+            tree_leaves,
+            print_limit=print_limit,
+            create_deepcopy=create_deepcopy,
+            str_kw=str_kw)
 
 
 class CompressedEnsemble(LeafDictionary):
@@ -293,8 +318,8 @@ class CompressedEnsemble(LeafDictionary):
             raise ValueError("The passed dataframe should")
 
         X_df_copy = X_df.reset_index(drop=True)
-        y_pred = Series(np.zeros(X_df_copy.shape[0]))
+        y_pred = np.zeros(X_df_copy.shape[0])
         for leaf_path, leaf_value in self.items():
             inds_to_set = X_df_copy.query(leaf_path).index
-            y_pred.loc[inds_to_set] += leaf_value
+            y_pred[inds_to_set] += leaf_value
         return y_pred

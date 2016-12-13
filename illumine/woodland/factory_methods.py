@@ -114,16 +114,16 @@ def make_LucidSKEnsemble(sk_ensemble, feature_names, init_estimator=None,
         the index of the column for the feature
 
     :param sk_ensemble: scikit-learn ensemble model object
-    :param feature_names (list): list of names (strings) of the features that were used
-        to split the tree
-    :param display_relation (bool): if marked false then only display feature else display
-        the relation as well; if marked true, the path
-    :param init_estimator (function): function that is the initial estimator of the ensemble
-        defaults to None, if None then the Scikit-learn tree's initial estimator
-    :param float_precision (int): to determine what number the node values, thresholds are
-        rounded to
-    :param tree_kw (dict): key-word arguments to be passed into LucidSKTree's constructor
-    :param ensemble_kw (dict): key-word arguments to be passed into LucidSKEnsemble's constructor
+    :param feature_names (list): list of names (strings) of the features that
+        were used to split the tree
+    :param init_estimator (function): the initial estimator of the ensemble
+        defaults to None, if None then equals Scikit-learn tree's initial estimator
+    :param float_precision (int): to determine what number the node
+        values, thresholds are rounded to
+    :param tree_kw (dict): key-word arguments to be passed into
+        LucidSKTree's constructor
+    :param ensemble_kw (dict): key-word arguments to be passed into
+        LucidSKEnsemble's constructor
 
     :returns: dictionary of SKTreeNode objects indexed by their order in the
         pre-order traversal of the Decision Tree

@@ -100,6 +100,6 @@ class LeafDictionary(object):
         if self.__str_cache is None:
             self.__str_cache = \
                 print_seq(iter_seq=self._seq, print_limit=self.__print_limit,
-                          return_string=True, **self.__str_kw)
+                          strip_at=',', return_string=True, **self.__str_kw)
 
         return self.__str_cache
