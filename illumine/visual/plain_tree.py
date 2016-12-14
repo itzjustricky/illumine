@@ -129,14 +129,14 @@ def active_leaves_boxplot(sk_ensemble, X, n_ax_rows=1):
 
     datapts_per_ax = ceil(1.0 * n_samples / n_ax_rows)
     for ind, ax in enumerate(all_axes):
-        subplt_slice = (datapts_per_ax * ind,
-                        min(datapts_per_ax * (ind + 1), n_samples - 1))
+        slice_start = datapts_per_ax * ind
+        slice_end = min(datapts_per_ax * (ind + 1), n_samples - 1)
 
         ax.boxplot(
-            formatted_predictions[subplt_slice[0]:subplt_slice[1]],
+            formatted_predictions[slice_start:slice_end],
             showfliers=False)
         ax.set_xticks(np.arange(1, datapts_per_ax + 1, datapts_per_ax // 10))
-        ax.set_xticklabels(np.arange(1, datapts_per_ax + 1, datapts_per_ax // 10))
+        ax.set_xticklabels(np.arange(slice_end, slice_end, datapts_per_ax // 10))
         ax.set_xlabel('Datarow #')
         ax.set_ylabel('Predictions')
 
