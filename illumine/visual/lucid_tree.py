@@ -77,7 +77,7 @@ def leaf_rank_barplot(lds_obj, n_top, rank_method, bar_color='#A2F789',
 
     if print_leaf_paths:
         for key, val in leaf_ranks.items():
-            print("[{}]: {:0.3f}\n".format(key, val))
+            print("[{}]: {:0.3f}".format(key, val))
 
     if leaf_output_file is not None:
         with open(leaf_output_file, 'w') as out_file:
