@@ -6,6 +6,7 @@
     @author: Ricky Chang
 """
 
+from math import ceil
 import numpy as np
 
 from ..woodland.leaf_analysis import get_tree_predictions
@@ -15,7 +16,7 @@ __all__ = ['feature_importance_barplot', 'active_leaves_boxplot',
            'step_improvement_plot']
 
 
-def feature_importance_barplot(sk_ensemble, feature_names, plt_title='',
+def feature_importance_barplot(sk_ensemble, feature_names,
                                max_per_plot=10, n_ax_cols=3, bar_color='#A2F789',
                                n_features_to_display=None):
     """ Plot feature importances with horizontal bars
@@ -65,8 +66,7 @@ def feature_importance_barplot(sk_ensemble, feature_names, plt_title='',
     return fig, all_axes
 
 
-def step_improvement_plot(sk_ensemble, X, y, error_func=None,
-                          plt_title=''):
+def step_improvement_plot(sk_ensemble, X, y, error_func=None):
     """ Plot the improvement per tree model added to the tree
 
     :param sk_ensemble: scikit-learn ensemble model object
@@ -99,7 +99,6 @@ def step_improvement_plot(sk_ensemble, X, y, error_func=None,
     ax.plot(staged_errors)
     ax.set_xlabel('# of Estimators')
     ax.set_ylabel('Error')
-    ax.set_title(plt_title)
 
     return fig, ax
 
@@ -128,11 +127,16 @@ def active_leaves_boxplot(sk_ensemble, X, n_ax_rows=1):
     if not isinstance(all_axes, np.ndarray):
         all_axes = np.array([all_axes])
 
-    for ax in all_axes:
-        # TODO: add many subplot functionality to visualize distribution across datarows
-        ax.boxplot(formatted_predictions, showfliers=False)
-        ax.set_xticks(np.arange(1, n_samples + 1, 10))
-        ax.set_xticklabels(np.arange(1, n_samples + 1, 10))
+    datapts_per_ax = ceil(1.0 * n_samples / n_ax_rows)
+    for ind, ax in enumerate(all_axes):
+        subplt_slice = (datapts_per_ax * ind,
+                        min(datapts_per_ax * (ind + 1), n_samples - 1))
+
+        ax.boxplot(
+            formatted_predictions[subplt_slice[0]:subplt_slice[1]],
+            showfliers=False)
+        ax.set_xticks(np.arange(1, datapts_per_ax + 1, datapts_per_ax // 10))
+        ax.set_xticklabels(np.arange(1, datapts_per_ax + 1, datapts_per_ax // 10))
         ax.set_xlabel('Datarow #')
         ax.set_ylabel('Predictions')
 
