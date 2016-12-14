@@ -136,7 +136,7 @@ def active_leaves_boxplot(sk_ensemble, X, n_ax_rows=1):
             formatted_predictions[slice_start:slice_end],
             showfliers=False)
         ax.set_xticks(np.arange(1, datapts_per_ax + 1, datapts_per_ax // 10))
-        ax.set_xticklabels(np.arange(slice_end, slice_end, datapts_per_ax // 10))
+        ax.set_xticklabels(np.arange(slice_start, slice_end, datapts_per_ax // 10))
         ax.set_xlabel('Datarow #')
         ax.set_ylabel('Predictions')
 
