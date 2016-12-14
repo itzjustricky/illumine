@@ -40,6 +40,7 @@ def feature_importance_barplot(sk_ensemble, feature_names, plt_title='',
 
     import matplotlib.pyplot as plt
     fig, (all_axes) = plt.subplots(n_ax_rows, n_ax_cols)
+    # this takes care of situation where n_ax_rows=1
     if not isinstance(all_axes, np.ndarray):
         all_axes = np.array([all_axes])
 
@@ -61,7 +62,7 @@ def feature_importance_barplot(sk_ensemble, feature_names, plt_title='',
         ax.set_xlabel('Relative Importance')
 
     fig.tight_layout()
-    plt.show()
+    return fig, all_axes
 
 
 def step_improvement_plot(sk_ensemble, X, y, error_func=None,
@@ -103,7 +104,7 @@ def step_improvement_plot(sk_ensemble, X, y, error_func=None,
     return fig, ax
 
 
-def active_leaves_boxplot(sk_ensemble, X, plt_title=''):
+def active_leaves_boxplot(sk_ensemble, X, n_ax_rows=1):
     """ Use a boxplot to plot the distribution
 
     :param sk_ensemble: scikit-learn ensemble model object
@@ -122,13 +123,17 @@ def active_leaves_boxplot(sk_ensemble, X, plt_title=''):
     formatted_predictions = make_boxplot_ready(tree_predictions)
     import matplotlib.pyplot as plt
 
-    # TODO: add many subplot functionality to visualize distribution across datarows
-    fig, ax = plt.subplots(1)
-    ax.boxplot(formatted_predictions, showfliers=False)
-    ax.set_xticks(np.arange(1, n_samples + 1, 10))
-    ax.set_xticklabels(np.arange(1, n_samples + 1, 10))
-    ax.set_xlabel('Datarow #')
-    ax.set_ylabel('Predictions')
-    ax.set_title(plt_title)
+    fig, (all_axes) = plt.subplots(n_ax_rows, 1)
+    # this takes care of situation where n_ax_rows=1
+    if not isinstance(all_axes, np.ndarray):
+        all_axes = np.array([all_axes])
 
-    return fig, ax
+    for ax in all_axes:
+        # TODO: add many subplot functionality to visualize distribution across datarows
+        ax.boxplot(formatted_predictions, showfliers=False)
+        ax.set_xticks(np.arange(1, n_samples + 1, 10))
+        ax.set_xticklabels(np.arange(1, n_samples + 1, 10))
+        ax.set_xlabel('Datarow #')
+        ax.set_ylabel('Predictions')
+
+    return fig, all_axes

@@ -99,7 +99,7 @@ def gather_leaf_values(sk_ensemble, X, feature_names, considered_leaves=None,
 
 valid_rank_methods = {
     'absolute-sum': lambda x: np.sum(np.abs(x)),
-    'abssolute-mean': lambda x: np.mean(np.abs(x)),
+    'absolute-mean': lambda x: np.mean(np.abs(x)),
     'count': len}
 
 

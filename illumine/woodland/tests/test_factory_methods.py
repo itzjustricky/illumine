@@ -19,8 +19,8 @@ from illumine.utils import StopWatch
 
 def test_LucidSKTree():
 
-    X1 = np.arange(0, 10, 0.1)
-    X2 = np.arange(10, 20, 0.1)
+    X1 = np.arange(0, 10, 0.1) + np.random.rand(100)
+    X2 = np.arange(10, 20, 0.1) + np.random.rand(100)
 
     y = np.sin(X1).ravel() + np.cos(X2).ravel()
     X_df = pd.DataFrame(np.array([X1, X2]).T, columns=['x1', 'x2'])
