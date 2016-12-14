@@ -20,6 +20,7 @@ import numpy as np
 from pandas import DataFrame
 
 from ..core import LeafDictionary
+from .optimized_predict import create_prediction
 
 
 class SKTreeNode(object):
@@ -123,15 +124,21 @@ class LucidSKTree(LeafDictionary):
         if not isinstance(X_df, DataFrame):
             raise ValueError("Predictions must be done on a Pandas dataframe")
         if not all(X_df.columns == self.feature_names):
-            raise ValueError("The passed dataframe should")
+            raise ValueError("The passed pandas DataFrame columns should equal the "
+                             "contain the feature_names attribute of the LucidSKTree")
 
+        """
         X_df_copy = X_df.reset_index(drop=True)
         for leaf_node in self.values():
             inds_to_set = X_df_copy.query(' & '.join(leaf_node.path)).index
             # update DataFrame to focus only on unused datapoints
             X_df_copy[~X_df_copy.index.isin(inds_to_set)]
             y_pred[inds_to_set] += leaf_node.value
-        return y_pred
+        """
+        # return y_pred
+        leaf_path, leaf_values = zip(*[(leaf.path, leaf.value) for leaf in self.values()])
+
+        return create_prediction(X_df, leaf_path, leaf_values)
 
 
 class LucidSKEnsemble(LeafDictionary):
@@ -317,9 +324,7 @@ class CompressedEnsemble(LeafDictionary):
         if not all(X_df.columns == self.feature_names):
             raise ValueError("The passed dataframe should")
 
-        X_df_copy = X_df.reset_index(drop=True)
-        y_pred = np.zeros(X_df_copy.shape[0])
-        for leaf_path, leaf_value in self.items():
-            inds_to_set = X_df_copy.query(leaf_path).index
-            y_pred[inds_to_set] += leaf_value
-        return y_pred
+        leaf_path, leaf_values = zip(*[(path, value) for path, value in self.items()])
+        leaf_path = [path_string.split(' & ') for path_string in leaf_path]
+
+        return create_prediction(X_df, leaf_path, leaf_values)
