@@ -62,8 +62,8 @@ def leaf_rank_barplot(foliage_obj, n_top, rank_method='abs_sum', bar_color='#A2F
                       plt_xlabel='Index of Sorted Leaves', plt_ylabel='',
                       plt_title='Plot of Sorted Rank'):
     """ Plot the barplot of leaf rank
-        TODO:
-    :param path_output_file:
+
+    :param path_output_file: TODO
     """
 
     if not isinstance(foliage_obj, LeafDataStore):

@@ -12,6 +12,8 @@
 import collections
 import numpy as np
 
+__all__ = ['print_seq']
+
 
 def _enforce_horizontal_limit(string, horizontal_limit, strip_at):
     """ Method to slice a string if passes some horizontal limit

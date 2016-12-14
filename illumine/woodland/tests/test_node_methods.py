@@ -14,7 +14,7 @@ from sklearn.ensemble import GradientBoostingRegressor
 
 from illumine.woodland import make_LucidSKTree
 from illumine.woodland import make_LucidSKEnsemble
-from illumine.util import StopWatch
+from illumine.utils import StopWatch
 
 
 def test_LucidSKTree():

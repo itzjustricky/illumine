@@ -14,7 +14,7 @@ import collections
 
 from copy import deepcopy
 
-from ..util.printing import print_seq
+from ..core.printing import print_seq
 
 
 class LeafDictionary(object):
