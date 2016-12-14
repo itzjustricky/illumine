@@ -8,12 +8,12 @@ cimport cython
 cimport numpy as np
 
 
-@cython.cdivision(False)
-def retrieve_leaf_paths(np.ndarray[double, mode="c", ndim=3] values,
-                        np.ndarray node_samples,
-                        np.ndarray features,
-                        np.ndarray thresholds,
-                        np.ndarray children_right,
+@cython.cdivision(True)
+def retrieve_leaf_paths(np.ndarray[double, ndim=3] values,
+                        np.ndarray[long, ndim=1] node_samples,
+                        np.ndarray[long, ndim=1] features,
+                        np.ndarray[double, ndim=1] thresholds,
+                        np.ndarray[long, ndim=1] children_right,
                         np.ndarray feature_names,
                         int float_precision):
     """ Gather all the leaves and keep track of the paths that
@@ -24,7 +24,9 @@ def retrieve_leaf_paths(np.ndarray[double, mode="c", ndim=3] values,
 
     tracker_stack = []  # a stack to track if all the children of a node is visited
     leaf_path = []      # ptr_stack keeps track of nodes
-    for node_index in range(n_splits):
+
+    cdef int node_index
+    for node_index in xrange(n_splits):
         if len(tracker_stack) != 0:
             tracker_stack[-1] += 1  # visiting the child of the latest node
 
@@ -37,7 +39,7 @@ def retrieve_leaf_paths(np.ndarray[double, mode="c", ndim=3] values,
 
         else:  # visiting leaf
             leaf_meta.append((
-                node_index,                            # leaf index in pre-order traversal
+                node_index,                            # leaf's index in pre-order traversal
                 leaf_path.copy(),                      # path to the leaf
                 float(round(values[node_index][0][0],  # leaf value
                             float_precision)),
