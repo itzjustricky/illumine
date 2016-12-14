@@ -49,15 +49,16 @@ def test_LucidSKEnsemble():
     y = np.sin(X1).ravel() + np.cos(X2).ravel()
     X_df = pd.DataFrame(np.array([X1, X2]).T, columns=['x1', 'x2'])
 
-    clf = GradientBoostingRegressor(n_estimators=5000)
+    clf = GradientBoostingRegressor(n_estimators=5000, max_depth=10)
     clf.fit(X_df, y)
 
-    lucid_ensemble = make_LucidSKEnsemble(
-        clf, feature_names=X_df.columns, float_precision=8)
+    with StopWatch("LucidSKEnsemble construction"):
+        lucid_ensemble = make_LucidSKEnsemble(
+            clf, feature_names=X_df.columns, float_precision=8)
 
-    with StopWatch("Scikit-learn session"):
+    with StopWatch("Scikit-learn"):
         sk_pred = clf.predict(X_df)
-    with StopWatch("Lucid session (non-compressed)"):
+    with StopWatch("Lucid (non-compressed)"):
         lucid_pred = lucid_ensemble.predict(X_df)
     # test prediction outputted from LucidSKEnsemble
     np.testing.assert_almost_equal(lucid_pred, sk_pred)
@@ -67,15 +68,16 @@ def test_LucidSKEnsemble():
           .format(len(lucid_ensemble._compressed_ensemble),
                   len(lucid_ensemble)))
 
-    with StopWatch("Lucid session (compressed)"):
+    with StopWatch("Lucid (compressed)"):
         lucid_pred = lucid_ensemble.predict(X_df)
     # test the compressed prediction
     np.testing.assert_almost_equal(lucid_pred, sk_pred)
 
 
 if __name__ == "__main__":
-    test_LucidSKTree()
+    # test_LucidSKTree()
     test_LucidSKEnsemble()
+
 """
 # Set main function for debugging if error
 import bpdb, sys, traceback

@@ -19,20 +19,43 @@
 
 from collections import OrderedDict
 
+import numpy as np
+
 from .leaf_objects import SKTreeNode
 from .leaf_objects import LucidSKTree
 from .leaf_objects import LucidSKEnsemble
 
+from ._retrieve_leaf_paths import retrieve_leaf_paths
+
 __all__ = ['make_LucidSKTree', 'make_LucidSKEnsemble']
 
 
-# TODO: separate the leaf path retrieval algorithm from make_LucidSKTree
-def _gather_leaf_paths():
+def _gather_leaf_paths(sk_tree, feature_names, float_precision):
     """ This function is used to gather the paths to all the
         leaves given some of the Scikit-learn attributes
         of a decision tree.
     """
-    pass
+    # values & node_samples are only used in SKTreeNode init
+    values = sk_tree.tree_.value
+    node_samples = sk_tree.tree_.n_node_samples
+    features = sk_tree.tree_.feature
+    thresholds = sk_tree.tree_.threshold
+    children_right = sk_tree.tree_.children_right
+    feature_names = np.array(feature_names)
+
+    if len(features) == 0:
+        raise ValueError("The passed tree is empty!")
+
+    leaf_meta = retrieve_leaf_paths(
+        values, node_samples, features, thresholds,
+        children_right, feature_names, float_precision)
+
+    tree_leaves = OrderedDict()
+    # convert function output to SKTreeNodes here
+    for tup in leaf_meta:
+        leaf_ind = tup[0]
+        tree_leaves[leaf_ind] = SKTreeNode(*tup[1:])
+    return tree_leaves
 
 
 def make_LucidSKTree(sk_tree, feature_names, float_precision=5,
@@ -60,46 +83,8 @@ def make_LucidSKTree(sk_tree, feature_names, float_precision=5,
         tree_kw = dict()
     elif not isinstance(tree_kw, dict):
         raise ValueError("tree_kw should be of type dict")
-    tree_leaves = OrderedDict()
 
-    # values & node_samples are only used in SKTreeNode init
-    values = sk_tree.tree_.value
-    node_samples = sk_tree.tree_.n_node_samples
-    features = sk_tree.tree_.feature
-    thresholds = sk_tree.tree_.threshold
-
-    n_splits = len(features)
-    if n_splits == 0:
-        raise ValueError("The passed tree is empty!")
-
-    # leaf path retrieval algorithm
-    tracker_stack = []  # a stack to track if all the children of a node is visited
-    leaf_path = []  # ptr_stack keeps track of nodes
-    for node_index in range(n_splits):
-        if len(tracker_stack) != 0:
-            tracker_stack[-1] += 1  # visiting the child of the latest node
-
-        if features[node_index] != -2:  # visiting inner node
-            tracker_stack.append(0)
-            append_str = "{}<={}".format(
-                feature_names[features[node_index]],
-                float(round(thresholds[node_index], float_precision)))
-            leaf_path.append(append_str)
-        else:  # visiting leaf
-            tree_leaves[node_index] = \
-                SKTreeNode(leaf_path.copy(),
-                           float(round(values[node_index][0][0], float_precision)),
-                           node_samples[node_index])
-
-            if node_index in sk_tree.tree_.children_right:
-                # pop out nodes that I am completely done with
-                while(len(tracker_stack) > 0 and tracker_stack[-1] == 2):
-                    leaf_path.pop()
-                    tracker_stack.pop()
-            if len(leaf_path) != 0:
-                leaf_path[-1] = leaf_path[-1].replace("<=", ">")
-    # end of leaf path retrieval algorithm
-
+    tree_leaves = _gather_leaf_paths(sk_tree, feature_names, float_precision)
     return LucidSKTree(tree_leaves, feature_names, **tree_kw)
 
 
