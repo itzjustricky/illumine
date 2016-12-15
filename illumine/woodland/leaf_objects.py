@@ -263,7 +263,7 @@ class LucidSKEnsemble(LeafDictionary):
             for leaf_node in lucid_tree.values():
                 # sort to make path uniques since splits in
                 # different orders are still equivalent decision trees
-                leaf_path = ' & '.join(sorted(leaf_node.path))
+                leaf_path = ' & '.join(leaf_node.path)
                 unique_leaves[leaf_path] = \
                     unique_leaves.get(leaf_path, 0) \
                     + self._learning_rate * leaf_node.value
