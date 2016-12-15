@@ -140,6 +140,13 @@ class LucidSKTree(LeafDictionary):
 
         return create_prediction(X_df, leaf_path, leaf_values)
 
+    def __reduce__(self):
+        return (self.__class__, (
+            self._seq,
+            self._feature_names,
+            self._print_limit)
+        )
+
 
 class LucidSKEnsemble(LeafDictionary):
     """ Object representation of an ensemble of unraveled decision trees

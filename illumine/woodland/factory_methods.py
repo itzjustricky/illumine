@@ -16,8 +16,8 @@
     @author: Ricky
 """
 
-
 from collections import OrderedDict
+from collections import Iterable
 
 import numpy as np
 
@@ -25,37 +25,57 @@ from .leaf_objects import SKTreeNode
 from .leaf_objects import LucidSKTree
 from .leaf_objects import LucidSKEnsemble
 
-from ._retrieve_leaf_paths import retrieve_leaf_paths
+from ._retrieve_leaf_paths import retrieve_tree_metas
 
 __all__ = ['make_LucidSKTree', 'make_LucidSKEnsemble']
 
 
-def _gather_leaf_paths(sk_tree, feature_names, float_precision):
+def assemble_lucid_trees(sk_trees, feature_names, float_precision, **tree_kw):
     """ This function is used to gather the paths to all the
         leaves given some of the Scikit-learn attributes
         of a decision tree.
     """
-    # values & node_samples are only used in SKTreeNode init
-    values = sk_tree.tree_.value
-    node_samples = sk_tree.tree_.n_node_samples
-    features = sk_tree.tree_.feature
-    thresholds = sk_tree.tree_.threshold
-    children_right = sk_tree.tree_.children_right
-    feature_names = np.array(feature_names)
+    tree_metas = retrieve_tree_metas(
+        *_accumulate_tree_attributes(sk_trees),
+        feature_names=np.array(feature_names),
+        float_precision=float_precision)
 
-    if len(features) == 0:
-        raise ValueError("The passed tree is empty!")
+    lucid_trees = []
+    for tree_meta in tree_metas:
+        tree_leaves = OrderedDict()
+        for leaf_meta in tree_meta:
+            leaf_ind = leaf_meta[0]
+            tree_leaves[leaf_ind] = SKTreeNode(*leaf_meta[1:])
 
-    leaf_meta = retrieve_leaf_paths(
-        values, node_samples, features, thresholds,
-        children_right, feature_names, float_precision)
+        lucid_trees.append(
+            LucidSKTree(tree_leaves, feature_names, **tree_kw))
 
-    tree_leaves = OrderedDict()
-    # convert function output to SKTreeNodes here
-    for tup in leaf_meta:
-        leaf_ind = tup[0]
-        tree_leaves[leaf_ind] = SKTreeNode(*tup[1:])
-    return tree_leaves
+    return lucid_trees
+
+
+def _accumulate_tree_attributes(sk_trees):
+    if not isinstance(sk_trees, Iterable):
+        sk_trees = [sk_trees]
+
+    accm_values = []
+    accm_node_samples = []
+    accm_features = []
+    accm_thresholds = []
+    accm_children_right = []
+
+    for sk_tree in sk_trees:
+        accm_values.append(sk_tree.tree_.value)
+        accm_node_samples.append(sk_tree.tree_.n_node_samples)
+        accm_features.append(sk_tree.tree_.feature)
+        accm_thresholds.append(sk_tree.tree_.threshold)
+        accm_children_right.append(sk_tree.tree_.children_right)
+    return (
+        accm_values,
+        accm_node_samples,
+        accm_features,
+        accm_thresholds,
+        accm_children_right
+    )
 
 
 def make_LucidSKTree(sk_tree, feature_names, float_precision=5,
@@ -83,13 +103,13 @@ def make_LucidSKTree(sk_tree, feature_names, float_precision=5,
         tree_kw = dict()
     elif not isinstance(tree_kw, dict):
         raise ValueError("tree_kw should be of type dict")
+    return assemble_lucid_trees(
+        sk_tree, feature_names, float_precision, **tree_kw)[0]
 
-    tree_leaves = _gather_leaf_paths(sk_tree, feature_names, float_precision)
-    return LucidSKTree(tree_leaves, feature_names, **tree_kw)
 
-
-def make_LucidSKEnsemble(sk_ensemble, feature_names, init_estimator=None,
-                         tree_kw=None, ensemble_kw=None, **kwargs):
+def make_LucidSKEnsemble(sk_ensemble, feature_names, float_precision=5,
+                         init_estimator=None, tree_kw=None,
+                         ensemble_kw=None, **kwargs):
     """ Breakdown a tree's splits and returns the value of every leaf along
         with the path of splits that led to the leaf
 
@@ -122,11 +142,9 @@ def make_LucidSKEnsemble(sk_ensemble, feature_names, init_estimator=None,
     elif not isinstance(ensemble_kw, dict):
         raise ValueError("tree_kw should be of type dict")
 
-    ensemble_of_leaves = []
-    for estimator in sk_ensemble.estimators_:
-        estimator = estimator[0]
-        ensemble_of_leaves.append(
-            make_LucidSKTree(estimator, feature_names, tree_kw=tree_kw, **kwargs))
+    ensemble_of_leaves = assemble_lucid_trees(
+        sk_ensemble.estimators_.ravel(),
+        feature_names, float_precision, **tree_kw)
 
     if init_estimator is None:
         init_estimator = sk_ensemble._init_decision_function

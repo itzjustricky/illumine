@@ -49,7 +49,7 @@ def test_LucidSKEnsemble():
     y = np.sin(X1).ravel() + np.cos(X2).ravel()
     X_df = pd.DataFrame(np.array([X1, X2]).T, columns=['x1', 'x2'])
 
-    clf = GradientBoostingRegressor(n_estimators=5000, max_depth=10)
+    clf = GradientBoostingRegressor(n_estimators=5000, max_depth=3)
     clf.fit(X_df, y)
 
     with StopWatch("LucidSKEnsemble construction"):

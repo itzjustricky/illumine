@@ -9,19 +9,49 @@ cimport numpy as np
 
 
 @cython.cdivision(True)
-def retrieve_leaf_paths(np.ndarray[double, ndim=3] values,
-                        np.ndarray[long, ndim=1] node_samples,
-                        np.ndarray[long, ndim=1] features,
-                        np.ndarray[double, ndim=1] thresholds,
-                        np.ndarray[long, ndim=1] children_right,
+def retrieve_tree_metas(accm_values,
+                        accm_node_samples,
+                        accm_features,
+                        accm_thresholds,
+                        accm_children_right,
                         np.ndarray feature_names,
                         int float_precision):
-    """ Gather all the leaves and keep track of the paths that
-        define the leaf.
+    tree_metas = []
+
+    for tup in zip(accm_values,
+                   accm_node_samples,
+                   accm_features,
+                   accm_thresholds,
+                   accm_children_right):
+
+        tree_metas.append(retrieve_leaf_paths(
+            values=tup[0],
+            node_samples=tup[1],
+            features=tup[2],
+            thresholds=tup[3],
+            children_right=tup[4],
+            feature_names=feature_names,
+            float_precision=float_precision)
+        )
+    return tree_metas
+
+
+cdef retrieve_leaf_paths(np.ndarray[double, ndim=3] values,
+                         np.ndarray[long, ndim=1] node_samples,
+                         np.ndarray[long, ndim=1] features,
+                         np.ndarray[double, ndim=1] thresholds,
+                         np.ndarray[long, ndim=1] children_right,
+                         np.ndarray feature_names,
+                         int float_precision):
+    """ Gather all the leaves of a tree and keep track of the
+        paths that define the leaf.
     """
     n_splits = len(features)
-    leaf_meta = []
 
+    if n_splits == 0:
+        raise ValueError("The passed tree is empty!")
+
+    tree_meta = []
     tracker_stack = []  # a stack to track if all the children of a node is visited
     leaf_path = []      # ptr_stack keeps track of nodes
 
@@ -38,7 +68,7 @@ def retrieve_leaf_paths(np.ndarray[double, ndim=3] values,
             leaf_path.append(append_str)
 
         else:  # visiting leaf
-            leaf_meta.append((
+            tree_meta.append((
                 node_index,                            # leaf's index in pre-order traversal
                 leaf_path.copy(),                      # path to the leaf
                 float(round(values[node_index][0][0],  # leaf value
@@ -54,4 +84,4 @@ def retrieve_leaf_paths(np.ndarray[double, ndim=3] values,
             if len(leaf_path) != 0:
                 leaf_path[-1] = leaf_path[-1].replace("<=", ">")
 
-    return leaf_meta
+    return tree_meta

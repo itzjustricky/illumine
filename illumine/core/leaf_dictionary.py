@@ -37,14 +37,14 @@ class LeafDictionary(object):
             self._seq = deepcopy(tree_leaves)
         else:
             self._seq = tree_leaves
-        self.__str_cache = None  # used to cache the string representation later
-        self.__len = len(tree_leaves)
-        self.__print_limit = print_limit  # limit for how many SKTreeNode objects to print
+        self._str_cache = None  # used to cache the string representation later
+        self._len = len(tree_leaves)
+        self._print_limit = print_limit  # limit for how many SKTreeNode objects to print
 
         if str_kw is None:
-            self.__str_kw = dict()
+            self._str_kw = dict()
         elif isinstance(str_kw, dict):
-            self.__str_kw = str_kw
+            self._str_kw = str_kw
         else:
             raise ValueError("str_kw should be an instance of a dictionary")
 
@@ -77,8 +77,8 @@ class LeafDictionary(object):
     def set_print_limit(self, print_limit):
         if not isinstance(print_limit, int):
             raise ValueError("The print_limit passed should be an integer.")
-        self.__print_limit = print_limit
-        self.__str_cache = None  # reset string cache
+        self._print_limit = print_limit
+        self._str_cache = None  # reset string cache
 
     def __contains__(self, item):
         return self._seq.__contains__(item)
@@ -87,19 +87,19 @@ class LeafDictionary(object):
         return self._seq.__iter__()
 
     def __getitem__(self, key):
-        self.__str_cache = None  # reset string cache
+        self._str_cache = None  # reset string cache
         return self._seq[key]
 
     def __repr__(self):
         return self.__str__()
 
     def __len__(self):
-        return self.__len
+        return self._len
 
     def __str__(self):
-        if self.__str_cache is None:
-            self.__str_cache = \
-                print_seq(iter_seq=self._seq, print_limit=self.__print_limit,
-                          strip_at=',', return_string=True, **self.__str_kw)
+        if self._str_cache is None:
+            self._str_cache = \
+                print_seq(iter_seq=self._seq, print_limit=self._print_limit,
+                          strip_at=',', return_string=True, **self._str_kw)
 
-        return self.__str_cache
+        return self._str_cache
