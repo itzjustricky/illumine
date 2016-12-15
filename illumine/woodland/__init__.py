@@ -17,10 +17,10 @@ from .leaf_analysis import rank_leaves_per_point
 from .leaf_analysis import get_tree_predictions
 from .leaf_analysis import unique_leaves_per_sample
 
-from .rank_methods import generate_error_rank
+from .leaf_validation import generate_error_rank
 
 
 __all__ = [
     'factory_methods', 'leaf_analysis',
-    'leaf_objects', 'rank_methods'
+    'leaf_objects', 'leaf_validation'
 ]

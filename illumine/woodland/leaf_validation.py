@@ -9,6 +9,9 @@
 """
 
 
+# def
+
+
 def generate_error_rank(true_y, error_method):
     """ Generate negative-error function so that
         error creates

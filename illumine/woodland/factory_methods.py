@@ -16,6 +16,7 @@
     @author: Ricky
 """
 
+import logging
 from collections import OrderedDict
 from collections import Iterable
 
@@ -35,10 +36,13 @@ def assemble_lucid_trees(sk_trees, feature_names, float_precision, **tree_kw):
         leaves given some of the Scikit-learn attributes
         of a decision tree.
     """
+    logging.getLogger(__name__).info(
+        "Starting to enter retrieve_tree_metas function")
     tree_metas = retrieve_tree_metas(
         *_accumulate_tree_attributes(sk_trees),
         feature_names=np.array(feature_names),
         float_precision=float_precision)
+    logging.getLogger(__name__).info("Retrieved tree metas")
 
     lucid_trees = []
     for tree_meta in tree_metas:

@@ -75,7 +75,7 @@ def test_LucidSKEnsemble():
 
 
 if __name__ == "__main__":
-    # test_LucidSKTree()
+    test_LucidSKTree()
     test_LucidSKEnsemble()
 
 """
