@@ -17,7 +17,7 @@ from .leaf_analysis import rank_leaves_per_point
 from .leaf_analysis import get_tree_predictions
 from .leaf_analysis import unique_leaves_per_sample
 
-from .leaf_validation import generate_error_rank
+from .leaf_validation import test_leaves
 
 
 __all__ = [

@@ -199,6 +199,7 @@ def get_tree_predictions(sk_ensemble, X, adjust_with_base=False):
     return leaf_values + adjustment[:, np.newaxis]
 
 
+# This function is very slow and I may want to scrap it altogether
 def unique_leaves_per_sample(sk_ensemble, X, feature_names, scale_by_total=True):
     """ Iterate through the samples of data X and count the number
         of unique leaf paths activated
@@ -218,14 +219,15 @@ def unique_leaves_per_sample(sk_ensemble, X, feature_names, scale_by_total=True)
         make_LucidSKEnsemble(sk_ensemble, feature_names=feature_names, display_relation=True)
 
     # Nx1 matrix (where N is the # of samples) with counts of unique leaves per sample
-    X_leaf_counts = []
+    X_leaf_counts = np.zeros(X.shape[0])
     # Iterate through the activated leaves for each data sample
-    for active_leaves in all_activated_leaves:
+    for ind, active_leaves in enumerate(all_activated_leaves):
 
         tmp_leaf_set = set()
         for estimator_ind, active_leaf_ind in enumerate(active_leaves):
             active_leaf = unraveled_ensemble[estimator_ind][active_leaf_ind]
-            tmp_leaf_set.add(active_leaf.path.__str__())
-        X_leaf_counts.append(len(tmp_leaf_set))
+            tmp_leaf_set.add(' & '.join(sorted(active_leaf.path)))
+        # X_leaf_counts[ind].append(len(tmp_leaf_set))
+        X_leaf_counts[ind] = len(tmp_leaf_set)
 
-    return np.array(X_leaf_counts)
+    return X_leaf_counts

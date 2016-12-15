@@ -111,9 +111,13 @@ class LucidSKTree(LeafDictionary):
     def feature_names(self):
         return self._feature_names
 
-    def predict(self, X_df):
+    def predict(self, X_df, considered_leaves=None):
         """ Create predictions from a pandas DataFrame.
             The DataFrame should have the same.
+
+        :param considered_leaves (Iterable): is a list of
+            the leaf paths that are considered for creating
+            the predictions
         """
         y_pred = np.zeros(X_df.shape[0])
         # this indicates the trained tree had no splits
@@ -127,15 +131,8 @@ class LucidSKTree(LeafDictionary):
             raise ValueError("The passed pandas DataFrame columns should equal the "
                              "contain the feature_names attribute of the LucidSKTree")
 
-        """
-        X_df_copy = X_df.reset_index(drop=True)
-        for leaf_node in self.values():
-            inds_to_set = X_df_copy.query(' & '.join(leaf_node.path)).index
-            # update DataFrame to focus only on unused datapoints
-            X_df_copy[~X_df_copy.index.isin(inds_to_set)]
-            y_pred[inds_to_set] += leaf_node.value
-        """
-        # return y_pred
+        if considered_leaves is not None:
+            pass
         leaf_path, leaf_values = zip(*[(leaf.path, leaf.value) for leaf in self.values()])
 
         return create_prediction(X_df, leaf_path, leaf_values)
@@ -161,8 +158,8 @@ class LucidSKEnsemble(LeafDictionary):
         This class is NOT meant to be INHERITED from.
     """
 
-    def __init__(self, tree_ensemble, feature_names, init_estimator, learning_rate,
-                 print_limit=5, create_deepcopy=True):
+    def __init__(self, tree_ensemble, feature_names, init_estimator,
+                 learning_rate, print_limit=5, create_deepcopy=True):
         """ Construct the LucidSKTree object using a dictionary object indexed
             by the leaf's index in the pre-order traversal of the decision tree.
 
@@ -211,15 +208,34 @@ class LucidSKEnsemble(LeafDictionary):
 
     @property
     def unique_leaves_count(self):
-        if self._unique_leaves_count is None:
-            print("AttributeError: you must run compress "
-                  "before getting unique_leaves_count")
+        if not self.is_compressed:
+            raise AttributeError(
+                "you must run the compress() method before "
+                "getting unique_leaves_count.")
         else:
             return self._unique_leaves_count
 
-    def predict(self, X_df):
-        y_pred = np.zeros(X_df.shape[0])
+    @property
+    def is_compressed(self):
+        return self._compressed_ensemble is not None
 
+    @property
+    def compressed_ensemble(self):
+        if self.is_compressed:
+            return self._compressed_ensemble
+        else:
+            raise AttributeError(
+                "you must run the compress() method before "
+                "getting getting the compressed_ensemble.")
+
+    def predict(self, X_df):
+        if not isinstance(X_df, DataFrame):
+            raise ValueError("Predictions must be done on a Pandas dataframe")
+        if not all(X_df.columns == self.feature_names):
+            raise ValueError("The passed pandas DataFrame columns should equal the "
+                             "contain the feature_names attribute of the LucidSKTree")
+
+        y_pred = np.zeros(X_df.shape[0])
         if self._compressed_ensemble is None:
             for lucid_tree in self:
                 y_pred += self._learning_rate * lucid_tree.predict(X_df)

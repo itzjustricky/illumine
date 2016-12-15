@@ -2,9 +2,6 @@
     Description:
         LeafDictionary serves as a base class for classes that
 
-    TODO:
-        * see if custom __reduce__ function is needed
-
 
     @author: Ricky Chang
 """
