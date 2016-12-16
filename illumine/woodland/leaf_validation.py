@@ -1,8 +1,7 @@
 """
     Description:
-        Contains functions to generate rank methods for
-        use in methods in rank_leaves & rank_leaves_per_point
-        in the woodland/leaf_analysis.py module
+        Module containing functions to validate
+        leaves form a LucidSKEnsemble object.
 
 
     @author: Ricky Chang
@@ -20,7 +19,6 @@ def test_leaves(lucid_ensemble, X_df, y_true,
                 score_function, required_threshold, considered_leaves=None,
                 normalize_score=False):
     """
-
     :param normalize_score (bool): indicates whether or not to
         normalize the score by the # of activated indices for
         a certain leaf
@@ -33,8 +31,8 @@ def test_leaves(lucid_ensemble, X_df, y_true,
     f_map = map_features_to_int(X_df.columns)
     X = X_df.values
 
-    considered_leaf_strings = [' & '.join(leaf) for leaf in considered_leaves]
     if considered_leaves is not None:
+        considered_leaf_strings = [' & '.join(leaf) for leaf in considered_leaves]
         filtered_leaves = \
             dict([(key, val) for key, val in lucid_ensemble.compressed_ensemble.items()
                   if key in considered_leaf_strings])

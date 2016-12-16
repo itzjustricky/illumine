@@ -182,6 +182,7 @@ class LucidSKEnsemble(LeafDictionary):
         self._feature_names = feature_names
         self._learning_rate = learning_rate
         self._unique_leaves_count = None
+        self._total_leaves_count = None
 
         # this object will be created if compress method is called
         self._compressed_ensemble = None
@@ -205,6 +206,15 @@ class LucidSKEnsemble(LeafDictionary):
     @property
     def feature_names(self):
         return self._feature_names
+
+    @property
+    def total_leaves_count(self):
+        if self._total_leaves_count is None:
+            cnt = 0
+            for lucid_tree in self:
+                cnt += len(lucid_tree)
+            self._total_leaves_count = cnt
+        return self._total_leaves_count
 
     @property
     def unique_leaves_count(self):
