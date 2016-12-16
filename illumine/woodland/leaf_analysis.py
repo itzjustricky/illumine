@@ -6,18 +6,19 @@
     @author: Ricky Chang
 """
 
-import operator
-from collections import Iterable
-from collections import OrderedDict
-
 import numpy as np
+from pandas import DataFrame
+from scipy.sparse import lil_matrix
 
 from .leaf_objects import LeafDataStore
 from .leaf_objects import LucidSKEnsemble
+
+from .optimized_predict import map_features_to_int
+from .optimized_predict import find_activated
 from .factory_methods import make_LucidSKEnsemble
 
-__all__ = ['gather_leaf_values', 'rank_leaves', 'rank_leaves_per_point',
-           'get_tree_predictions', 'unique_leaves_per_sample']
+__all__ = ['gather_leaf_values', 'get_tree_predictions',
+           'compute_activation']
 
 
 # this method is not meant to be called outside this module
@@ -97,97 +98,18 @@ def gather_leaf_values(sk_ensemble, X, feature_names, considered_leaves=None,
         return lds_list
 
 
-valid_rank_methods = {
-    'absolute-sum': lambda x: np.sum(np.abs(x)),
-    'absolute-mean': lambda x: np.mean(np.abs(x)),
-    'count': len}
-
-
-def rank_leaves(lds_obj, rank_method, float_precision=5, n_top=10):
-    """ Gather the n_top leaves according to some rank_method function
-
-    :param lds_obj: an instance of LeafDataStore that is outputted from
-        aggregate_trained_leaves or aggregate_tested_leaves methods
-    :param n_top (int): the number of leaves to display
-    :param rank_method: the ranking method for the leafpaths
-    """
-    if not isinstance(lds_obj, LeafDataStore):
-        raise ValueError("The lds_obj passed is of type {}".format(type(lds_obj)),
-                         "; it should be an instance of LeafDataStore")
-
-    if isinstance(rank_method, str):
-        if rank_method not in valid_rank_methods.keys():
-            raise ValueError(' '.join((
-                "The passed rank_method ({}) argument is not a valid string argument {}."
-                .format(rank_method, list(valid_rank_methods.keys())),
-                "A callable object can also be passed."))
-            )
-        rank_method = valid_rank_methods[rank_method]
-
-    elif not callable(rank_method):
-        raise ValueError(' '.join((
-            "The passed rank_method argument should be a callable function",
-            "taking a vector as an argument or a valid str {}"
-            .format(list(valid_rank_methods.keys()))
-        )))
-
-    aggregated_ranks = []
-    # Gather the ranks
-    for leaf_path, values in lds_obj.items():
-        aggregated_ranks.append(
-            (leaf_path, round(rank_method(values), float_precision))
-        )
-    aggregated_rank = sorted(aggregated_ranks, key=operator.itemgetter(1), reverse=True)
-
-    return LeafDataStore(OrderedDict(
-        ((path, rank) for path, rank in aggregated_rank[:n_top])))
-
-
-def rank_leaves_per_point(lds_list, rank_method, float_precision=5, n_top=10):
-    """ Gather the n_top leaves according to some rank_method function
-        per data-point
-
-    :param lds_obj: an instance of LeafDataStore that is outputted from
-        aggregate_trained_leaves or aggregate_tested_leaves methods
-    :param n_top: the number of leaves to display
-    :param rank_method: the ranking method for the leafpaths
-    :param considered_leaves: a list of the leaves to be considered
-        defaults to None; if None then all leaves will be considered
-    """
-    if isinstance(lds_list, dict):
-        raise ValueError("The passed argument lds_list should not be a dict, "
-                         "it should be a list of LeafDataStore objects outputted "
-                         "by gather_leaf_values with gather_method=per-point.")
-
-    if not isinstance(lds_list, Iterable):
-        raise ValueError("The passed argument for lds_list "
-                         "must be an iterable object")
-    if not all(map(lambda x: isinstance(x, LeafDataStore), lds_list)):
-        raise ValueError("The passed argument for lds_list must "
-                         "be a list of LeafDataStore objects.")
-
-    rank_list = []
-    for lds_obj in lds_list:
-        rank_list.append(
-            rank_leaves(
-                lds_obj=lds_obj,
-                rank_method=rank_method,
-                float_precision=float_precision,
-                n_top=n_top)
-        )
-    return rank_list
-
-
-def get_tree_predictions(sk_ensemble, X, adjust_with_base=False):
+def get_tree_predictions(sk_ensemble, X, adjust_with_init=False):
     """ Retrieve the tree predictions of each tree in the ensemble
 
     :param sk_ensemble: scikit-learn tree object
     :param X: array_like or sparse matrix, shape = [n_samples, n_features]
-    :param adjust_with_init (bool): whether or not to adjust with the base/initial
-        estimator; by default, in most sklearn ensemble objects, the first prediction
-        is the mean of the target in the training data
+    :param adjust_with_init (bool): whether or not to adjust with the
+        initial estimator.
+
+        By default, in most sklearn ensemble objects, the first
+        prediction is the mean of the target in the training data
     """
-    if adjust_with_base: adjustment = sk_ensemble.init_.predict(X).ravel()
+    if adjust_with_init: adjustment = sk_ensemble.init_.predict(X).ravel()
     else: adjustment = np.zeros(X.shape[0])
 
     leaf_values = np.zeros((X.shape[0], sk_ensemble.n_estimators))
@@ -199,35 +121,38 @@ def get_tree_predictions(sk_ensemble, X, adjust_with_base=False):
     return leaf_values + adjustment[:, np.newaxis]
 
 
-# This function is very slow and I may want to scrap it altogether
-def unique_leaves_per_sample(sk_ensemble, X, feature_names, scale_by_total=True):
-    """ Iterate through the samples of data X and count the number
-        of unique leaf paths activated
-
-    :param sk_ensemble: scikit-learn ensemble model object
-    :param X: the feature matrix (Nxp) where N and p is the # of samples and
-        features, respectively
-    :param feature_names (list): list of names (strings) of the features that
-        were used to split the tree
-    :param scale_by_total (bool): indicate whether or not to scale by the
-        total number of unique leaves in the sk_ensemble
+def compute_activation(lucid_ensemble, X_df, considered_leaves=None):
+    """ Compute an activation matrix to be used as vectors for
+        clustering leaves together
     """
+    if not isinstance(X_df, DataFrame):
+        raise ValueError("The passed X_df argument should be of type DataFrame.")
 
-    # Get a matrix of all the leaves activated
-    all_activated_leaves = sk_ensemble.apply(X)
-    unraveled_ensemble = \
-        make_LucidSKEnsemble(sk_ensemble, feature_names=feature_names, display_relation=True)
+    if not isinstance(lucid_ensemble, LucidSKEnsemble):
+        raise ValueError("The passed lucid_ensemble argument should "
+                         "be of type LucidSKEnsemble.")
 
-    # Nx1 matrix (where N is the # of samples) with counts of unique leaves per sample
-    X_leaf_counts = np.zeros(X.shape[0])
-    # Iterate through the activated leaves for each data sample
-    for ind, active_leaves in enumerate(all_activated_leaves):
+    f_map = map_features_to_int(X_df.columns)
+    X = X_df.values
 
-        tmp_leaf_set = set()
-        for estimator_ind, active_leaf_ind in enumerate(active_leaves):
-            active_leaf = unraveled_ensemble[estimator_ind][active_leaf_ind]
-            tmp_leaf_set.add(' & '.join(sorted(active_leaf.path)))
-        # X_leaf_counts[ind].append(len(tmp_leaf_set))
-        X_leaf_counts[ind] = len(tmp_leaf_set)
+    if considered_leaves is not None:
+        considered_leaf_strings = [' & '.join(leaf) for leaf in considered_leaves]
+        filtered_leaves = \
+            dict([(key, val) for key, val in lucid_ensemble.compressed_ensemble.items()
+                  if key in considered_leaf_strings])
+    else:
+        filtered_leaves = lucid_ensemble.compressed_ensemble.items()
 
-    return X_leaf_counts
+    leaf_paths = []
+    activation_matrix = lil_matrix(
+        (X_df.shape[0], lucid_ensemble.unique_leaves_count),
+        dtype=bool)
+
+    for ind, leaf_pair in enumerate(filtered_leaves):
+        path, value = leaf_pair
+
+        leaf_paths.append(path)
+        activated_indices = find_activated(X, f_map, path.split(' & '))
+        activation_matrix[np.where(activated_indices)[0], ind] = 1
+
+    return np.array(leaf_paths), activation_matrix.tocsr()
