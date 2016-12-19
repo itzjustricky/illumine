@@ -89,6 +89,16 @@ class LucidSKTree(LeafDictionary):
             by the leaf's index in the pre-order traversal of the decision tree.
 
             The leaf's index is in set [0, k-1] where k is the # of nodes (inner & leaf nodes)
+
+        :param tree_leaves (dict): a dictionary of representations of the leaves from the
+            Scikit-learn tree models, the keys are the index of the leaves in the pre-order
+            traversal of the decision tree
+        :param feature_names (list): list of names (strings) of the features that
+            were used to split the tree
+        :param print_limit (int): configuration for how to print the LucidSKEnsemble
+            out to the console
+        :param create_deepcopy (bool): indicates whether or not to make a deepcopy of
+            the tree_leaves argument passed into the __init__ function
         """
         if not isinstance(tree_leaves, dict):
             raise ValueError("A dictionary object with keys mapped to SKTreeNodes should ",
@@ -171,7 +181,7 @@ class LucidSKEnsemble(LeafDictionary):
         :param init_estimator (function): function that is the initial estimator of the ensemble
         :param print_limit (int): configuration for how to print the LucidSKEnsemble
             out to the console
-        :param deepcopy (bool): indicates whether or not to make a deepcopy of
+        :param create_deepcopy (bool): indicates whether or not to make a deepcopy of
             the tree_ensemble argument passed into the __init__ function
         """
         if not isinstance(tree_ensemble, list):
@@ -205,10 +215,16 @@ class LucidSKEnsemble(LeafDictionary):
 
     @property
     def feature_names(self):
+        """ The name of the features that were used
+            to train the scikit-learn model
+        """
         return self._feature_names
 
     @property
     def total_leaves_count(self):
+        """ The # of total leaves in the Ensemble, i.e. certain
+            unique leaves may be counted more than once.
+        """
         if self._total_leaves_count is None:
             cnt = 0
             for lucid_tree in self:
@@ -218,6 +234,7 @@ class LucidSKEnsemble(LeafDictionary):
 
     @property
     def unique_leaves_count(self):
+        """ The # of unique leaves in the Ensemble """
         if not self.is_compressed:
             raise AttributeError(
                 "you must run the compress() method before "
@@ -227,16 +244,32 @@ class LucidSKEnsemble(LeafDictionary):
 
     @property
     def is_compressed(self):
+        """ Boolean to indicate whether or not the LucidSKEnsemble
+            object is compressed or not.
+        """
         return self._compressed_ensemble is not None
 
     @property
     def compressed_ensemble(self):
+        """ The actual CompressedEnsemble object.
+            The compress() method must be called before
+            trying to get this object.
+        """
         if self.is_compressed:
             return self._compressed_ensemble
         else:
             raise AttributeError(
                 "you must run the compress() method before "
                 "getting getting the compressed_ensemble.")
+
+    def __reduce__(self):
+        return (self.__class__, (
+            self._seq,
+            self.feature_names,
+            self._init_estimator,
+            self._learning_rate,
+            self._print_limit)
+        )
 
     def predict(self, X_df):
         if not isinstance(X_df, DataFrame):
@@ -340,6 +373,7 @@ class CompressedEnsemble(LeafDictionary):
             by the leaf's index in the pre-order traversal of the decision tree.
 
             The leaf's index is in set [0, k-1] where k is the # of nodes (inner & leaf nodes)
+            This object should be constructed using LucidSKEnsemble.compress() method
         """
         if not isinstance(tree_leaves, dict):
             raise ValueError("A dictionary object with keys mapped to SKTreeNodes should ",
@@ -356,6 +390,9 @@ class CompressedEnsemble(LeafDictionary):
 
     @property
     def feature_names(self):
+        """ The name of the features that were used
+            to train the scikit-learn model
+        """
         return self._feature_names
 
     def predict(self, X_df):
