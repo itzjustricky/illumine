@@ -16,7 +16,7 @@ from .optimized_predict import find_activated
 
 
 def test_leaves(lucid_ensemble, X_df, y_true,
-                score_function, required_threshold, considered_leaves=None,
+                score_function, required_threshold=0, considered_leaves=None,
                 normalize_score=False):
     """
     :param normalize_score (bool): indicates whether or not to
@@ -32,15 +32,18 @@ def test_leaves(lucid_ensemble, X_df, y_true,
     X = X_df.values
 
     if considered_leaves is not None:
-        considered_leaf_strings = [' & '.join(leaf) for leaf in considered_leaves]
+        # if not all(map(lambda x: isinstance(x, str), considered_leaves)):
+        # considered_leaf = [' & '.join(leaf) for leaf in considered_leaves]
         filtered_leaves = \
-            dict([(key, val) for key, val in lucid_ensemble.compressed_ensemble.items()
-                  if key in considered_leaf_strings])
+            dict(((key, lucid_ensemble.compressed_ensemble[key])
+                  for key in considered_leaves))
+        # dict([(key, val) for key, val in lucid_ensemble.compressed_ensemble.items()
+        # if key in considered_leaves])
     else:
-        filtered_leaves = lucid_ensemble.compressed_ensemble.items()
+        filtered_leaves = lucid_ensemble.compressed_ensemble
 
     scores = dict()
-    for ind, leaf_pair in enumerate(filtered_leaves):
+    for ind, leaf_pair in enumerate(filtered_leaves.items()):
         path, value = leaf_pair
         activated_indices = find_activated(X, f_map, path.split(' & '))
         n_activated = np.sum(activated_indices)
