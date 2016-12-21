@@ -122,13 +122,9 @@ class LucidSKTree(LeafDictionary):
     def feature_names(self):
         return self._feature_names
 
-    def predict(self, X_df, considered_leaves=None):
+    def predict(self, X_df):
         """ Create predictions from a pandas DataFrame.
             The DataFrame should have the same.
-
-        :param considered_leaves (Iterable): is a list of
-            the leaf paths that are considered for creating
-            the predictions
         """
         y_pred = np.zeros(X_df.shape[0])
         # this indicates the trained tree had no splits
@@ -142,9 +138,8 @@ class LucidSKTree(LeafDictionary):
             raise ValueError("The passed pandas DataFrame columns should equal the "
                              "contain the feature_names attribute of the LucidSKTree")
 
-        if considered_leaves is not None:
-            pass
-        leaf_path, leaf_values = zip(*[(leaf.path, leaf.value) for leaf in self.values()])
+        leaf_path, leaf_values = \
+            zip(*[(leaf.path, leaf.value) for leaf in self.values()])
 
         return create_prediction(X_df, leaf_path, leaf_values)
 
@@ -263,7 +258,7 @@ class LucidSKEnsemble(LeafDictionary):
         else:
             raise AttributeError(
                 "you must run the compress() method before "
-                "getting getting the compressed_ensemble.")
+                "getting the compressed_ensemble.")
 
     def __reduce__(self):
         return (self.__class__, (

@@ -15,9 +15,9 @@ from .optimized_predict import map_features_to_int
 from .optimized_predict import find_activated
 
 
-def test_leaves(lucid_ensemble, X_df, y_true,
-                score_function, required_threshold=0, considered_leaves=None,
-                normalize_score=False):
+def score_leaves(lucid_ensemble, X_df, y_true,
+                 score_function, required_threshold=0, considered_leaves=None,
+                 normalize_score=False):
     """
     :param normalize_score (bool): indicates whether or not to
         normalize the score by the # of activated indices for
@@ -32,8 +32,10 @@ def test_leaves(lucid_ensemble, X_df, y_true,
     X = X_df.values
 
     if considered_leaves is not None:
-        # if not all(map(lambda x: isinstance(x, str), considered_leaves)):
-        # considered_leaf = [' & '.join(leaf) for leaf in considered_leaves]
+        if not all(map(lambda x: isinstance(x, str), considered_leaves)):
+            raise ValueError(
+                "All elements of considered_leaves should be of type string; "
+                "the elements are string representations of the leaf-paths.")
         filtered_leaves = \
             dict(((key, lucid_ensemble.compressed_ensemble[key])
                   for key in considered_leaves))

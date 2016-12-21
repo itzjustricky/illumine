@@ -91,9 +91,9 @@ def gather_leaf_values(sk_ensemble, X, feature_names, considered_leaves=None,
     else:  # gather_method == 'per-point'
         lds_list = []
         for active_leaves in all_activated_leaves:
-            point_lds = \
-                _gather_leaf_values(lucid_ensemble, active_leaves.reshape(1, -1),
-                                    considered_leaves, create_deepcopy=False)
+            point_lds = _gather_leaf_values(
+                lucid_ensemble, active_leaves.reshape(1, -1),
+                considered_leaves, create_deepcopy=False)
             lds_list.append(point_lds)
         return lds_list
 
@@ -123,7 +123,10 @@ def get_tree_predictions(sk_ensemble, X, adjust_with_init=False):
 
 def compute_activation(lucid_ensemble, X_df, considered_leaves=None):
     """ Compute an activation matrix to be used as vectors for
-        clustering leaves together
+        clustering leaves together.
+
+        This function requires that lucid_ensemble is compressed, i.e.
+        the compress() method was called.
     """
     if not isinstance(X_df, DataFrame):
         raise ValueError("The passed X_df argument should be of type DataFrame.")
@@ -136,19 +139,22 @@ def compute_activation(lucid_ensemble, X_df, considered_leaves=None):
     X = X_df.values
 
     if considered_leaves is not None:
-        considered_leaf_strings = [' & '.join(leaf) for leaf in considered_leaves]
+        if not all(map(lambda x: isinstance(x, str), considered_leaves)):
+            raise ValueError(
+                "All elements of considered_leaves should be of type string; "
+                "the elements are string representations of the leaf-paths.")
         filtered_leaves = \
-            dict([(key, val) for key, val in lucid_ensemble.compressed_ensemble.items()
-                  if key in considered_leaf_strings])
+            dict(((key, lucid_ensemble.compressed_ensemble[key])
+                  for key in considered_leaves))
     else:
-        filtered_leaves = lucid_ensemble.compressed_ensemble.items()
+        filtered_leaves = lucid_ensemble.compressed_ensemble
 
     leaf_paths = []
     activation_matrix = lil_matrix(
         (X_df.shape[0], lucid_ensemble.unique_leaves_count),
         dtype=bool)
 
-    for ind, leaf_pair in enumerate(filtered_leaves):
+    for ind, leaf_pair in enumerate(filtered_leaves.items()):
         path, value = leaf_pair
 
         leaf_paths.append(path)

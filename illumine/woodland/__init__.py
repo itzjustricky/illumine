@@ -15,7 +15,7 @@ from .leaf_analysis import gather_leaf_values
 from .leaf_analysis import get_tree_predictions
 from .leaf_analysis import compute_activation
 
-from .leaf_validation import test_leaves
+from .leaf_validation import score_leaves
 
 __all__ = [
     'factory_methods', 'leaf_analysis',
