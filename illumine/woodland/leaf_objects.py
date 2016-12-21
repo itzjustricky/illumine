@@ -13,6 +13,7 @@
     @author: Ricky
 """
 
+from copy import deepcopy
 from collections import Iterable
 from collections import OrderedDict
 
@@ -197,12 +198,14 @@ class LucidSKEnsemble(LeafDictionary):
         # this object will be created if compress method is called
         self._compressed_ensemble = None
 
-        if not callable(init_estimator):
+        if not hasattr(init_estimator, 'predict'):
             raise ValueError(
-                "The init_estimator should be a callable function that "
-                "takes X (feature matrix) as an argument.")
+                "The init_estimator should be an object with a predict "
+                "function with function signature predict(self, X) "
+                "where X is the feature matrix.")
         else:
-            self._init_estimator = init_estimator
+            # this must be deepcopied to make LucidSKEnsemble pickeable
+            self._init_estimator = deepcopy(init_estimator)
 
         str_kw = {"print_format": "Estimator {}\n============\n{}",
                   "print_with_index": True}
@@ -283,10 +286,10 @@ class LucidSKEnsemble(LeafDictionary):
             for lucid_tree in self:
                 y_pred += self._learning_rate * lucid_tree.predict(X_df)
 
-            return y_pred + self._init_estimator(X_df).ravel()
+            return y_pred + self._init_estimator.predict(X_df).ravel()
         else:
             return self._compressed_ensemble.predict(X_df) \
-                + self._init_estimator(X_df).ravel()
+                + self._init_estimator.predict(X_df).ravel()
 
     def compress(self, **kwargs):
         """ Create a CompressedEnsemble object which aggregates all

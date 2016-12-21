@@ -17,6 +17,7 @@
 """
 
 import logging
+from copy import deepcopy
 from collections import OrderedDict
 from collections import Iterable
 
@@ -151,11 +152,12 @@ def make_LucidSKEnsemble(sk_ensemble, feature_names, float_precision=5,
         feature_names, float_precision, **tree_kw)
 
     if init_estimator is None:
-        init_estimator = sk_ensemble._init_decision_function
-    elif not callable(init_estimator):
+        init_estimator = sk_ensemble.init_
+    elif not hasattr(init_estimator, 'predict'):
         raise ValueError(
-            "The init_estimator should be a callable function that "
-            "takes X (feature matrix) as an argument.")
+            "The init_estimator should be an object with a predict "
+            "function with function signature predict(self, X) "
+            "where X is the feature matrix.")
 
     return LucidSKEnsemble(
         ensemble_of_leaves, feature_names,

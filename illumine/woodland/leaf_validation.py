@@ -1,7 +1,7 @@
 """
     Description:
         Module containing functions to validate
-        leaves form a LucidSKEnsemble object.
+        leaves from a LucidSKEnsemble object.
 
 
     @author: Ricky Chang
