@@ -772,6 +772,7 @@ typedef npy_longdouble __pyx_t_5numpy_longdouble_t;
 
 
 /*--- Type declarations ---*/
+struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit;
 
 /* "../../../anaconda2/envs/py33/lib/python3.3/site-packages/Cython/Includes/numpy/__init__.pxd":764
  * ctypedef npy_longdouble longdouble_t
@@ -808,6 +809,22 @@ typedef npy_clongdouble __pyx_t_5numpy_clongdouble_t;
  * cdef inline object PyArray_MultiIterNew1(a):
  */
 typedef npy_cdouble __pyx_t_5numpy_complex_t;
+
+/* "illumine/woodland/_retrieve_leaf_paths.pyx":36
+ * 
+ * 
+ * cdef class TreeSplit:             # <<<<<<<<<<<<<<
+ *     """ Representation of TreeSplit which contains
+ *         feature_name, relation, threshold of a
+ */
+struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit {
+  PyObject_HEAD
+  PyObject *_feature_name;
+  PyObject *_relation;
+  double _threshold;
+  int _float_precision;
+};
+
 
 /* --- Runtime support code (head) --- */
 /* Refnanny.proto */
@@ -957,6 +974,21 @@ static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i,
 /* ExtTypeTest.proto */
 static CYTHON_INLINE int __Pyx_TypeTest(PyObject *obj, PyTypeObject *type);
 
+/* PyObjectCallMethO.proto */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg);
+#endif
+
+/* PyObjectCallOneArg.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg);
+
+/* PyObjectCallNoArg.proto */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func);
+#else
+#define __Pyx_PyObject_CallNoArg(func) __Pyx_PyObject_Call(func, __pyx_empty_tuple, NULL)
+#endif
+
 /* BufferFormatCheck.proto */
 static CYTHON_INLINE int  __Pyx_GetBufferAndValidate(Py_buffer* buf, PyObject* obj,
     __Pyx_TypeInfo* dtype, int flags, int nd, int cast, __Pyx_BufFmt_StackElem* stack);
@@ -1015,27 +1047,6 @@ static CYTHON_INLINE int __Pyx_SetItemInt_Fast(PyObject *o, Py_ssize_t i, PyObje
 static void __Pyx_RaiseBufferIndexError(int axis);
 
 #define __Pyx_BufPtrStrided1d(type, buf, i0, s0) (type)((char*)buf + i0 * s0)
-/* PyObjectCallMethO.proto */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg);
-#endif
-
-/* PyObjectCallOneArg.proto */
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg);
-
-/* PyObjectCallNoArg.proto */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func);
-#else
-#define __Pyx_PyObject_CallNoArg(func) __Pyx_PyObject_Call(func, __pyx_empty_tuple, NULL)
-#endif
-
-/* PySequenceContains.proto */
-static CYTHON_INLINE int __Pyx_PySequence_ContainsTF(PyObject* item, PyObject* seq, int eq) {
-    int result = PySequence_Contains(seq, item);
-    return unlikely(result < 0) ? result : (result == (eq == Py_EQ));
-}
-
 /* PyIntBinop.proto */
 #if CYTHON_COMPILING_IN_CPYTHON
 static PyObject* __Pyx_PyInt_EqObjC(PyObject *op1, PyObject *op2, long intval, int inplace);
@@ -1328,7 +1339,8 @@ static PyTypeObject *__pyx_ptype_5numpy_ufunc = 0;
 static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *, char *, char *, int *); /*proto*/
 
 /* Module declarations from 'illumine.woodland._retrieve_leaf_paths' */
-static PyObject *__pyx_f_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_leaf_paths(PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, int); /*proto*/
+static PyTypeObject *__pyx_ptype_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit = 0;
+static PyObject *__pyx_f_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_leaf_path(PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, int); /*proto*/
 static __Pyx_TypeInfo __Pyx_TypeInfo_double = { "double", NULL, sizeof(double), { 0 }, 0, 'R', 0, 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_long = { "long", NULL, sizeof(long), { 0 }, 0, IS_UNSIGNED(long) ? 'U' : 'I', IS_UNSIGNED(long), 0 };
 #define __Pyx_MODULE_NAME "illumine.woodland._retrieve_leaf_paths"
@@ -1336,15 +1348,17 @@ int __pyx_module_is_main_illumine__woodland___retrieve_leaf_paths = 0;
 
 /* Implementation of 'illumine.woodland._retrieve_leaf_paths' */
 static PyObject *__pyx_builtin_zip;
+static PyObject *__pyx_builtin_round;
 static PyObject *__pyx_builtin_ValueError;
 static PyObject *__pyx_builtin_xrange;
-static PyObject *__pyx_builtin_round;
 static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_RuntimeError;
-static const char __pyx_k__2[] = "{}<={}";
+static const char __pyx_k_[] = "{}{}{}";
 static const char __pyx_k__3[] = "<=";
 static const char __pyx_k__4[] = ">";
+static const char __pyx_k_key[] = "__key";
 static const char __pyx_k_pop[] = "pop";
+static const char __pyx_k_str[] = "__str__";
 static const char __pyx_k_tup[] = "tup";
 static const char __pyx_k_zip[] = "zip";
 static const char __pyx_k_copy[] = "copy";
@@ -1354,21 +1368,22 @@ static const char __pyx_k_range[] = "range";
 static const char __pyx_k_round[] = "round";
 static const char __pyx_k_format[] = "format";
 static const char __pyx_k_xrange[] = "xrange";
-static const char __pyx_k_replace[] = "replace";
+static const char __pyx_k_relation[] = "relation";
+static const char __pyx_k_threshold[] = "threshold";
 static const char __pyx_k_ValueError[] = "ValueError";
 static const char __pyx_k_tree_metas[] = "tree_metas";
 static const char __pyx_k_accm_values[] = "accm_values";
 static const char __pyx_k_RuntimeError[] = "RuntimeError";
+static const char __pyx_k_feature_name[] = "feature_name";
 static const char __pyx_k_accm_features[] = "accm_features";
 static const char __pyx_k_feature_names[] = "feature_names";
 static const char __pyx_k_accm_thresholds[] = "accm_thresholds";
 static const char __pyx_k_float_precision[] = "float_precision";
 static const char __pyx_k_accm_node_samples[] = "accm_node_samples";
-static const char __pyx_k_accm_children_right[] = "accm_children_right";
 static const char __pyx_k_retrieve_tree_metas[] = "retrieve_tree_metas";
 static const char __pyx_k_The_passed_tree_is_empty[] = "The passed tree is empty!";
 static const char __pyx_k_ndarray_is_not_C_contiguous[] = "ndarray is not C contiguous";
-static const char __pyx_k_Cython_module_for_the_retrieve[] = "\n    Cython module for the retrieve_leaf_paths\n    function used to build lucid-tree objects\n\n";
+static const char __pyx_k_Cython_module_for_the_retrieve[] = "\n    Cython module for the retrieve_leaf_path\n    function used to build lucid-tree objects\n\n";
 static const char __pyx_k_home_itzjustricky_workspace_git[] = "/home/itzjustricky/workspace/gitdev/illumine/illumine/woodland/_retrieve_leaf_paths.pyx";
 static const char __pyx_k_unknown_dtype_code_in_numpy_pxd[] = "unknown dtype code in numpy.pxd (%d)";
 static const char __pyx_k_Format_string_allocated_too_shor[] = "Format string allocated too short, see comment in numpy.pxd";
@@ -1376,48 +1391,60 @@ static const char __pyx_k_Non_native_byte_order_not_suppor[] = "Non-native byte 
 static const char __pyx_k_illumine_woodland__retrieve_leaf[] = "illumine.woodland._retrieve_leaf_paths";
 static const char __pyx_k_ndarray_is_not_Fortran_contiguou[] = "ndarray is not Fortran contiguous";
 static const char __pyx_k_Format_string_allocated_too_shor_2[] = "Format string allocated too short.";
+static PyObject *__pyx_kp_s_;
 static PyObject *__pyx_kp_u_Format_string_allocated_too_shor;
 static PyObject *__pyx_kp_u_Format_string_allocated_too_shor_2;
 static PyObject *__pyx_kp_u_Non_native_byte_order_not_suppor;
 static PyObject *__pyx_n_s_RuntimeError;
 static PyObject *__pyx_kp_s_The_passed_tree_is_empty;
 static PyObject *__pyx_n_s_ValueError;
-static PyObject *__pyx_kp_s__2;
 static PyObject *__pyx_kp_s__3;
 static PyObject *__pyx_kp_s__4;
-static PyObject *__pyx_n_s_accm_children_right;
 static PyObject *__pyx_n_s_accm_features;
 static PyObject *__pyx_n_s_accm_node_samples;
 static PyObject *__pyx_n_s_accm_thresholds;
 static PyObject *__pyx_n_s_accm_values;
 static PyObject *__pyx_n_s_copy;
+static PyObject *__pyx_n_s_feature_name;
 static PyObject *__pyx_n_s_feature_names;
 static PyObject *__pyx_n_s_float_precision;
 static PyObject *__pyx_n_s_format;
 static PyObject *__pyx_kp_s_home_itzjustricky_workspace_git;
 static PyObject *__pyx_n_s_illumine_woodland__retrieve_leaf;
+static PyObject *__pyx_n_s_key;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_kp_u_ndarray_is_not_C_contiguous;
 static PyObject *__pyx_kp_u_ndarray_is_not_Fortran_contiguou;
 static PyObject *__pyx_n_s_pop;
 static PyObject *__pyx_n_s_range;
-static PyObject *__pyx_n_s_replace;
+static PyObject *__pyx_n_s_relation;
 static PyObject *__pyx_n_s_retrieve_tree_metas;
 static PyObject *__pyx_n_s_round;
+static PyObject *__pyx_n_s_str;
 static PyObject *__pyx_n_s_test;
+static PyObject *__pyx_n_s_threshold;
 static PyObject *__pyx_n_s_tree_metas;
 static PyObject *__pyx_n_s_tup;
 static PyObject *__pyx_kp_u_unknown_dtype_code_in_numpy_pxd;
 static PyObject *__pyx_n_s_xrange;
 static PyObject *__pyx_n_s_zip;
-static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_tree_metas(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_accm_values, PyObject *__pyx_v_accm_node_samples, PyObject *__pyx_v_accm_features, PyObject *__pyx_v_accm_thresholds, PyObject *__pyx_v_accm_children_right, PyArrayObject *__pyx_v_feature_names, int __pyx_v_float_precision); /* proto */
+static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_tree_metas(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_accm_values, PyObject *__pyx_v_accm_node_samples, PyObject *__pyx_v_accm_features, PyObject *__pyx_v_accm_thresholds, PyArrayObject *__pyx_v_feature_names, int __pyx_v_float_precision); /* proto */
+static int __pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit___cinit__(struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *__pyx_v_self, PyObject *__pyx_v_feature_name, PyObject *__pyx_v_relation, double __pyx_v_threshold, int __pyx_v_float_precision); /* proto */
+static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_12feature_name___get__(struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_8relation___get__(struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_9threshold___get__(struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_2__key(struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *__pyx_v_self); /* proto */
+static Py_hash_t __pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_4__hash__(struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_6__str__(struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_8__repr__(struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *__pyx_v_self); /* proto */
 static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info); /* proto */
+static PyObject *__pyx_tp_new_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static __Pyx_CachedCFunction __pyx_umethod_PyList_Type_pop = {0, &__pyx_n_s_pop, 0, 0, 0};
 static PyObject *__pyx_int_0;
 static PyObject *__pyx_int_1;
 static PyObject *__pyx_int_2;
-static PyObject *__pyx_tuple_;
+static PyObject *__pyx_tuple__2;
 static PyObject *__pyx_tuple__5;
 static PyObject *__pyx_tuple__6;
 static PyObject *__pyx_tuple__7;
@@ -1425,8 +1452,7 @@ static PyObject *__pyx_tuple__8;
 static PyObject *__pyx_tuple__9;
 static PyObject *__pyx_tuple__10;
 static PyObject *__pyx_tuple__11;
-static PyObject *__pyx_tuple__12;
-static PyObject *__pyx_codeobj__13;
+static PyObject *__pyx_codeobj__12;
 
 /* "illumine/woodland/_retrieve_leaf_paths.pyx":12
  * 
@@ -1444,20 +1470,18 @@ static PyObject *__pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_1retrieve_t
   PyObject *__pyx_v_accm_node_samples = 0;
   PyObject *__pyx_v_accm_features = 0;
   PyObject *__pyx_v_accm_thresholds = 0;
-  PyObject *__pyx_v_accm_children_right = 0;
   PyArrayObject *__pyx_v_feature_names = 0;
   int __pyx_v_float_precision;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("retrieve_tree_metas (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_accm_values,&__pyx_n_s_accm_node_samples,&__pyx_n_s_accm_features,&__pyx_n_s_accm_thresholds,&__pyx_n_s_accm_children_right,&__pyx_n_s_feature_names,&__pyx_n_s_float_precision,0};
-    PyObject* values[7] = {0,0,0,0,0,0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_accm_values,&__pyx_n_s_accm_node_samples,&__pyx_n_s_accm_features,&__pyx_n_s_accm_thresholds,&__pyx_n_s_feature_names,&__pyx_n_s_float_precision,0};
+    PyObject* values[6] = {0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
         case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
@@ -1475,38 +1499,33 @@ static PyObject *__pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_1retrieve_t
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_accm_node_samples)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("retrieve_tree_metas", 1, 7, 7, 1); __PYX_ERR(0, 12, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("retrieve_tree_metas", 1, 6, 6, 1); __PYX_ERR(0, 12, __pyx_L3_error)
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_accm_features)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("retrieve_tree_metas", 1, 7, 7, 2); __PYX_ERR(0, 12, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("retrieve_tree_metas", 1, 6, 6, 2); __PYX_ERR(0, 12, __pyx_L3_error)
         }
         case  3:
         if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_accm_thresholds)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("retrieve_tree_metas", 1, 7, 7, 3); __PYX_ERR(0, 12, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("retrieve_tree_metas", 1, 6, 6, 3); __PYX_ERR(0, 12, __pyx_L3_error)
         }
         case  4:
-        if (likely((values[4] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_accm_children_right)) != 0)) kw_args--;
+        if (likely((values[4] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_feature_names)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("retrieve_tree_metas", 1, 7, 7, 4); __PYX_ERR(0, 12, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("retrieve_tree_metas", 1, 6, 6, 4); __PYX_ERR(0, 12, __pyx_L3_error)
         }
         case  5:
-        if (likely((values[5] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_feature_names)) != 0)) kw_args--;
+        if (likely((values[5] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_float_precision)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("retrieve_tree_metas", 1, 7, 7, 5); __PYX_ERR(0, 12, __pyx_L3_error)
-        }
-        case  6:
-        if (likely((values[6] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_float_precision)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("retrieve_tree_metas", 1, 7, 7, 6); __PYX_ERR(0, 12, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("retrieve_tree_metas", 1, 6, 6, 5); __PYX_ERR(0, 12, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "retrieve_tree_metas") < 0)) __PYX_ERR(0, 12, __pyx_L3_error)
       }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 7) {
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 6) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
@@ -1515,26 +1534,24 @@ static PyObject *__pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_1retrieve_t
       values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
       values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
       values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
-      values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
     }
     __pyx_v_accm_values = values[0];
     __pyx_v_accm_node_samples = values[1];
     __pyx_v_accm_features = values[2];
     __pyx_v_accm_thresholds = values[3];
-    __pyx_v_accm_children_right = values[4];
-    __pyx_v_feature_names = ((PyArrayObject *)values[5]);
-    __pyx_v_float_precision = __Pyx_PyInt_As_int(values[6]); if (unlikely((__pyx_v_float_precision == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 18, __pyx_L3_error)
+    __pyx_v_feature_names = ((PyArrayObject *)values[4]);
+    __pyx_v_float_precision = __Pyx_PyInt_As_int(values[5]); if (unlikely((__pyx_v_float_precision == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 17, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("retrieve_tree_metas", 1, 7, 7, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 12, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("retrieve_tree_metas", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 12, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("illumine.woodland._retrieve_leaf_paths.retrieve_tree_metas", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_feature_names), __pyx_ptype_5numpy_ndarray, 1, "feature_names", 0))) __PYX_ERR(0, 17, __pyx_L1_error)
-  __pyx_r = __pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_tree_metas(__pyx_self, __pyx_v_accm_values, __pyx_v_accm_node_samples, __pyx_v_accm_features, __pyx_v_accm_thresholds, __pyx_v_accm_children_right, __pyx_v_feature_names, __pyx_v_float_precision);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_feature_names), __pyx_ptype_5numpy_ndarray, 1, "feature_names", 0))) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_r = __pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_tree_metas(__pyx_self, __pyx_v_accm_values, __pyx_v_accm_node_samples, __pyx_v_accm_features, __pyx_v_accm_thresholds, __pyx_v_feature_names, __pyx_v_float_precision);
 
   /* function exit code */
   goto __pyx_L0;
@@ -1545,7 +1562,7 @@ static PyObject *__pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_1retrieve_t
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_tree_metas(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_accm_values, PyObject *__pyx_v_accm_node_samples, PyObject *__pyx_v_accm_features, PyObject *__pyx_v_accm_thresholds, PyObject *__pyx_v_accm_children_right, PyArrayObject *__pyx_v_feature_names, int __pyx_v_float_precision) {
+static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_tree_metas(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_accm_values, PyObject *__pyx_v_accm_node_samples, PyObject *__pyx_v_accm_features, PyObject *__pyx_v_accm_thresholds, PyArrayObject *__pyx_v_feature_names, int __pyx_v_float_precision) {
   PyObject *__pyx_v_tree_metas = NULL;
   PyObject *__pyx_v_tup = NULL;
   PyObject *__pyx_r = NULL;
@@ -1558,30 +1575,29 @@ static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_tr
   PyObject *__pyx_t_6 = NULL;
   PyObject *__pyx_t_7 = NULL;
   PyObject *__pyx_t_8 = NULL;
-  PyObject *__pyx_t_9 = NULL;
-  int __pyx_t_10;
+  int __pyx_t_9;
   __Pyx_RefNannySetupContext("retrieve_tree_metas", 0);
 
-  /* "illumine/woodland/_retrieve_leaf_paths.pyx":19
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":18
  *                         np.ndarray feature_names,
  *                         int float_precision):
  *     tree_metas = []             # <<<<<<<<<<<<<<
  * 
  *     for tup in zip(accm_values,
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 19, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 18, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_tree_metas = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "illumine/woodland/_retrieve_leaf_paths.pyx":21
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":20
  *     tree_metas = []
  * 
  *     for tup in zip(accm_values,             # <<<<<<<<<<<<<<
  *                    accm_node_samples,
  *                    accm_features,
  */
-  __pyx_t_1 = PyTuple_New(5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 21, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 20, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_accm_values);
   __Pyx_GIVEREF(__pyx_v_accm_values);
@@ -1595,19 +1611,16 @@ static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_tr
   __Pyx_INCREF(__pyx_v_accm_thresholds);
   __Pyx_GIVEREF(__pyx_v_accm_thresholds);
   PyTuple_SET_ITEM(__pyx_t_1, 3, __pyx_v_accm_thresholds);
-  __Pyx_INCREF(__pyx_v_accm_children_right);
-  __Pyx_GIVEREF(__pyx_v_accm_children_right);
-  PyTuple_SET_ITEM(__pyx_t_1, 4, __pyx_v_accm_children_right);
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_zip, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 21, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_zip, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 20, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
     __pyx_t_1 = __pyx_t_2; __Pyx_INCREF(__pyx_t_1); __pyx_t_3 = 0;
     __pyx_t_4 = NULL;
   } else {
-    __pyx_t_3 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 21, __pyx_L1_error)
+    __pyx_t_3 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 20, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 21, __pyx_L1_error)
+    __pyx_t_4 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 20, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   for (;;) {
@@ -1615,17 +1628,17 @@ static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_tr
       if (likely(PyList_CheckExact(__pyx_t_1))) {
         if (__pyx_t_3 >= PyList_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_3); __Pyx_INCREF(__pyx_t_2); __pyx_t_3++; if (unlikely(0 < 0)) __PYX_ERR(0, 21, __pyx_L1_error)
+        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_3); __Pyx_INCREF(__pyx_t_2); __pyx_t_3++; if (unlikely(0 < 0)) __PYX_ERR(0, 20, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 21, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 20, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       } else {
         if (__pyx_t_3 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_3); __Pyx_INCREF(__pyx_t_2); __pyx_t_3++; if (unlikely(0 < 0)) __PYX_ERR(0, 21, __pyx_L1_error)
+        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_3); __Pyx_INCREF(__pyx_t_2); __pyx_t_3++; if (unlikely(0 < 0)) __PYX_ERR(0, 20, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 21, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 20, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       }
@@ -1635,7 +1648,7 @@ static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_tr
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 21, __pyx_L1_error)
+          else __PYX_ERR(0, 20, __pyx_L1_error)
         }
         break;
       }
@@ -1644,79 +1657,67 @@ static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_tr
     __Pyx_XDECREF_SET(__pyx_v_tup, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "illumine/woodland/_retrieve_leaf_paths.pyx":28
+    /* "illumine/woodland/_retrieve_leaf_paths.pyx":26
  * 
- *         tree_metas.append(retrieve_leaf_paths(
+ *         tree_metas.append(retrieve_leaf_path(
  *             values=tup[0],             # <<<<<<<<<<<<<<
  *             node_samples=tup[1],
  *             features=tup[2],
  */
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_tup, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_tup, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 26, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 28, __pyx_L1_error)
+    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 26, __pyx_L1_error)
 
-    /* "illumine/woodland/_retrieve_leaf_paths.pyx":29
- *         tree_metas.append(retrieve_leaf_paths(
+    /* "illumine/woodland/_retrieve_leaf_paths.pyx":27
+ *         tree_metas.append(retrieve_leaf_path(
  *             values=tup[0],
  *             node_samples=tup[1],             # <<<<<<<<<<<<<<
  *             features=tup[2],
  *             thresholds=tup[3],
  */
-    __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_tup, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 29, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_tup, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 27, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    if (!(likely(((__pyx_t_5) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_5, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 29, __pyx_L1_error)
+    if (!(likely(((__pyx_t_5) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_5, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 27, __pyx_L1_error)
 
-    /* "illumine/woodland/_retrieve_leaf_paths.pyx":30
+    /* "illumine/woodland/_retrieve_leaf_paths.pyx":28
  *             values=tup[0],
  *             node_samples=tup[1],
  *             features=tup[2],             # <<<<<<<<<<<<<<
  *             thresholds=tup[3],
- *             children_right=tup[4],
+ *             feature_names=feature_names,
  */
-    __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_tup, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 30, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_tup, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 28, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 30, __pyx_L1_error)
+    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 28, __pyx_L1_error)
 
-    /* "illumine/woodland/_retrieve_leaf_paths.pyx":31
+    /* "illumine/woodland/_retrieve_leaf_paths.pyx":29
  *             node_samples=tup[1],
  *             features=tup[2],
  *             thresholds=tup[3],             # <<<<<<<<<<<<<<
- *             children_right=tup[4],
- *             feature_names=feature_names,
- */
-    __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_tup, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 31, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    if (!(likely(((__pyx_t_7) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_7, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 31, __pyx_L1_error)
-
-    /* "illumine/woodland/_retrieve_leaf_paths.pyx":32
- *             features=tup[2],
- *             thresholds=tup[3],
- *             children_right=tup[4],             # <<<<<<<<<<<<<<
  *             feature_names=feature_names,
  *             float_precision=float_precision)
  */
-    __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_tup, 4, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 32, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    if (!(likely(((__pyx_t_8) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_8, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 32, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_tup, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 29, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    if (!(likely(((__pyx_t_7) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_7, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 29, __pyx_L1_error)
 
-    /* "illumine/woodland/_retrieve_leaf_paths.pyx":27
- *                    accm_children_right):
+    /* "illumine/woodland/_retrieve_leaf_paths.pyx":25
+ *                    accm_thresholds):
  * 
- *         tree_metas.append(retrieve_leaf_paths(             # <<<<<<<<<<<<<<
+ *         tree_metas.append(retrieve_leaf_path(             # <<<<<<<<<<<<<<
  *             values=tup[0],
  *             node_samples=tup[1],
  */
-    __pyx_t_9 = __pyx_f_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_leaf_paths(((PyArrayObject *)__pyx_t_2), ((PyArrayObject *)__pyx_t_5), ((PyArrayObject *)__pyx_t_6), ((PyArrayObject *)__pyx_t_7), ((PyArrayObject *)__pyx_t_8), __pyx_v_feature_names, __pyx_v_float_precision); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 27, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
+    __pyx_t_8 = __pyx_f_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_leaf_path(((PyArrayObject *)__pyx_t_2), ((PyArrayObject *)__pyx_t_5), ((PyArrayObject *)__pyx_t_6), ((PyArrayObject *)__pyx_t_7), __pyx_v_feature_names, __pyx_v_float_precision); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 25, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_tree_metas, __pyx_t_8); if (unlikely(__pyx_t_9 == -1)) __PYX_ERR(0, 25, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_10 = __Pyx_PyList_Append(__pyx_v_tree_metas, __pyx_t_9); if (unlikely(__pyx_t_10 == -1)) __PYX_ERR(0, 27, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "illumine/woodland/_retrieve_leaf_paths.pyx":21
+    /* "illumine/woodland/_retrieve_leaf_paths.pyx":20
  *     tree_metas = []
  * 
  *     for tup in zip(accm_values,             # <<<<<<<<<<<<<<
@@ -1726,7 +1727,7 @@ static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_tr
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "illumine/woodland/_retrieve_leaf_paths.pyx":36
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":33
  *             float_precision=float_precision)
  *         )
  *     return tree_metas             # <<<<<<<<<<<<<<
@@ -1754,7 +1755,6 @@ static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_tr
   __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_8);
-  __Pyx_XDECREF(__pyx_t_9);
   __Pyx_AddTraceback("illumine.woodland._retrieve_leaf_paths.retrieve_tree_metas", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -1765,23 +1765,735 @@ static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_tr
   return __pyx_r;
 }
 
-/* "illumine/woodland/_retrieve_leaf_paths.pyx":39
+/* "illumine/woodland/_retrieve_leaf_paths.pyx":47
+ *     cdef int _float_precision
  * 
- * 
- * cdef retrieve_leaf_paths(np.ndarray[double, ndim=3] values,             # <<<<<<<<<<<<<<
- *                          np.ndarray[long, ndim=1] node_samples,
- *                          np.ndarray[long, ndim=1] features,
+ *     def __cinit__(self,             # <<<<<<<<<<<<<<
+ *                   str feature_name,
+ *                   str relation,
  */
 
-static PyObject *__pyx_f_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_leaf_paths(PyArrayObject *__pyx_v_values, PyArrayObject *__pyx_v_node_samples, PyArrayObject *__pyx_v_features, PyArrayObject *__pyx_v_thresholds, PyArrayObject *__pyx_v_children_right, PyArrayObject *__pyx_v_feature_names, int __pyx_v_float_precision) {
+/* Python wrapper */
+static int __pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_1__cinit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static int __pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_1__cinit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyObject *__pyx_v_feature_name = 0;
+  PyObject *__pyx_v_relation = 0;
+  double __pyx_v_threshold;
+  int __pyx_v_float_precision;
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__cinit__ (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_feature_name,&__pyx_n_s_relation,&__pyx_n_s_threshold,&__pyx_n_s_float_precision,0};
+    PyObject* values[4] = {0,0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_feature_name)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        case  1:
+        if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_relation)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 4, 4, 1); __PYX_ERR(0, 47, __pyx_L3_error)
+        }
+        case  2:
+        if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_threshold)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 4, 4, 2); __PYX_ERR(0, 47, __pyx_L3_error)
+        }
+        case  3:
+        if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_float_precision)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 4, 4, 3); __PYX_ERR(0, 47, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 47, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+    }
+    __pyx_v_feature_name = ((PyObject*)values[0]);
+    __pyx_v_relation = ((PyObject*)values[1]);
+    __pyx_v_threshold = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_threshold == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 50, __pyx_L3_error)
+    __pyx_v_float_precision = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_float_precision == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 51, __pyx_L3_error)
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 47, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("illumine.woodland._retrieve_leaf_paths.TreeSplit.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return -1;
+  __pyx_L4_argument_unpacking_done:;
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_feature_name), (&PyString_Type), 1, "feature_name", 1))) __PYX_ERR(0, 48, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_relation), (&PyString_Type), 1, "relation", 1))) __PYX_ERR(0, 49, __pyx_L1_error)
+  __pyx_r = __pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit___cinit__(((struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *)__pyx_v_self), __pyx_v_feature_name, __pyx_v_relation, __pyx_v_threshold, __pyx_v_float_precision);
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit___cinit__(struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *__pyx_v_self, PyObject *__pyx_v_feature_name, PyObject *__pyx_v_relation, double __pyx_v_threshold, int __pyx_v_float_precision) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__cinit__", 0);
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":52
+ *                   double threshold,
+ *                   int float_precision):
+ *         self._feature_name = feature_name             # <<<<<<<<<<<<<<
+ *         self._relation = relation
+ *         self._threshold = threshold
+ */
+  __Pyx_INCREF(__pyx_v_feature_name);
+  __Pyx_GIVEREF(__pyx_v_feature_name);
+  __Pyx_GOTREF(__pyx_v_self->_feature_name);
+  __Pyx_DECREF(__pyx_v_self->_feature_name);
+  __pyx_v_self->_feature_name = __pyx_v_feature_name;
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":53
+ *                   int float_precision):
+ *         self._feature_name = feature_name
+ *         self._relation = relation             # <<<<<<<<<<<<<<
+ *         self._threshold = threshold
+ *         self._float_precision = float_precision
+ */
+  __Pyx_INCREF(__pyx_v_relation);
+  __Pyx_GIVEREF(__pyx_v_relation);
+  __Pyx_GOTREF(__pyx_v_self->_relation);
+  __Pyx_DECREF(__pyx_v_self->_relation);
+  __pyx_v_self->_relation = __pyx_v_relation;
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":54
+ *         self._feature_name = feature_name
+ *         self._relation = relation
+ *         self._threshold = threshold             # <<<<<<<<<<<<<<
+ *         self._float_precision = float_precision
+ * 
+ */
+  __pyx_v_self->_threshold = __pyx_v_threshold;
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":55
+ *         self._relation = relation
+ *         self._threshold = threshold
+ *         self._float_precision = float_precision             # <<<<<<<<<<<<<<
+ * 
+ *     @property
+ */
+  __pyx_v_self->_float_precision = __pyx_v_float_precision;
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":47
+ *     cdef int _float_precision
+ * 
+ *     def __cinit__(self,             # <<<<<<<<<<<<<<
+ *                   str feature_name,
+ *                   str relation,
+ */
+
+  /* function exit code */
+  __pyx_r = 0;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "illumine/woodland/_retrieve_leaf_paths.pyx":58
+ * 
+ *     @property
+ *     def feature_name(self):             # <<<<<<<<<<<<<<
+ *         return self._feature_name
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_12feature_name_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_12feature_name_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_12feature_name___get__(((struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_12feature_name___get__(struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__", 0);
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":59
+ *     @property
+ *     def feature_name(self):
+ *         return self._feature_name             # <<<<<<<<<<<<<<
+ * 
+ *     @property
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_self->_feature_name);
+  __pyx_r = __pyx_v_self->_feature_name;
+  goto __pyx_L0;
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":58
+ * 
+ *     @property
+ *     def feature_name(self):             # <<<<<<<<<<<<<<
+ *         return self._feature_name
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "illumine/woodland/_retrieve_leaf_paths.pyx":62
+ * 
+ *     @property
+ *     def relation(self):             # <<<<<<<<<<<<<<
+ *         return self._relation
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_8relation_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_8relation_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_8relation___get__(((struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_8relation___get__(struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__", 0);
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":63
+ *     @property
+ *     def relation(self):
+ *         return self._relation             # <<<<<<<<<<<<<<
+ * 
+ *     @property
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_self->_relation);
+  __pyx_r = __pyx_v_self->_relation;
+  goto __pyx_L0;
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":62
+ * 
+ *     @property
+ *     def relation(self):             # <<<<<<<<<<<<<<
+ *         return self._relation
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "illumine/woodland/_retrieve_leaf_paths.pyx":66
+ * 
+ *     @property
+ *     def threshold(self):             # <<<<<<<<<<<<<<
+ *         return self._threshold
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_9threshold_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_9threshold_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_9threshold___get__(((struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_9threshold___get__(struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("__get__", 0);
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":67
+ *     @property
+ *     def threshold(self):
+ *         return self._threshold             # <<<<<<<<<<<<<<
+ * 
+ *     def __key(self):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->_threshold); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 67, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":66
+ * 
+ *     @property
+ *     def threshold(self):             # <<<<<<<<<<<<<<
+ *         return self._threshold
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("illumine.woodland._retrieve_leaf_paths.TreeSplit.threshold.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "illumine/woodland/_retrieve_leaf_paths.pyx":69
+ *         return self._threshold
+ * 
+ *     def __key(self):             # <<<<<<<<<<<<<<
+ *         return self.__str__()
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_3__key(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_3__key(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__key (wrapper)", 0);
+  __pyx_r = __pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_2__key(((struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_2__key(struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  __Pyx_RefNannySetupContext("__key", 0);
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":70
+ * 
+ *     def __key(self):
+ *         return self.__str__()             # <<<<<<<<<<<<<<
+ * 
+ *     def __hash__(self):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_str); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 70, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
+  if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  if (__pyx_t_3) {
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 70, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  } else {
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 70, __pyx_L1_error)
+  }
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":69
+ *         return self._threshold
+ * 
+ *     def __key(self):             # <<<<<<<<<<<<<<
+ *         return self.__str__()
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_AddTraceback("illumine.woodland._retrieve_leaf_paths.TreeSplit.__key", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "illumine/woodland/_retrieve_leaf_paths.pyx":72
+ *         return self.__str__()
+ * 
+ *     def __hash__(self):             # <<<<<<<<<<<<<<
+ *         return hash(self.__key())
+ * 
+ */
+
+/* Python wrapper */
+static Py_hash_t __pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_5__hash__(PyObject *__pyx_v_self); /*proto*/
+static Py_hash_t __pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_5__hash__(PyObject *__pyx_v_self) {
+  Py_hash_t __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__hash__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_4__hash__(((struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static Py_hash_t __pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_4__hash__(struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *__pyx_v_self) {
+  Py_hash_t __pyx_r;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  Py_hash_t __pyx_t_4;
+  __Pyx_RefNannySetupContext("__hash__", 0);
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":73
+ * 
+ *     def __hash__(self):
+ *         return hash(self.__key())             # <<<<<<<<<<<<<<
+ * 
+ *     def __str__(self):
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_key); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 73, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
+  if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  if (__pyx_t_3) {
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 73, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  } else {
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 73, __pyx_L1_error)
+  }
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_4 = PyObject_Hash(__pyx_t_1); if (unlikely(__pyx_t_4 == -1)) __PYX_ERR(0, 73, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_r = __pyx_t_4;
+  goto __pyx_L0;
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":72
+ *         return self.__str__()
+ * 
+ *     def __hash__(self):             # <<<<<<<<<<<<<<
+ *         return hash(self.__key())
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_AddTraceback("illumine.woodland._retrieve_leaf_paths.TreeSplit.__hash__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  if (unlikely(__pyx_r == -1) && !PyErr_Occurred()) __pyx_r = -2;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "illumine/woodland/_retrieve_leaf_paths.pyx":75
+ *         return hash(self.__key())
+ * 
+ *     def __str__(self):             # <<<<<<<<<<<<<<
+ *         return "{}{}{}".format(
+ *             self.feature_name,
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_7__str__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_7__str__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__str__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_6__str__(((struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_6__str__(struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  PyObject *__pyx_t_5 = NULL;
+  PyObject *__pyx_t_6 = NULL;
+  PyObject *__pyx_t_7 = NULL;
+  Py_ssize_t __pyx_t_8;
+  __Pyx_RefNannySetupContext("__str__", 0);
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":76
+ * 
+ *     def __str__(self):
+ *         return "{}{}{}".format(             # <<<<<<<<<<<<<<
+ *             self.feature_name,
+ *             self.relation,
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_, __pyx_n_s_format); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":77
+ *     def __str__(self):
+ *         return "{}{}{}".format(
+ *             self.feature_name,             # <<<<<<<<<<<<<<
+ *             self.relation,
+ *             round(self.threshold, self._float_precision))
+ */
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_feature_name); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":78
+ *         return "{}{}{}".format(
+ *             self.feature_name,
+ *             self.relation,             # <<<<<<<<<<<<<<
+ *             round(self.threshold, self._float_precision))
+ * 
+ */
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_relation); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":79
+ *             self.feature_name,
+ *             self.relation,
+ *             round(self.threshold, self._float_precision))             # <<<<<<<<<<<<<<
+ * 
+ *     def __repr__(self):
+ */
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_threshold); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_self->_float_precision); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_GIVEREF(__pyx_t_5);
+  PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5);
+  __Pyx_GIVEREF(__pyx_t_6);
+  PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_6);
+  __pyx_t_5 = 0;
+  __pyx_t_6 = 0;
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_builtin_round, __pyx_t_7, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_7 = NULL;
+  __pyx_t_8 = 0;
+  if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_7)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_7);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+      __pyx_t_8 = 1;
+    }
+  }
+  __pyx_t_5 = PyTuple_New(3+__pyx_t_8); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  if (__pyx_t_7) {
+    __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_7); __pyx_t_7 = NULL;
+  }
+  __Pyx_GIVEREF(__pyx_t_3);
+  PyTuple_SET_ITEM(__pyx_t_5, 0+__pyx_t_8, __pyx_t_3);
+  __Pyx_GIVEREF(__pyx_t_4);
+  PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_8, __pyx_t_4);
+  __Pyx_GIVEREF(__pyx_t_6);
+  PyTuple_SET_ITEM(__pyx_t_5, 2+__pyx_t_8, __pyx_t_6);
+  __pyx_t_3 = 0;
+  __pyx_t_4 = 0;
+  __pyx_t_6 = 0;
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":75
+ *         return hash(self.__key())
+ * 
+ *     def __str__(self):             # <<<<<<<<<<<<<<
+ *         return "{}{}{}".format(
+ *             self.feature_name,
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_AddTraceback("illumine.woodland._retrieve_leaf_paths.TreeSplit.__str__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "illumine/woodland/_retrieve_leaf_paths.pyx":81
+ *             round(self.threshold, self._float_precision))
+ * 
+ *     def __repr__(self):             # <<<<<<<<<<<<<<
+ *         return self.__str__()
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_9__repr__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_9__repr__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__repr__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_8__repr__(((struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_8__repr__(struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  __Pyx_RefNannySetupContext("__repr__", 0);
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":82
+ * 
+ *     def __repr__(self):
+ *         return self.__str__()             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_str); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
+  if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  if (__pyx_t_3) {
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 82, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  } else {
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 82, __pyx_L1_error)
+  }
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":81
+ *             round(self.threshold, self._float_precision))
+ * 
+ *     def __repr__(self):             # <<<<<<<<<<<<<<
+ *         return self.__str__()
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_AddTraceback("illumine.woodland._retrieve_leaf_paths.TreeSplit.__repr__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "illumine/woodland/_retrieve_leaf_paths.pyx":85
+ * 
+ * 
+ * cdef retrieve_leaf_path(np.ndarray[double, ndim=3] values,             # <<<<<<<<<<<<<<
+ *                         np.ndarray[long, ndim=1] node_samples,
+ *                         np.ndarray[long, ndim=1] features,
+ */
+
+static PyObject *__pyx_f_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_leaf_path(PyArrayObject *__pyx_v_values, PyArrayObject *__pyx_v_node_samples, PyArrayObject *__pyx_v_features, PyArrayObject *__pyx_v_thresholds, PyArrayObject *__pyx_v_feature_names, int __pyx_v_float_precision) {
   Py_ssize_t __pyx_v_n_splits;
-  PyObject *__pyx_v_tree_meta = NULL;
-  PyObject *__pyx_v_tracker_stack = NULL;
-  PyObject *__pyx_v_leaf_path = NULL;
+  PyObject *__pyx_v_tree_meta = 0;
+  PyObject *__pyx_v_tracker_stack = 0;
+  PyObject *__pyx_v_leaf_path = 0;
   int __pyx_v_node_index;
-  PyObject *__pyx_v_append_str = NULL;
-  __Pyx_LocalBuf_ND __pyx_pybuffernd_children_right;
-  __Pyx_Buffer __pyx_pybuffer_children_right;
+  struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *__pyx_v_tree_split = NULL;
+  PyObject *__pyx_v_tmp_split = NULL;
+  struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *__pyx_v_new_split = NULL;
   __Pyx_LocalBuf_ND __pyx_pybuffernd_features;
   __Pyx_Buffer __pyx_pybuffer_features;
   __Pyx_LocalBuf_ND __pyx_pybuffernd_node_samples;
@@ -1803,14 +2515,13 @@ static PyObject *__pyx_f_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_lea
   int __pyx_t_9;
   Py_ssize_t __pyx_t_10;
   long __pyx_t_11;
-  PyObject *__pyx_t_12 = NULL;
-  Py_ssize_t __pyx_t_13;
+  Py_ssize_t __pyx_t_12;
+  PyObject *__pyx_t_13 = NULL;
   PyObject *__pyx_t_14 = NULL;
   PyObject *__pyx_t_15 = NULL;
-  PyObject *__pyx_t_16 = NULL;
-  Py_ssize_t __pyx_t_17;
-  int __pyx_t_18;
-  __Pyx_RefNannySetupContext("retrieve_leaf_paths", 0);
+  Py_ssize_t __pyx_t_16;
+  int __pyx_t_17;
+  __Pyx_RefNannySetupContext("retrieve_leaf_path", 0);
   __pyx_pybuffer_values.pybuffer.buf = NULL;
   __pyx_pybuffer_values.refcount = 0;
   __pyx_pybuffernd_values.data = NULL;
@@ -1827,47 +2538,38 @@ static PyObject *__pyx_f_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_lea
   __pyx_pybuffer_thresholds.refcount = 0;
   __pyx_pybuffernd_thresholds.data = NULL;
   __pyx_pybuffernd_thresholds.rcbuffer = &__pyx_pybuffer_thresholds;
-  __pyx_pybuffer_children_right.pybuffer.buf = NULL;
-  __pyx_pybuffer_children_right.refcount = 0;
-  __pyx_pybuffernd_children_right.data = NULL;
-  __pyx_pybuffernd_children_right.rcbuffer = &__pyx_pybuffer_children_right;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_values.rcbuffer->pybuffer, (PyObject*)__pyx_v_values, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 3, 0, __pyx_stack) == -1)) __PYX_ERR(0, 39, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_values.rcbuffer->pybuffer, (PyObject*)__pyx_v_values, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 3, 0, __pyx_stack) == -1)) __PYX_ERR(0, 85, __pyx_L1_error)
   }
   __pyx_pybuffernd_values.diminfo[0].strides = __pyx_pybuffernd_values.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_values.diminfo[0].shape = __pyx_pybuffernd_values.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_values.diminfo[1].strides = __pyx_pybuffernd_values.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_values.diminfo[1].shape = __pyx_pybuffernd_values.rcbuffer->pybuffer.shape[1]; __pyx_pybuffernd_values.diminfo[2].strides = __pyx_pybuffernd_values.rcbuffer->pybuffer.strides[2]; __pyx_pybuffernd_values.diminfo[2].shape = __pyx_pybuffernd_values.rcbuffer->pybuffer.shape[2];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_node_samples.rcbuffer->pybuffer, (PyObject*)__pyx_v_node_samples, &__Pyx_TypeInfo_long, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 39, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_node_samples.rcbuffer->pybuffer, (PyObject*)__pyx_v_node_samples, &__Pyx_TypeInfo_long, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 85, __pyx_L1_error)
   }
   __pyx_pybuffernd_node_samples.diminfo[0].strides = __pyx_pybuffernd_node_samples.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_node_samples.diminfo[0].shape = __pyx_pybuffernd_node_samples.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_features.rcbuffer->pybuffer, (PyObject*)__pyx_v_features, &__Pyx_TypeInfo_long, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 39, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_features.rcbuffer->pybuffer, (PyObject*)__pyx_v_features, &__Pyx_TypeInfo_long, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 85, __pyx_L1_error)
   }
   __pyx_pybuffernd_features.diminfo[0].strides = __pyx_pybuffernd_features.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_features.diminfo[0].shape = __pyx_pybuffernd_features.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_thresholds.rcbuffer->pybuffer, (PyObject*)__pyx_v_thresholds, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 39, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_thresholds.rcbuffer->pybuffer, (PyObject*)__pyx_v_thresholds, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 85, __pyx_L1_error)
   }
   __pyx_pybuffernd_thresholds.diminfo[0].strides = __pyx_pybuffernd_thresholds.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_thresholds.diminfo[0].shape = __pyx_pybuffernd_thresholds.rcbuffer->pybuffer.shape[0];
-  {
-    __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_children_right.rcbuffer->pybuffer, (PyObject*)__pyx_v_children_right, &__Pyx_TypeInfo_long, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 39, __pyx_L1_error)
-  }
-  __pyx_pybuffernd_children_right.diminfo[0].strides = __pyx_pybuffernd_children_right.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_children_right.diminfo[0].shape = __pyx_pybuffernd_children_right.rcbuffer->pybuffer.shape[0];
 
-  /* "illumine/woodland/_retrieve_leaf_paths.pyx":49
- *         paths that define the leaf.
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":104
+ *             the training data
  *     """
  *     n_splits = len(features)             # <<<<<<<<<<<<<<
  * 
  *     if n_splits == 0:
  */
-  __pyx_t_1 = PyObject_Length(((PyObject *)__pyx_v_features)); if (unlikely(__pyx_t_1 == -1)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __pyx_t_1 = PyObject_Length(((PyObject *)__pyx_v_features)); if (unlikely(__pyx_t_1 == -1)) __PYX_ERR(0, 104, __pyx_L1_error)
   __pyx_v_n_splits = __pyx_t_1;
 
-  /* "illumine/woodland/_retrieve_leaf_paths.pyx":51
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":106
  *     n_splits = len(features)
  * 
  *     if n_splits == 0:             # <<<<<<<<<<<<<<
@@ -1877,20 +2579,20 @@ static PyObject *__pyx_f_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_lea
   __pyx_t_2 = ((__pyx_v_n_splits == 0) != 0);
   if (__pyx_t_2) {
 
-    /* "illumine/woodland/_retrieve_leaf_paths.pyx":52
+    /* "illumine/woodland/_retrieve_leaf_paths.pyx":107
  * 
  *     if n_splits == 0:
  *         raise ValueError("The passed tree is empty!")             # <<<<<<<<<<<<<<
  * 
- *     tree_meta = []
+ *     cdef list tree_meta = []
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 52, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 107, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(0, 52, __pyx_L1_error)
+    __PYX_ERR(0, 107, __pyx_L1_error)
 
-    /* "illumine/woodland/_retrieve_leaf_paths.pyx":51
+    /* "illumine/woodland/_retrieve_leaf_paths.pyx":106
  *     n_splits = len(features)
  * 
  *     if n_splits == 0:             # <<<<<<<<<<<<<<
@@ -1899,43 +2601,43 @@ static PyObject *__pyx_f_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_lea
  */
   }
 
-  /* "illumine/woodland/_retrieve_leaf_paths.pyx":54
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":109
  *         raise ValueError("The passed tree is empty!")
  * 
- *     tree_meta = []             # <<<<<<<<<<<<<<
- *     tracker_stack = []  # a stack to track if all the children of a node is visited
- *     leaf_path = []      # ptr_stack keeps track of nodes
+ *     cdef list tree_meta = []             # <<<<<<<<<<<<<<
+ *     cdef list tracker_stack = []  # a stack to track if all the children of a node is visited
+ *     cdef list leaf_path = []      # ptr_stack keeps track of nodes
  */
-  __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 109, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_v_tree_meta = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "illumine/woodland/_retrieve_leaf_paths.pyx":55
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":110
  * 
- *     tree_meta = []
- *     tracker_stack = []  # a stack to track if all the children of a node is visited             # <<<<<<<<<<<<<<
- *     leaf_path = []      # ptr_stack keeps track of nodes
+ *     cdef list tree_meta = []
+ *     cdef list tracker_stack = []  # a stack to track if all the children of a node is visited             # <<<<<<<<<<<<<<
+ *     cdef list leaf_path = []      # ptr_stack keeps track of nodes
  * 
  */
-  __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 55, __pyx_L1_error)
+  __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 110, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_v_tracker_stack = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "illumine/woodland/_retrieve_leaf_paths.pyx":56
- *     tree_meta = []
- *     tracker_stack = []  # a stack to track if all the children of a node is visited
- *     leaf_path = []      # ptr_stack keeps track of nodes             # <<<<<<<<<<<<<<
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":111
+ *     cdef list tree_meta = []
+ *     cdef list tracker_stack = []  # a stack to track if all the children of a node is visited
+ *     cdef list leaf_path = []      # ptr_stack keeps track of nodes             # <<<<<<<<<<<<<<
  * 
  *     cdef int node_index
  */
-  __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 111, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_v_leaf_path = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "illumine/woodland/_retrieve_leaf_paths.pyx":59
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":114
  * 
  *     cdef int node_index
  *     for node_index in xrange(n_splits):             # <<<<<<<<<<<<<<
@@ -1946,18 +2648,18 @@ static PyObject *__pyx_f_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_lea
   for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_1; __pyx_t_4+=1) {
     __pyx_v_node_index = __pyx_t_4;
 
-    /* "illumine/woodland/_retrieve_leaf_paths.pyx":60
+    /* "illumine/woodland/_retrieve_leaf_paths.pyx":115
  *     cdef int node_index
  *     for node_index in xrange(n_splits):
  *         if len(tracker_stack) != 0:             # <<<<<<<<<<<<<<
  *             tracker_stack[-1] += 1  # visiting the child of the latest node
  * 
  */
-    __pyx_t_5 = PyList_GET_SIZE(__pyx_v_tracker_stack); if (unlikely(__pyx_t_5 == -1)) __PYX_ERR(0, 60, __pyx_L1_error)
+    __pyx_t_5 = PyList_GET_SIZE(__pyx_v_tracker_stack); if (unlikely(__pyx_t_5 == -1)) __PYX_ERR(0, 115, __pyx_L1_error)
     __pyx_t_2 = ((__pyx_t_5 != 0) != 0);
     if (__pyx_t_2) {
 
-      /* "illumine/woodland/_retrieve_leaf_paths.pyx":61
+      /* "illumine/woodland/_retrieve_leaf_paths.pyx":116
  *     for node_index in xrange(n_splits):
  *         if len(tracker_stack) != 0:
  *             tracker_stack[-1] += 1  # visiting the child of the latest node             # <<<<<<<<<<<<<<
@@ -1965,15 +2667,15 @@ static PyObject *__pyx_f_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_lea
  *         if features[node_index] != -2:  # visiting inner node
  */
       __pyx_t_5 = -1L;
-      __pyx_t_3 = __Pyx_GetItemInt_List(__pyx_v_tracker_stack, __pyx_t_5, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 61, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_GetItemInt_List(__pyx_v_tracker_stack, __pyx_t_5, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 116, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_6 = __Pyx_PyInt_AddObjC(__pyx_t_3, __pyx_int_1, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 61, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyInt_AddObjC(__pyx_t_3, __pyx_int_1, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 116, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(__Pyx_SetItemInt(__pyx_v_tracker_stack, __pyx_t_5, __pyx_t_6, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1) < 0)) __PYX_ERR(0, 61, __pyx_L1_error)
+      if (unlikely(__Pyx_SetItemInt(__pyx_v_tracker_stack, __pyx_t_5, __pyx_t_6, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1) < 0)) __PYX_ERR(0, 116, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-      /* "illumine/woodland/_retrieve_leaf_paths.pyx":60
+      /* "illumine/woodland/_retrieve_leaf_paths.pyx":115
  *     cdef int node_index
  *     for node_index in xrange(n_splits):
  *         if len(tracker_stack) != 0:             # <<<<<<<<<<<<<<
@@ -1982,12 +2684,12 @@ static PyObject *__pyx_f_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_lea
  */
     }
 
-    /* "illumine/woodland/_retrieve_leaf_paths.pyx":63
+    /* "illumine/woodland/_retrieve_leaf_paths.pyx":118
  *             tracker_stack[-1] += 1  # visiting the child of the latest node
  * 
  *         if features[node_index] != -2:  # visiting inner node             # <<<<<<<<<<<<<<
  *             tracker_stack.append(0)
- *             append_str = "{}<={}".format(
+ *             tree_split = TreeSplit(
  */
     __pyx_t_7 = __pyx_v_node_index;
     __pyx_t_8 = -1;
@@ -1997,37 +2699,29 @@ static PyObject *__pyx_f_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_lea
     } else if (unlikely(__pyx_t_7 >= __pyx_pybuffernd_features.diminfo[0].shape)) __pyx_t_8 = 0;
     if (unlikely(__pyx_t_8 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_8);
-      __PYX_ERR(0, 63, __pyx_L1_error)
+      __PYX_ERR(0, 118, __pyx_L1_error)
     }
     __pyx_t_2 = (((*__Pyx_BufPtrStrided1d(long *, __pyx_pybuffernd_features.rcbuffer->pybuffer.buf, __pyx_t_7, __pyx_pybuffernd_features.diminfo[0].strides)) != -2L) != 0);
     if (__pyx_t_2) {
 
-      /* "illumine/woodland/_retrieve_leaf_paths.pyx":64
+      /* "illumine/woodland/_retrieve_leaf_paths.pyx":119
  * 
  *         if features[node_index] != -2:  # visiting inner node
  *             tracker_stack.append(0)             # <<<<<<<<<<<<<<
- *             append_str = "{}<={}".format(
- *                 feature_names[features[node_index]],
+ *             tree_split = TreeSplit(
+ *                 feature_name=feature_names[features[node_index]],
  */
-      __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_tracker_stack, __pyx_int_0); if (unlikely(__pyx_t_9 == -1)) __PYX_ERR(0, 64, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_tracker_stack, __pyx_int_0); if (unlikely(__pyx_t_9 == -1)) __PYX_ERR(0, 119, __pyx_L1_error)
 
-      /* "illumine/woodland/_retrieve_leaf_paths.pyx":65
- *         if features[node_index] != -2:  # visiting inner node
+      /* "illumine/woodland/_retrieve_leaf_paths.pyx":121
  *             tracker_stack.append(0)
- *             append_str = "{}<={}".format(             # <<<<<<<<<<<<<<
- *                 feature_names[features[node_index]],
- *                 float(round(thresholds[node_index], float_precision)))
+ *             tree_split = TreeSplit(
+ *                 feature_name=feature_names[features[node_index]],             # <<<<<<<<<<<<<<
+ *                 relation='<=',
+ *                 threshold=thresholds[node_index],
  */
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s__2, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 65, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-
-      /* "illumine/woodland/_retrieve_leaf_paths.pyx":66
- *             tracker_stack.append(0)
- *             append_str = "{}<={}".format(
- *                 feature_names[features[node_index]],             # <<<<<<<<<<<<<<
- *                 float(round(thresholds[node_index], float_precision)))
- *             leaf_path.append(append_str)
- */
+      __pyx_t_6 = PyDict_New(); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 121, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_6);
       __pyx_t_10 = __pyx_v_node_index;
       __pyx_t_8 = -1;
       if (__pyx_t_10 < 0) {
@@ -2036,97 +2730,82 @@ static PyObject *__pyx_f_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_lea
       } else if (unlikely(__pyx_t_10 >= __pyx_pybuffernd_features.diminfo[0].shape)) __pyx_t_8 = 0;
       if (unlikely(__pyx_t_8 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_8);
-        __PYX_ERR(0, 66, __pyx_L1_error)
+        __PYX_ERR(0, 121, __pyx_L1_error)
       }
       __pyx_t_11 = (*__Pyx_BufPtrStrided1d(long *, __pyx_pybuffernd_features.rcbuffer->pybuffer.buf, __pyx_t_10, __pyx_pybuffernd_features.diminfo[0].strides));
-      __pyx_t_12 = __Pyx_GetItemInt(((PyObject *)__pyx_v_feature_names), __pyx_t_11, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 66, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_12);
+      __pyx_t_3 = __Pyx_GetItemInt(((PyObject *)__pyx_v_feature_names), __pyx_t_11, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 121, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_feature_name, __pyx_t_3) < 0) __PYX_ERR(0, 121, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_relation, __pyx_kp_s__3) < 0) __PYX_ERR(0, 121, __pyx_L1_error)
 
-      /* "illumine/woodland/_retrieve_leaf_paths.pyx":67
- *             append_str = "{}<={}".format(
- *                 feature_names[features[node_index]],
- *                 float(round(thresholds[node_index], float_precision)))             # <<<<<<<<<<<<<<
- *             leaf_path.append(append_str)
- * 
+      /* "illumine/woodland/_retrieve_leaf_paths.pyx":123
+ *                 feature_name=feature_names[features[node_index]],
+ *                 relation='<=',
+ *                 threshold=thresholds[node_index],             # <<<<<<<<<<<<<<
+ *                 float_precision=float_precision
+ *             )
  */
-      __pyx_t_13 = __pyx_v_node_index;
+      __pyx_t_12 = __pyx_v_node_index;
       __pyx_t_8 = -1;
-      if (__pyx_t_13 < 0) {
-        __pyx_t_13 += __pyx_pybuffernd_thresholds.diminfo[0].shape;
-        if (unlikely(__pyx_t_13 < 0)) __pyx_t_8 = 0;
-      } else if (unlikely(__pyx_t_13 >= __pyx_pybuffernd_thresholds.diminfo[0].shape)) __pyx_t_8 = 0;
+      if (__pyx_t_12 < 0) {
+        __pyx_t_12 += __pyx_pybuffernd_thresholds.diminfo[0].shape;
+        if (unlikely(__pyx_t_12 < 0)) __pyx_t_8 = 0;
+      } else if (unlikely(__pyx_t_12 >= __pyx_pybuffernd_thresholds.diminfo[0].shape)) __pyx_t_8 = 0;
       if (unlikely(__pyx_t_8 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_8);
-        __PYX_ERR(0, 67, __pyx_L1_error)
+        __PYX_ERR(0, 123, __pyx_L1_error)
       }
-      __pyx_t_14 = PyFloat_FromDouble((*__Pyx_BufPtrStrided1d(double *, __pyx_pybuffernd_thresholds.rcbuffer->pybuffer.buf, __pyx_t_13, __pyx_pybuffernd_thresholds.diminfo[0].strides))); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 67, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_14);
-      __pyx_t_15 = __Pyx_PyInt_From_int(__pyx_v_float_precision); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 67, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_15);
-      __pyx_t_16 = PyTuple_New(2); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 67, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_16);
-      __Pyx_GIVEREF(__pyx_t_14);
-      PyTuple_SET_ITEM(__pyx_t_16, 0, __pyx_t_14);
-      __Pyx_GIVEREF(__pyx_t_15);
-      PyTuple_SET_ITEM(__pyx_t_16, 1, __pyx_t_15);
-      __pyx_t_14 = 0;
-      __pyx_t_15 = 0;
-      __pyx_t_15 = __Pyx_PyObject_Call(__pyx_builtin_round, __pyx_t_16, NULL); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 67, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_15);
-      __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
-      __pyx_t_16 = __Pyx_PyNumber_Float(__pyx_t_15); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 67, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_16);
-      __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-      __pyx_t_15 = NULL;
-      __pyx_t_5 = 0;
-      if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_3))) {
-        __pyx_t_15 = PyMethod_GET_SELF(__pyx_t_3);
-        if (likely(__pyx_t_15)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-          __Pyx_INCREF(__pyx_t_15);
-          __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_3, function);
-          __pyx_t_5 = 1;
-        }
-      }
-      __pyx_t_14 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 65, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_14);
-      if (__pyx_t_15) {
-        __Pyx_GIVEREF(__pyx_t_15); PyTuple_SET_ITEM(__pyx_t_14, 0, __pyx_t_15); __pyx_t_15 = NULL;
-      }
-      __Pyx_GIVEREF(__pyx_t_12);
-      PyTuple_SET_ITEM(__pyx_t_14, 0+__pyx_t_5, __pyx_t_12);
-      __Pyx_GIVEREF(__pyx_t_16);
-      PyTuple_SET_ITEM(__pyx_t_14, 1+__pyx_t_5, __pyx_t_16);
-      __pyx_t_12 = 0;
-      __pyx_t_16 = 0;
-      __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_14, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 65, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+      __pyx_t_3 = PyFloat_FromDouble((*__Pyx_BufPtrStrided1d(double *, __pyx_pybuffernd_thresholds.rcbuffer->pybuffer.buf, __pyx_t_12, __pyx_pybuffernd_thresholds.diminfo[0].strides))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 123, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_threshold, __pyx_t_3) < 0) __PYX_ERR(0, 121, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __Pyx_XDECREF_SET(__pyx_v_append_str, __pyx_t_6);
-      __pyx_t_6 = 0;
 
-      /* "illumine/woodland/_retrieve_leaf_paths.pyx":68
- *                 feature_names[features[node_index]],
- *                 float(round(thresholds[node_index], float_precision)))
- *             leaf_path.append(append_str)             # <<<<<<<<<<<<<<
- * 
- *         else:  # visiting leaf
+      /* "illumine/woodland/_retrieve_leaf_paths.pyx":125
+ *                 threshold=thresholds[node_index],
+ *                 float_precision=float_precision
+ *             )             # <<<<<<<<<<<<<<
+ *             leaf_path.append(tree_split)
+ *             # tmp_split = leaf_path.pop()
  */
-      __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_leaf_path, __pyx_v_append_str); if (unlikely(__pyx_t_9 == -1)) __PYX_ERR(0, 68, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_float_precision); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 125, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_float_precision, __pyx_t_3) < 0) __PYX_ERR(0, 121, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-      /* "illumine/woodland/_retrieve_leaf_paths.pyx":63
+      /* "illumine/woodland/_retrieve_leaf_paths.pyx":120
+ *         if features[node_index] != -2:  # visiting inner node
+ *             tracker_stack.append(0)
+ *             tree_split = TreeSplit(             # <<<<<<<<<<<<<<
+ *                 feature_name=feature_names[features[node_index]],
+ *                 relation='<=',
+ */
+      __pyx_t_3 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit), __pyx_empty_tuple, __pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 120, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __Pyx_XDECREF_SET(__pyx_v_tree_split, ((struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *)__pyx_t_3));
+      __pyx_t_3 = 0;
+
+      /* "illumine/woodland/_retrieve_leaf_paths.pyx":126
+ *                 float_precision=float_precision
+ *             )
+ *             leaf_path.append(tree_split)             # <<<<<<<<<<<<<<
+ *             # tmp_split = leaf_path.pop()
+ *             # print(tmp_split.relation)
+ */
+      __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_leaf_path, ((PyObject *)__pyx_v_tree_split)); if (unlikely(__pyx_t_9 == -1)) __PYX_ERR(0, 126, __pyx_L1_error)
+
+      /* "illumine/woodland/_retrieve_leaf_paths.pyx":118
  *             tracker_stack[-1] += 1  # visiting the child of the latest node
  * 
  *         if features[node_index] != -2:  # visiting inner node             # <<<<<<<<<<<<<<
  *             tracker_stack.append(0)
- *             append_str = "{}<={}".format(
+ *             tree_split = TreeSplit(
  */
       goto __pyx_L7;
     }
 
-    /* "illumine/woodland/_retrieve_leaf_paths.pyx":71
+    /* "illumine/woodland/_retrieve_leaf_paths.pyx":131
  * 
  *         else:  # visiting leaf
  *             tree_meta.append((             # <<<<<<<<<<<<<<
@@ -2135,259 +2814,325 @@ static PyObject *__pyx_f_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_lea
  */
     /*else*/ {
 
-      /* "illumine/woodland/_retrieve_leaf_paths.pyx":72
+      /* "illumine/woodland/_retrieve_leaf_paths.pyx":132
  *         else:  # visiting leaf
  *             tree_meta.append((
  *                 node_index,                            # leaf's index in pre-order traversal             # <<<<<<<<<<<<<<
  *                 leaf_path.copy(),                      # path to the leaf
  *                 float(round(values[node_index][0][0],  # leaf value
  */
-      __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_node_index); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 72, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
+      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_node_index); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 132, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
 
-      /* "illumine/woodland/_retrieve_leaf_paths.pyx":73
+      /* "illumine/woodland/_retrieve_leaf_paths.pyx":133
  *             tree_meta.append((
  *                 node_index,                            # leaf's index in pre-order traversal
  *                 leaf_path.copy(),                      # path to the leaf             # <<<<<<<<<<<<<<
  *                 float(round(values[node_index][0][0],  # leaf value
  *                             float_precision)),
  */
-      __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_leaf_path, __pyx_n_s_copy); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 73, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_14);
-      __pyx_t_16 = NULL;
-      if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_14))) {
-        __pyx_t_16 = PyMethod_GET_SELF(__pyx_t_14);
-        if (likely(__pyx_t_16)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_14);
-          __Pyx_INCREF(__pyx_t_16);
+      __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_leaf_path, __pyx_n_s_copy); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 133, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_13);
+      __pyx_t_14 = NULL;
+      if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_13))) {
+        __pyx_t_14 = PyMethod_GET_SELF(__pyx_t_13);
+        if (likely(__pyx_t_14)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_13);
+          __Pyx_INCREF(__pyx_t_14);
           __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_14, function);
+          __Pyx_DECREF_SET(__pyx_t_13, function);
         }
       }
-      if (__pyx_t_16) {
-        __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_14, __pyx_t_16); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 73, __pyx_L1_error)
-        __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+      if (__pyx_t_14) {
+        __pyx_t_6 = __Pyx_PyObject_CallOneArg(__pyx_t_13, __pyx_t_14); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 133, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
       } else {
-        __pyx_t_3 = __Pyx_PyObject_CallNoArg(__pyx_t_14); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 73, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyObject_CallNoArg(__pyx_t_13); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 133, __pyx_L1_error)
       }
-      __Pyx_GOTREF(__pyx_t_3);
-      __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+      __Pyx_GOTREF(__pyx_t_6);
+      __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
-      /* "illumine/woodland/_retrieve_leaf_paths.pyx":74
+      /* "illumine/woodland/_retrieve_leaf_paths.pyx":134
  *                 node_index,                            # leaf's index in pre-order traversal
  *                 leaf_path.copy(),                      # path to the leaf
  *                 float(round(values[node_index][0][0],  # leaf value             # <<<<<<<<<<<<<<
  *                             float_precision)),
  *                 node_samples[node_index]               # number of samples at leaf
  */
-      __pyx_t_14 = __Pyx_GetItemInt(((PyObject *)__pyx_v_values), __pyx_v_node_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 74, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_GetItemInt(((PyObject *)__pyx_v_values), __pyx_v_node_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 134, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_13);
+      __pyx_t_14 = __Pyx_GetItemInt(__pyx_t_13, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 134, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_14);
-      __pyx_t_16 = __Pyx_GetItemInt(__pyx_t_14, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 74, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_16);
+      __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+      __pyx_t_13 = __Pyx_GetItemInt(__pyx_t_14, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 134, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_13);
       __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-      __pyx_t_14 = __Pyx_GetItemInt(__pyx_t_16, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 74, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_14);
-      __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
 
-      /* "illumine/woodland/_retrieve_leaf_paths.pyx":75
+      /* "illumine/woodland/_retrieve_leaf_paths.pyx":135
  *                 leaf_path.copy(),                      # path to the leaf
  *                 float(round(values[node_index][0][0],  # leaf value
  *                             float_precision)),             # <<<<<<<<<<<<<<
  *                 node_samples[node_index]               # number of samples at leaf
  *             ))
  */
-      __pyx_t_16 = __Pyx_PyInt_From_int(__pyx_v_float_precision); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 75, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_16);
+      __pyx_t_14 = __Pyx_PyInt_From_int(__pyx_v_float_precision); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 135, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_14);
 
-      /* "illumine/woodland/_retrieve_leaf_paths.pyx":74
+      /* "illumine/woodland/_retrieve_leaf_paths.pyx":134
  *                 node_index,                            # leaf's index in pre-order traversal
  *                 leaf_path.copy(),                      # path to the leaf
  *                 float(round(values[node_index][0][0],  # leaf value             # <<<<<<<<<<<<<<
  *                             float_precision)),
  *                 node_samples[node_index]               # number of samples at leaf
  */
-      __pyx_t_12 = PyTuple_New(2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 74, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_12);
+      __pyx_t_15 = PyTuple_New(2); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 134, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_15);
+      __Pyx_GIVEREF(__pyx_t_13);
+      PyTuple_SET_ITEM(__pyx_t_15, 0, __pyx_t_13);
       __Pyx_GIVEREF(__pyx_t_14);
-      PyTuple_SET_ITEM(__pyx_t_12, 0, __pyx_t_14);
-      __Pyx_GIVEREF(__pyx_t_16);
-      PyTuple_SET_ITEM(__pyx_t_12, 1, __pyx_t_16);
+      PyTuple_SET_ITEM(__pyx_t_15, 1, __pyx_t_14);
+      __pyx_t_13 = 0;
       __pyx_t_14 = 0;
-      __pyx_t_16 = 0;
-      __pyx_t_16 = __Pyx_PyObject_Call(__pyx_builtin_round, __pyx_t_12, NULL); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 74, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_16);
-      __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-      __pyx_t_12 = __Pyx_PyNumber_Float(__pyx_t_16); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 74, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_12);
-      __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+      __pyx_t_14 = __Pyx_PyObject_Call(__pyx_builtin_round, __pyx_t_15, NULL); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 134, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_14);
+      __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+      __pyx_t_15 = __Pyx_PyNumber_Float(__pyx_t_14); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 134, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_15);
+      __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
 
-      /* "illumine/woodland/_retrieve_leaf_paths.pyx":76
+      /* "illumine/woodland/_retrieve_leaf_paths.pyx":136
  *                 float(round(values[node_index][0][0],  # leaf value
  *                             float_precision)),
  *                 node_samples[node_index]               # number of samples at leaf             # <<<<<<<<<<<<<<
  *             ))
  * 
  */
-      __pyx_t_17 = __pyx_v_node_index;
+      __pyx_t_16 = __pyx_v_node_index;
       __pyx_t_8 = -1;
-      if (__pyx_t_17 < 0) {
-        __pyx_t_17 += __pyx_pybuffernd_node_samples.diminfo[0].shape;
-        if (unlikely(__pyx_t_17 < 0)) __pyx_t_8 = 0;
-      } else if (unlikely(__pyx_t_17 >= __pyx_pybuffernd_node_samples.diminfo[0].shape)) __pyx_t_8 = 0;
+      if (__pyx_t_16 < 0) {
+        __pyx_t_16 += __pyx_pybuffernd_node_samples.diminfo[0].shape;
+        if (unlikely(__pyx_t_16 < 0)) __pyx_t_8 = 0;
+      } else if (unlikely(__pyx_t_16 >= __pyx_pybuffernd_node_samples.diminfo[0].shape)) __pyx_t_8 = 0;
       if (unlikely(__pyx_t_8 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_8);
-        __PYX_ERR(0, 76, __pyx_L1_error)
+        __PYX_ERR(0, 136, __pyx_L1_error)
       }
-      __pyx_t_16 = __Pyx_PyInt_From_long((*__Pyx_BufPtrStrided1d(long *, __pyx_pybuffernd_node_samples.rcbuffer->pybuffer.buf, __pyx_t_17, __pyx_pybuffernd_node_samples.diminfo[0].strides))); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 76, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_16);
+      __pyx_t_14 = __Pyx_PyInt_From_long((*__Pyx_BufPtrStrided1d(long *, __pyx_pybuffernd_node_samples.rcbuffer->pybuffer.buf, __pyx_t_16, __pyx_pybuffernd_node_samples.diminfo[0].strides))); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 136, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_14);
 
-      /* "illumine/woodland/_retrieve_leaf_paths.pyx":72
+      /* "illumine/woodland/_retrieve_leaf_paths.pyx":132
  *         else:  # visiting leaf
  *             tree_meta.append((
  *                 node_index,                            # leaf's index in pre-order traversal             # <<<<<<<<<<<<<<
  *                 leaf_path.copy(),                      # path to the leaf
  *                 float(round(values[node_index][0][0],  # leaf value
  */
-      __pyx_t_14 = PyTuple_New(4); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 72, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_14);
-      __Pyx_GIVEREF(__pyx_t_6);
-      PyTuple_SET_ITEM(__pyx_t_14, 0, __pyx_t_6);
+      __pyx_t_13 = PyTuple_New(4); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 132, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_13);
       __Pyx_GIVEREF(__pyx_t_3);
-      PyTuple_SET_ITEM(__pyx_t_14, 1, __pyx_t_3);
-      __Pyx_GIVEREF(__pyx_t_12);
-      PyTuple_SET_ITEM(__pyx_t_14, 2, __pyx_t_12);
-      __Pyx_GIVEREF(__pyx_t_16);
-      PyTuple_SET_ITEM(__pyx_t_14, 3, __pyx_t_16);
-      __pyx_t_6 = 0;
+      PyTuple_SET_ITEM(__pyx_t_13, 0, __pyx_t_3);
+      __Pyx_GIVEREF(__pyx_t_6);
+      PyTuple_SET_ITEM(__pyx_t_13, 1, __pyx_t_6);
+      __Pyx_GIVEREF(__pyx_t_15);
+      PyTuple_SET_ITEM(__pyx_t_13, 2, __pyx_t_15);
+      __Pyx_GIVEREF(__pyx_t_14);
+      PyTuple_SET_ITEM(__pyx_t_13, 3, __pyx_t_14);
       __pyx_t_3 = 0;
-      __pyx_t_12 = 0;
-      __pyx_t_16 = 0;
+      __pyx_t_6 = 0;
+      __pyx_t_15 = 0;
+      __pyx_t_14 = 0;
 
-      /* "illumine/woodland/_retrieve_leaf_paths.pyx":71
+      /* "illumine/woodland/_retrieve_leaf_paths.pyx":131
  * 
  *         else:  # visiting leaf
  *             tree_meta.append((             # <<<<<<<<<<<<<<
  *                 node_index,                            # leaf's index in pre-order traversal
  *                 leaf_path.copy(),                      # path to the leaf
  */
-      __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_tree_meta, __pyx_t_14); if (unlikely(__pyx_t_9 == -1)) __PYX_ERR(0, 71, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+      __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_tree_meta, __pyx_t_13); if (unlikely(__pyx_t_9 == -1)) __PYX_ERR(0, 131, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
-      /* "illumine/woodland/_retrieve_leaf_paths.pyx":79
+      /* "illumine/woodland/_retrieve_leaf_paths.pyx":139
  *             ))
  * 
- *             if node_index in children_right:             # <<<<<<<<<<<<<<
+ *             if len(tracker_stack) > 0 and tracker_stack[-1] == 2:             # <<<<<<<<<<<<<<
  *                 # pop out nodes that I am completely done with
  *                 while(len(tracker_stack) > 0 and tracker_stack[-1] == 2):
  */
-      __pyx_t_14 = __Pyx_PyInt_From_int(__pyx_v_node_index); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 79, __pyx_L1_error)
+      __pyx_t_5 = PyList_GET_SIZE(__pyx_v_tracker_stack); if (unlikely(__pyx_t_5 == -1)) __PYX_ERR(0, 139, __pyx_L1_error)
+      __pyx_t_17 = ((__pyx_t_5 > 0) != 0);
+      if (__pyx_t_17) {
+      } else {
+        __pyx_t_2 = __pyx_t_17;
+        goto __pyx_L9_bool_binop_done;
+      }
+      __pyx_t_13 = __Pyx_GetItemInt_List(__pyx_v_tracker_stack, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 139, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_13);
+      __pyx_t_14 = __Pyx_PyInt_EqObjC(__pyx_t_13, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 139, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_14);
-      __pyx_t_2 = (__Pyx_PySequence_ContainsTF(__pyx_t_14, ((PyObject *)__pyx_v_children_right), Py_EQ)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 79, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+      __pyx_t_17 = __Pyx_PyObject_IsTrue(__pyx_t_14); if (unlikely(__pyx_t_17 < 0)) __PYX_ERR(0, 139, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-      __pyx_t_18 = (__pyx_t_2 != 0);
-      if (__pyx_t_18) {
+      __pyx_t_2 = __pyx_t_17;
+      __pyx_L9_bool_binop_done:;
+      if (__pyx_t_2) {
 
-        /* "illumine/woodland/_retrieve_leaf_paths.pyx":81
- *             if node_index in children_right:
+        /* "illumine/woodland/_retrieve_leaf_paths.pyx":141
+ *             if len(tracker_stack) > 0 and tracker_stack[-1] == 2:
  *                 # pop out nodes that I am completely done with
  *                 while(len(tracker_stack) > 0 and tracker_stack[-1] == 2):             # <<<<<<<<<<<<<<
  *                     leaf_path.pop()
  *                     tracker_stack.pop()
  */
         while (1) {
-          __pyx_t_5 = PyList_GET_SIZE(__pyx_v_tracker_stack); if (unlikely(__pyx_t_5 == -1)) __PYX_ERR(0, 81, __pyx_L1_error)
-          __pyx_t_2 = ((__pyx_t_5 > 0) != 0);
-          if (__pyx_t_2) {
+          __pyx_t_5 = PyList_GET_SIZE(__pyx_v_tracker_stack); if (unlikely(__pyx_t_5 == -1)) __PYX_ERR(0, 141, __pyx_L1_error)
+          __pyx_t_17 = ((__pyx_t_5 > 0) != 0);
+          if (__pyx_t_17) {
           } else {
-            __pyx_t_18 = __pyx_t_2;
-            goto __pyx_L11_bool_binop_done;
+            __pyx_t_2 = __pyx_t_17;
+            goto __pyx_L13_bool_binop_done;
           }
-          __pyx_t_14 = __Pyx_GetItemInt_List(__pyx_v_tracker_stack, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 81, __pyx_L1_error)
+          __pyx_t_14 = __Pyx_GetItemInt_List(__pyx_v_tracker_stack, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 141, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_14);
-          __pyx_t_16 = __Pyx_PyInt_EqObjC(__pyx_t_14, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 81, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_16);
+          __pyx_t_13 = __Pyx_PyInt_EqObjC(__pyx_t_14, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 141, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_13);
           __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-          __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_16); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 81, __pyx_L1_error)
-          __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
-          __pyx_t_18 = __pyx_t_2;
-          __pyx_L11_bool_binop_done:;
-          if (!__pyx_t_18) break;
+          __pyx_t_17 = __Pyx_PyObject_IsTrue(__pyx_t_13); if (unlikely(__pyx_t_17 < 0)) __PYX_ERR(0, 141, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+          __pyx_t_2 = __pyx_t_17;
+          __pyx_L13_bool_binop_done:;
+          if (!__pyx_t_2) break;
 
-          /* "illumine/woodland/_retrieve_leaf_paths.pyx":82
+          /* "illumine/woodland/_retrieve_leaf_paths.pyx":142
  *                 # pop out nodes that I am completely done with
  *                 while(len(tracker_stack) > 0 and tracker_stack[-1] == 2):
  *                     leaf_path.pop()             # <<<<<<<<<<<<<<
  *                     tracker_stack.pop()
  *             if len(leaf_path) != 0:
  */
-          __pyx_t_16 = __Pyx_PyList_Pop(__pyx_v_leaf_path); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 82, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_16);
-          __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+          __pyx_t_13 = __Pyx_PyList_Pop(__pyx_v_leaf_path); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 142, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_13);
+          __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
-          /* "illumine/woodland/_retrieve_leaf_paths.pyx":83
+          /* "illumine/woodland/_retrieve_leaf_paths.pyx":143
  *                 while(len(tracker_stack) > 0 and tracker_stack[-1] == 2):
  *                     leaf_path.pop()
  *                     tracker_stack.pop()             # <<<<<<<<<<<<<<
  *             if len(leaf_path) != 0:
- *                 leaf_path[-1] = leaf_path[-1].replace("<=", ">")
+ *                 tmp_split = leaf_path.pop()
  */
-          __pyx_t_16 = __Pyx_PyList_Pop(__pyx_v_tracker_stack); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 83, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_16);
-          __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+          __pyx_t_13 = __Pyx_PyList_Pop(__pyx_v_tracker_stack); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 143, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_13);
+          __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
         }
 
-        /* "illumine/woodland/_retrieve_leaf_paths.pyx":79
+        /* "illumine/woodland/_retrieve_leaf_paths.pyx":139
  *             ))
  * 
- *             if node_index in children_right:             # <<<<<<<<<<<<<<
+ *             if len(tracker_stack) > 0 and tracker_stack[-1] == 2:             # <<<<<<<<<<<<<<
  *                 # pop out nodes that I am completely done with
  *                 while(len(tracker_stack) > 0 and tracker_stack[-1] == 2):
  */
       }
 
-      /* "illumine/woodland/_retrieve_leaf_paths.pyx":84
+      /* "illumine/woodland/_retrieve_leaf_paths.pyx":144
  *                     leaf_path.pop()
  *                     tracker_stack.pop()
  *             if len(leaf_path) != 0:             # <<<<<<<<<<<<<<
- *                 leaf_path[-1] = leaf_path[-1].replace("<=", ">")
- * 
+ *                 tmp_split = leaf_path.pop()
+ *                 new_split = TreeSplit(
  */
-      __pyx_t_5 = PyList_GET_SIZE(__pyx_v_leaf_path); if (unlikely(__pyx_t_5 == -1)) __PYX_ERR(0, 84, __pyx_L1_error)
-      __pyx_t_18 = ((__pyx_t_5 != 0) != 0);
-      if (__pyx_t_18) {
+      __pyx_t_5 = PyList_GET_SIZE(__pyx_v_leaf_path); if (unlikely(__pyx_t_5 == -1)) __PYX_ERR(0, 144, __pyx_L1_error)
+      __pyx_t_2 = ((__pyx_t_5 != 0) != 0);
+      if (__pyx_t_2) {
 
-        /* "illumine/woodland/_retrieve_leaf_paths.pyx":85
+        /* "illumine/woodland/_retrieve_leaf_paths.pyx":145
  *                     tracker_stack.pop()
  *             if len(leaf_path) != 0:
- *                 leaf_path[-1] = leaf_path[-1].replace("<=", ">")             # <<<<<<<<<<<<<<
+ *                 tmp_split = leaf_path.pop()             # <<<<<<<<<<<<<<
+ *                 new_split = TreeSplit(
+ *                     feature_name=tmp_split.feature_name,
+ */
+        __pyx_t_13 = __Pyx_PyList_Pop(__pyx_v_leaf_path); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 145, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_13);
+        __Pyx_XDECREF_SET(__pyx_v_tmp_split, __pyx_t_13);
+        __pyx_t_13 = 0;
+
+        /* "illumine/woodland/_retrieve_leaf_paths.pyx":147
+ *                 tmp_split = leaf_path.pop()
+ *                 new_split = TreeSplit(
+ *                     feature_name=tmp_split.feature_name,             # <<<<<<<<<<<<<<
+ *                     relation='>',
+ *                     threshold=tmp_split.threshold,
+ */
+        __pyx_t_13 = PyDict_New(); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 147, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_13);
+        __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_tmp_split, __pyx_n_s_feature_name); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 147, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_14);
+        if (PyDict_SetItem(__pyx_t_13, __pyx_n_s_feature_name, __pyx_t_14) < 0) __PYX_ERR(0, 147, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+        if (PyDict_SetItem(__pyx_t_13, __pyx_n_s_relation, __pyx_kp_s__4) < 0) __PYX_ERR(0, 147, __pyx_L1_error)
+
+        /* "illumine/woodland/_retrieve_leaf_paths.pyx":149
+ *                     feature_name=tmp_split.feature_name,
+ *                     relation='>',
+ *                     threshold=tmp_split.threshold,             # <<<<<<<<<<<<<<
+ *                     float_precision=float_precision
+ *                 )
+ */
+        __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_tmp_split, __pyx_n_s_threshold); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 149, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_14);
+        if (PyDict_SetItem(__pyx_t_13, __pyx_n_s_threshold, __pyx_t_14) < 0) __PYX_ERR(0, 147, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+
+        /* "illumine/woodland/_retrieve_leaf_paths.pyx":151
+ *                     threshold=tmp_split.threshold,
+ *                     float_precision=float_precision
+ *                 )             # <<<<<<<<<<<<<<
+ *                 leaf_path.append(new_split)
+ * 
+ */
+        __pyx_t_14 = __Pyx_PyInt_From_int(__pyx_v_float_precision); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 151, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_14);
+        if (PyDict_SetItem(__pyx_t_13, __pyx_n_s_float_precision, __pyx_t_14) < 0) __PYX_ERR(0, 147, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+
+        /* "illumine/woodland/_retrieve_leaf_paths.pyx":146
+ *             if len(leaf_path) != 0:
+ *                 tmp_split = leaf_path.pop()
+ *                 new_split = TreeSplit(             # <<<<<<<<<<<<<<
+ *                     feature_name=tmp_split.feature_name,
+ *                     relation='>',
+ */
+        __pyx_t_14 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit), __pyx_empty_tuple, __pyx_t_13); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 146, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_14);
+        __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+        __Pyx_XDECREF_SET(__pyx_v_new_split, ((struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *)__pyx_t_14));
+        __pyx_t_14 = 0;
+
+        /* "illumine/woodland/_retrieve_leaf_paths.pyx":152
+ *                     float_precision=float_precision
+ *                 )
+ *                 leaf_path.append(new_split)             # <<<<<<<<<<<<<<
  * 
  *     return tree_meta
  */
-        __pyx_t_16 = __Pyx_GetItemInt_List(__pyx_v_leaf_path, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 85, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_16);
-        __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_n_s_replace); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 85, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_14);
-        __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
-        __pyx_t_16 = __Pyx_PyObject_Call(__pyx_t_14, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 85, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_16);
-        __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-        if (unlikely(__Pyx_SetItemInt(__pyx_v_leaf_path, -1L, __pyx_t_16, long, 1, __Pyx_PyInt_From_long, 1, 1, 1) < 0)) __PYX_ERR(0, 85, __pyx_L1_error)
-        __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+        __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_leaf_path, ((PyObject *)__pyx_v_new_split)); if (unlikely(__pyx_t_9 == -1)) __PYX_ERR(0, 152, __pyx_L1_error)
 
-        /* "illumine/woodland/_retrieve_leaf_paths.pyx":84
+        /* "illumine/woodland/_retrieve_leaf_paths.pyx":144
  *                     leaf_path.pop()
  *                     tracker_stack.pop()
  *             if len(leaf_path) != 0:             # <<<<<<<<<<<<<<
- *                 leaf_path[-1] = leaf_path[-1].replace("<=", ">")
- * 
+ *                 tmp_split = leaf_path.pop()
+ *                 new_split = TreeSplit(
  */
       }
     }
     __pyx_L7:;
   }
 
-  /* "illumine/woodland/_retrieve_leaf_paths.pyx":87
- *                 leaf_path[-1] = leaf_path[-1].replace("<=", ">")
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":154
+ *                 leaf_path.append(new_split)
  * 
  *     return tree_meta             # <<<<<<<<<<<<<<
  */
@@ -2396,37 +3141,34 @@ static PyObject *__pyx_f_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_lea
   __pyx_r = __pyx_v_tree_meta;
   goto __pyx_L0;
 
-  /* "illumine/woodland/_retrieve_leaf_paths.pyx":39
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":85
  * 
  * 
- * cdef retrieve_leaf_paths(np.ndarray[double, ndim=3] values,             # <<<<<<<<<<<<<<
- *                          np.ndarray[long, ndim=1] node_samples,
- *                          np.ndarray[long, ndim=1] features,
+ * cdef retrieve_leaf_path(np.ndarray[double, ndim=3] values,             # <<<<<<<<<<<<<<
+ *                         np.ndarray[long, ndim=1] node_samples,
+ *                         np.ndarray[long, ndim=1] features,
  */
 
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_12);
+  __Pyx_XDECREF(__pyx_t_13);
   __Pyx_XDECREF(__pyx_t_14);
   __Pyx_XDECREF(__pyx_t_15);
-  __Pyx_XDECREF(__pyx_t_16);
   { PyObject *__pyx_type, *__pyx_value, *__pyx_tb;
     __Pyx_PyThreadState_declare
     __Pyx_PyThreadState_assign
     __Pyx_ErrFetch(&__pyx_type, &__pyx_value, &__pyx_tb);
-    __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_children_right.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_features.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_node_samples.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_thresholds.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_values.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("illumine.woodland._retrieve_leaf_paths.retrieve_leaf_paths", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("illumine.woodland._retrieve_leaf_paths.retrieve_leaf_path", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   goto __pyx_L2;
   __pyx_L0:;
-  __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_children_right.rcbuffer->pybuffer);
   __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_features.rcbuffer->pybuffer);
   __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_node_samples.rcbuffer->pybuffer);
   __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_thresholds.rcbuffer->pybuffer);
@@ -2435,7 +3177,9 @@ static PyObject *__pyx_f_8illumine_8woodland_20_retrieve_leaf_paths_retrieve_lea
   __Pyx_XDECREF(__pyx_v_tree_meta);
   __Pyx_XDECREF(__pyx_v_tracker_stack);
   __Pyx_XDECREF(__pyx_v_leaf_path);
-  __Pyx_XDECREF(__pyx_v_append_str);
+  __Pyx_XDECREF((PyObject *)__pyx_v_tree_split);
+  __Pyx_XDECREF(__pyx_v_tmp_split);
+  __Pyx_XDECREF((PyObject *)__pyx_v_new_split);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
@@ -2610,7 +3354,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  * 
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 218, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 218, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -2666,7 +3410,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  * 
  *             info.buf = PyArray_DATA(self)
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 222, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 222, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -2975,7 +3719,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  *                 if   t == NPY_BYTE:        f = "b"
  *                 elif t == NPY_UBYTE:       f = "B"
  */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 259, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 259, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_Raise(__pyx_t_3, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3790,7 +4534,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  * 
  *         if ((child.byteorder == c'>' and little_endian) or
  */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__9, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 799, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 799, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_Raise(__pyx_t_3, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3858,7 +4602,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  *             # One could encode it in the format string and have Cython
  *             # complain instead, BUT: < and > in format strings also imply
  */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__10, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 803, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__9, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 803, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_Raise(__pyx_t_3, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3967,7 +4711,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  * 
  *             # Until ticket #99 is fixed, use integers to avoid warnings
  */
-        __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__11, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 823, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__10, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 823, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_Raise(__pyx_t_4, 0, 0, 0);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -4563,6 +5307,118 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_get_array_base(PyArrayObject *__py
   return __pyx_r;
 }
 
+static PyObject *__pyx_tp_new_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit(PyTypeObject *t, PyObject *a, PyObject *k) {
+  struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *p;
+  PyObject *o;
+  if (likely((t->tp_flags & Py_TPFLAGS_IS_ABSTRACT) == 0)) {
+    o = (*t->tp_alloc)(t, 0);
+  } else {
+    o = (PyObject *) PyBaseObject_Type.tp_new(t, __pyx_empty_tuple, 0);
+  }
+  if (unlikely(!o)) return 0;
+  p = ((struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *)o);
+  p->_feature_name = ((PyObject*)Py_None); Py_INCREF(Py_None);
+  p->_relation = ((PyObject*)Py_None); Py_INCREF(Py_None);
+  if (unlikely(__pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_1__cinit__(o, a, k) < 0)) {
+    Py_DECREF(o); o = 0;
+  }
+  return o;
+}
+
+static void __pyx_tp_dealloc_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit(PyObject *o) {
+  struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *p = (struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit *)o;
+  #if PY_VERSION_HEX >= 0x030400a1
+  if (unlikely(Py_TYPE(o)->tp_finalize) && (!PyType_IS_GC(Py_TYPE(o)) || !_PyGC_FINALIZED(o))) {
+    if (PyObject_CallFinalizerFromDealloc(o)) return;
+  }
+  #endif
+  Py_CLEAR(p->_feature_name);
+  Py_CLEAR(p->_relation);
+  (*Py_TYPE(o)->tp_free)(o);
+}
+
+static PyObject *__pyx_getprop_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_feature_name(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_12feature_name_1__get__(o);
+}
+
+static PyObject *__pyx_getprop_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_relation(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_8relation_1__get__(o);
+}
+
+static PyObject *__pyx_getprop_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_threshold(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_9threshold_1__get__(o);
+}
+
+static PyMethodDef __pyx_methods_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit[] = {
+  {"__key", (PyCFunction)__pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_3__key, METH_NOARGS, 0},
+  {0, 0, 0, 0}
+};
+
+static struct PyGetSetDef __pyx_getsets_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit[] = {
+  {(char *)"feature_name", __pyx_getprop_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_feature_name, 0, (char *)0, 0},
+  {(char *)"relation", __pyx_getprop_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_relation, 0, (char *)0, 0},
+  {(char *)"threshold", __pyx_getprop_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_threshold, 0, (char *)0, 0},
+  {0, 0, 0, 0, 0}
+};
+
+static PyTypeObject __pyx_type_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit = {
+  PyVarObject_HEAD_INIT(0, 0)
+  "illumine.woodland._retrieve_leaf_paths.TreeSplit", /*tp_name*/
+  sizeof(struct __pyx_obj_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit), /*tp_basicsize*/
+  0, /*tp_itemsize*/
+  __pyx_tp_dealloc_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit, /*tp_dealloc*/
+  0, /*tp_print*/
+  0, /*tp_getattr*/
+  0, /*tp_setattr*/
+  #if PY_MAJOR_VERSION < 3
+  0, /*tp_compare*/
+  #endif
+  #if PY_MAJOR_VERSION >= 3
+  0, /*tp_as_async*/
+  #endif
+  __pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_9__repr__, /*tp_repr*/
+  0, /*tp_as_number*/
+  0, /*tp_as_sequence*/
+  0, /*tp_as_mapping*/
+  __pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_5__hash__, /*tp_hash*/
+  0, /*tp_call*/
+  __pyx_pw_8illumine_8woodland_20_retrieve_leaf_paths_9TreeSplit_7__str__, /*tp_str*/
+  0, /*tp_getattro*/
+  0, /*tp_setattro*/
+  0, /*tp_as_buffer*/
+  Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_BASETYPE, /*tp_flags*/
+  " Representation of TreeSplit which contains\n        feature_name, relation, threshold of a\n        decision tree split\n    ", /*tp_doc*/
+  0, /*tp_traverse*/
+  0, /*tp_clear*/
+  0, /*tp_richcompare*/
+  0, /*tp_weaklistoffset*/
+  0, /*tp_iter*/
+  0, /*tp_iternext*/
+  __pyx_methods_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit, /*tp_methods*/
+  0, /*tp_members*/
+  __pyx_getsets_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit, /*tp_getset*/
+  0, /*tp_base*/
+  0, /*tp_dict*/
+  0, /*tp_descr_get*/
+  0, /*tp_descr_set*/
+  0, /*tp_dictoffset*/
+  0, /*tp_init*/
+  0, /*tp_alloc*/
+  __pyx_tp_new_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit, /*tp_new*/
+  0, /*tp_free*/
+  0, /*tp_is_gc*/
+  0, /*tp_bases*/
+  0, /*tp_mro*/
+  0, /*tp_cache*/
+  0, /*tp_subclasses*/
+  0, /*tp_weaklist*/
+  0, /*tp_del*/
+  0, /*tp_version_tag*/
+  #if PY_VERSION_HEX >= 0x030400a1
+  0, /*tp_finalize*/
+  #endif
+};
+
 static PyMethodDef __pyx_methods[] = {
   {0, 0, 0, 0}
 };
@@ -4586,35 +5442,38 @@ static struct PyModuleDef __pyx_moduledef = {
 #endif
 
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
+  {&__pyx_kp_s_, __pyx_k_, sizeof(__pyx_k_), 0, 0, 1, 0},
   {&__pyx_kp_u_Format_string_allocated_too_shor, __pyx_k_Format_string_allocated_too_shor, sizeof(__pyx_k_Format_string_allocated_too_shor), 0, 1, 0, 0},
   {&__pyx_kp_u_Format_string_allocated_too_shor_2, __pyx_k_Format_string_allocated_too_shor_2, sizeof(__pyx_k_Format_string_allocated_too_shor_2), 0, 1, 0, 0},
   {&__pyx_kp_u_Non_native_byte_order_not_suppor, __pyx_k_Non_native_byte_order_not_suppor, sizeof(__pyx_k_Non_native_byte_order_not_suppor), 0, 1, 0, 0},
   {&__pyx_n_s_RuntimeError, __pyx_k_RuntimeError, sizeof(__pyx_k_RuntimeError), 0, 0, 1, 1},
   {&__pyx_kp_s_The_passed_tree_is_empty, __pyx_k_The_passed_tree_is_empty, sizeof(__pyx_k_The_passed_tree_is_empty), 0, 0, 1, 0},
   {&__pyx_n_s_ValueError, __pyx_k_ValueError, sizeof(__pyx_k_ValueError), 0, 0, 1, 1},
-  {&__pyx_kp_s__2, __pyx_k__2, sizeof(__pyx_k__2), 0, 0, 1, 0},
   {&__pyx_kp_s__3, __pyx_k__3, sizeof(__pyx_k__3), 0, 0, 1, 0},
   {&__pyx_kp_s__4, __pyx_k__4, sizeof(__pyx_k__4), 0, 0, 1, 0},
-  {&__pyx_n_s_accm_children_right, __pyx_k_accm_children_right, sizeof(__pyx_k_accm_children_right), 0, 0, 1, 1},
   {&__pyx_n_s_accm_features, __pyx_k_accm_features, sizeof(__pyx_k_accm_features), 0, 0, 1, 1},
   {&__pyx_n_s_accm_node_samples, __pyx_k_accm_node_samples, sizeof(__pyx_k_accm_node_samples), 0, 0, 1, 1},
   {&__pyx_n_s_accm_thresholds, __pyx_k_accm_thresholds, sizeof(__pyx_k_accm_thresholds), 0, 0, 1, 1},
   {&__pyx_n_s_accm_values, __pyx_k_accm_values, sizeof(__pyx_k_accm_values), 0, 0, 1, 1},
   {&__pyx_n_s_copy, __pyx_k_copy, sizeof(__pyx_k_copy), 0, 0, 1, 1},
+  {&__pyx_n_s_feature_name, __pyx_k_feature_name, sizeof(__pyx_k_feature_name), 0, 0, 1, 1},
   {&__pyx_n_s_feature_names, __pyx_k_feature_names, sizeof(__pyx_k_feature_names), 0, 0, 1, 1},
   {&__pyx_n_s_float_precision, __pyx_k_float_precision, sizeof(__pyx_k_float_precision), 0, 0, 1, 1},
   {&__pyx_n_s_format, __pyx_k_format, sizeof(__pyx_k_format), 0, 0, 1, 1},
   {&__pyx_kp_s_home_itzjustricky_workspace_git, __pyx_k_home_itzjustricky_workspace_git, sizeof(__pyx_k_home_itzjustricky_workspace_git), 0, 0, 1, 0},
   {&__pyx_n_s_illumine_woodland__retrieve_leaf, __pyx_k_illumine_woodland__retrieve_leaf, sizeof(__pyx_k_illumine_woodland__retrieve_leaf), 0, 0, 1, 1},
+  {&__pyx_n_s_key, __pyx_k_key, sizeof(__pyx_k_key), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_kp_u_ndarray_is_not_C_contiguous, __pyx_k_ndarray_is_not_C_contiguous, sizeof(__pyx_k_ndarray_is_not_C_contiguous), 0, 1, 0, 0},
   {&__pyx_kp_u_ndarray_is_not_Fortran_contiguou, __pyx_k_ndarray_is_not_Fortran_contiguou, sizeof(__pyx_k_ndarray_is_not_Fortran_contiguou), 0, 1, 0, 0},
   {&__pyx_n_s_pop, __pyx_k_pop, sizeof(__pyx_k_pop), 0, 0, 1, 1},
   {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
-  {&__pyx_n_s_replace, __pyx_k_replace, sizeof(__pyx_k_replace), 0, 0, 1, 1},
+  {&__pyx_n_s_relation, __pyx_k_relation, sizeof(__pyx_k_relation), 0, 0, 1, 1},
   {&__pyx_n_s_retrieve_tree_metas, __pyx_k_retrieve_tree_metas, sizeof(__pyx_k_retrieve_tree_metas), 0, 0, 1, 1},
   {&__pyx_n_s_round, __pyx_k_round, sizeof(__pyx_k_round), 0, 0, 1, 1},
+  {&__pyx_n_s_str, __pyx_k_str, sizeof(__pyx_k_str), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
+  {&__pyx_n_s_threshold, __pyx_k_threshold, sizeof(__pyx_k_threshold), 0, 0, 1, 1},
   {&__pyx_n_s_tree_metas, __pyx_k_tree_metas, sizeof(__pyx_k_tree_metas), 0, 0, 1, 1},
   {&__pyx_n_s_tup, __pyx_k_tup, sizeof(__pyx_k_tup), 0, 0, 1, 1},
   {&__pyx_kp_u_unknown_dtype_code_in_numpy_pxd, __pyx_k_unknown_dtype_code_in_numpy_pxd, sizeof(__pyx_k_unknown_dtype_code_in_numpy_pxd), 0, 1, 0, 0},
@@ -4623,14 +5482,14 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_zip = __Pyx_GetBuiltinName(__pyx_n_s_zip); if (!__pyx_builtin_zip) __PYX_ERR(0, 21, __pyx_L1_error)
-  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 52, __pyx_L1_error)
+  __pyx_builtin_zip = __Pyx_GetBuiltinName(__pyx_n_s_zip); if (!__pyx_builtin_zip) __PYX_ERR(0, 20, __pyx_L1_error)
+  __pyx_builtin_round = __Pyx_GetBuiltinName(__pyx_n_s_round); if (!__pyx_builtin_round) __PYX_ERR(0, 79, __pyx_L1_error)
+  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 107, __pyx_L1_error)
   #if PY_MAJOR_VERSION >= 3
-  __pyx_builtin_xrange = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_xrange) __PYX_ERR(0, 59, __pyx_L1_error)
+  __pyx_builtin_xrange = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_xrange) __PYX_ERR(0, 114, __pyx_L1_error)
   #else
-  __pyx_builtin_xrange = __Pyx_GetBuiltinName(__pyx_n_s_xrange); if (!__pyx_builtin_xrange) __PYX_ERR(0, 59, __pyx_L1_error)
+  __pyx_builtin_xrange = __Pyx_GetBuiltinName(__pyx_n_s_xrange); if (!__pyx_builtin_xrange) __PYX_ERR(0, 114, __pyx_L1_error)
   #endif
-  __pyx_builtin_round = __Pyx_GetBuiltinName(__pyx_n_s_round); if (!__pyx_builtin_round) __PYX_ERR(0, 67, __pyx_L1_error)
   __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(1, 231, __pyx_L1_error)
   __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_n_s_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(1, 799, __pyx_L1_error)
   return 0;
@@ -4642,27 +5501,16 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "illumine/woodland/_retrieve_leaf_paths.pyx":52
+  /* "illumine/woodland/_retrieve_leaf_paths.pyx":107
  * 
  *     if n_splits == 0:
  *         raise ValueError("The passed tree is empty!")             # <<<<<<<<<<<<<<
  * 
- *     tree_meta = []
+ *     cdef list tree_meta = []
  */
-  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_s_The_passed_tree_is_empty); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 52, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple_);
-  __Pyx_GIVEREF(__pyx_tuple_);
-
-  /* "illumine/woodland/_retrieve_leaf_paths.pyx":85
- *                     tracker_stack.pop()
- *             if len(leaf_path) != 0:
- *                 leaf_path[-1] = leaf_path[-1].replace("<=", ">")             # <<<<<<<<<<<<<<
- * 
- *     return tree_meta
- */
-  __pyx_tuple__5 = PyTuple_Pack(2, __pyx_kp_s__3, __pyx_kp_s__4); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 85, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__5);
-  __Pyx_GIVEREF(__pyx_tuple__5);
+  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_s_The_passed_tree_is_empty); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 107, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__2);
+  __Pyx_GIVEREF(__pyx_tuple__2);
 
   /* "../../../anaconda2/envs/py33/lib/python3.3/site-packages/Cython/Includes/numpy/__init__.pxd":218
  *             if ((flags & pybuf.PyBUF_C_CONTIGUOUS == pybuf.PyBUF_C_CONTIGUOUS)
@@ -4671,9 +5519,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
  */
-  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_C_contiguous); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(1, 218, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__6);
-  __Pyx_GIVEREF(__pyx_tuple__6);
+  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_C_contiguous); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(1, 218, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__5);
+  __Pyx_GIVEREF(__pyx_tuple__5);
 
   /* "../../../anaconda2/envs/py33/lib/python3.3/site-packages/Cython/Includes/numpy/__init__.pxd":222
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
@@ -4682,9 +5530,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *             info.buf = PyArray_DATA(self)
  */
-  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_Fortran_contiguou); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(1, 222, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__7);
-  __Pyx_GIVEREF(__pyx_tuple__7);
+  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_Fortran_contiguou); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(1, 222, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__6);
+  __Pyx_GIVEREF(__pyx_tuple__6);
 
   /* "../../../anaconda2/envs/py33/lib/python3.3/site-packages/Cython/Includes/numpy/__init__.pxd":259
  *                 if ((descr.byteorder == c'>' and little_endian) or
@@ -4693,9 +5541,9 @@ static int __Pyx_InitCachedConstants(void) {
  *                 if   t == NPY_BYTE:        f = "b"
  *                 elif t == NPY_UBYTE:       f = "B"
  */
-  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(1, 259, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__8);
-  __Pyx_GIVEREF(__pyx_tuple__8);
+  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(1, 259, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__7);
+  __Pyx_GIVEREF(__pyx_tuple__7);
 
   /* "../../../anaconda2/envs/py33/lib/python3.3/site-packages/Cython/Includes/numpy/__init__.pxd":799
  * 
@@ -4704,9 +5552,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *         if ((child.byteorder == c'>' and little_endian) or
  */
-  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(1, 799, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__9);
-  __Pyx_GIVEREF(__pyx_tuple__9);
+  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(1, 799, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__8);
+  __Pyx_GIVEREF(__pyx_tuple__8);
 
   /* "../../../anaconda2/envs/py33/lib/python3.3/site-packages/Cython/Includes/numpy/__init__.pxd":803
  *         if ((child.byteorder == c'>' and little_endian) or
@@ -4715,9 +5563,9 @@ static int __Pyx_InitCachedConstants(void) {
  *             # One could encode it in the format string and have Cython
  *             # complain instead, BUT: < and > in format strings also imply
  */
-  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(1, 803, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__10);
-  __Pyx_GIVEREF(__pyx_tuple__10);
+  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(1, 803, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__9);
+  __Pyx_GIVEREF(__pyx_tuple__9);
 
   /* "../../../anaconda2/envs/py33/lib/python3.3/site-packages/Cython/Includes/numpy/__init__.pxd":823
  *             t = child.type_num
@@ -4726,9 +5574,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *             # Until ticket #99 is fixed, use integers to avoid warnings
  */
-  __pyx_tuple__11 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor_2); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(1, 823, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__11);
-  __Pyx_GIVEREF(__pyx_tuple__11);
+  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor_2); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(1, 823, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__10);
+  __Pyx_GIVEREF(__pyx_tuple__10);
 
   /* "illumine/woodland/_retrieve_leaf_paths.pyx":12
  * 
@@ -4737,10 +5585,10 @@ static int __Pyx_InitCachedConstants(void) {
  *                         accm_node_samples,
  *                         accm_features,
  */
-  __pyx_tuple__12 = PyTuple_Pack(9, __pyx_n_s_accm_values, __pyx_n_s_accm_node_samples, __pyx_n_s_accm_features, __pyx_n_s_accm_thresholds, __pyx_n_s_accm_children_right, __pyx_n_s_feature_names, __pyx_n_s_float_precision, __pyx_n_s_tree_metas, __pyx_n_s_tup); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 12, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__12);
-  __Pyx_GIVEREF(__pyx_tuple__12);
-  __pyx_codeobj__13 = (PyObject*)__Pyx_PyCode_New(7, 0, 9, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__12, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_itzjustricky_workspace_git, __pyx_n_s_retrieve_tree_metas, 12, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 12, __pyx_L1_error)
+  __pyx_tuple__11 = PyTuple_Pack(8, __pyx_n_s_accm_values, __pyx_n_s_accm_node_samples, __pyx_n_s_accm_features, __pyx_n_s_accm_thresholds, __pyx_n_s_feature_names, __pyx_n_s_float_precision, __pyx_n_s_tree_metas, __pyx_n_s_tup); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__11);
+  __Pyx_GIVEREF(__pyx_tuple__11);
+  __pyx_codeobj__12 = (PyObject*)__Pyx_PyCode_New(6, 0, 8, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__11, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_itzjustricky_workspace_git, __pyx_n_s_retrieve_tree_metas, 12, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__12)) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -4843,6 +5691,10 @@ PyMODINIT_FUNC PyInit__retrieve_leaf_paths(void)
   /*--- Variable export code ---*/
   /*--- Function export code ---*/
   /*--- Type init code ---*/
+  if (PyType_Ready(&__pyx_type_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit) < 0) __PYX_ERR(0, 36, __pyx_L1_error)
+  __pyx_type_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit.tp_print = 0;
+  if (PyObject_SetAttrString(__pyx_m, "TreeSplit", (PyObject *)&__pyx_type_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit) < 0) __PYX_ERR(0, 36, __pyx_L1_error)
+  __pyx_ptype_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit = &__pyx_type_8illumine_8woodland_20_retrieve_leaf_paths_TreeSplit;
   /*--- Type import code ---*/
   __pyx_ptype_7cpython_4type_type = __Pyx_ImportType(__Pyx_BUILTIN_MODULE_NAME, "type", 
   #if CYTHON_COMPILING_IN_PYPY
@@ -4877,7 +5729,7 @@ PyMODINIT_FUNC PyInit__retrieve_leaf_paths(void)
 
   /* "illumine/woodland/_retrieve_leaf_paths.pyx":1
  * """             # <<<<<<<<<<<<<<
- *     Cython module for the retrieve_leaf_paths
+ *     Cython module for the retrieve_leaf_path
  *     function used to build lucid-tree objects
  */
   __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
@@ -5230,8 +6082,79 @@ static CYTHON_INLINE int __Pyx_TypeTest(PyObject *obj, PyTypeObject *type) {
     return 0;
 }
 
+/* PyObjectCallMethO */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg) {
+    PyObject *self, *result;
+    PyCFunction cfunc;
+    cfunc = PyCFunction_GET_FUNCTION(func);
+    self = PyCFunction_GET_SELF(func);
+    if (unlikely(Py_EnterRecursiveCall((char*)" while calling a Python object")))
+        return NULL;
+    result = cfunc(self, arg);
+    Py_LeaveRecursiveCall();
+    if (unlikely(!result) && unlikely(!PyErr_Occurred())) {
+        PyErr_SetString(
+            PyExc_SystemError,
+            "NULL result without error in PyObject_Call");
+    }
+    return result;
+}
+#endif
+
+/* PyObjectCallOneArg */
+#if CYTHON_COMPILING_IN_CPYTHON
+static PyObject* __Pyx__PyObject_CallOneArg(PyObject *func, PyObject *arg) {
+    PyObject *result;
+    PyObject *args = PyTuple_New(1);
+    if (unlikely(!args)) return NULL;
+    Py_INCREF(arg);
+    PyTuple_SET_ITEM(args, 0, arg);
+    result = __Pyx_PyObject_Call(func, args, NULL);
+    Py_DECREF(args);
+    return result;
+}
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg) {
+#ifdef __Pyx_CyFunction_USED
+    if (likely(PyCFunction_Check(func) || PyObject_TypeCheck(func, __pyx_CyFunctionType))) {
+#else
+    if (likely(PyCFunction_Check(func))) {
+#endif
+        if (likely(PyCFunction_GET_FLAGS(func) & METH_O)) {
+            return __Pyx_PyObject_CallMethO(func, arg);
+        }
+    }
+    return __Pyx__PyObject_CallOneArg(func, arg);
+}
+#else
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg) {
+    PyObject *result;
+    PyObject *args = PyTuple_Pack(1, arg);
+    if (unlikely(!args)) return NULL;
+    result = __Pyx_PyObject_Call(func, args, NULL);
+    Py_DECREF(args);
+    return result;
+}
+#endif
+
+/* PyObjectCallNoArg */
+  #if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func) {
+#ifdef __Pyx_CyFunction_USED
+    if (likely(PyCFunction_Check(func) || PyObject_TypeCheck(func, __pyx_CyFunctionType))) {
+#else
+    if (likely(PyCFunction_Check(func))) {
+#endif
+        if (likely(PyCFunction_GET_FLAGS(func) & METH_NOARGS)) {
+            return __Pyx_PyObject_CallMethO(func, NULL);
+        }
+    }
+    return __Pyx_PyObject_Call(func, __pyx_empty_tuple, NULL);
+}
+#endif
+
 /* BufferFormatCheck */
-static CYTHON_INLINE int __Pyx_IsLittleEndian(void) {
+    static CYTHON_INLINE int __Pyx_IsLittleEndian(void) {
   unsigned int n = 1;
   return *(unsigned char*)(&n) != 0;
 }
@@ -5781,7 +6704,7 @@ static CYTHON_INLINE void __Pyx_SafeReleaseBuffer(Py_buffer* info) {
 }
 
 /* PyErrFetchRestore */
-  #if CYTHON_COMPILING_IN_CPYTHON
+      #if CYTHON_COMPILING_IN_CPYTHON
 static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb) {
     PyObject *tmp_type, *tmp_value, *tmp_tb;
     tmp_type = tstate->curexc_type;
@@ -5805,7 +6728,7 @@ static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject 
 #endif
 
 /* RaiseException */
-  #if PY_MAJOR_VERSION < 3
+      #if PY_MAJOR_VERSION < 3
 static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb,
                         CYTHON_UNUSED PyObject *cause) {
     __Pyx_PyThreadState_declare
@@ -5968,7 +6891,7 @@ bad:
 #endif
 
 /* PyIntBinop */
-    #if CYTHON_COMPILING_IN_CPYTHON
+        #if CYTHON_COMPILING_IN_CPYTHON
 static PyObject* __Pyx_PyInt_AddObjC(PyObject *op1, PyObject *op2, CYTHON_UNUSED long intval, CYTHON_UNUSED int inplace) {
     #if PY_MAJOR_VERSION < 3
     if (likely(PyInt_CheckExact(op1))) {
@@ -6066,7 +6989,7 @@ static PyObject* __Pyx_PyInt_AddObjC(PyObject *op1, PyObject *op2, CYTHON_UNUSED
 #endif
 
 /* SetItemInt */
-    static CYTHON_INLINE int __Pyx_SetItemInt_Generic(PyObject *o, PyObject *j, PyObject *v) {
+        static CYTHON_INLINE int __Pyx_SetItemInt_Generic(PyObject *o, PyObject *j, PyObject *v) {
     int r;
     if (!j) return -1;
     r = PyObject_SetItem(o, j, v);
@@ -6114,81 +7037,10 @@ static CYTHON_INLINE int __Pyx_SetItemInt_Fast(PyObject *o, Py_ssize_t i, PyObje
 }
 
 /* BufferIndexError */
-      static void __Pyx_RaiseBufferIndexError(int axis) {
+          static void __Pyx_RaiseBufferIndexError(int axis) {
   PyErr_Format(PyExc_IndexError,
      "Out of bounds on buffer access (axis %d)", axis);
 }
-
-/* PyObjectCallMethO */
-      #if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg) {
-    PyObject *self, *result;
-    PyCFunction cfunc;
-    cfunc = PyCFunction_GET_FUNCTION(func);
-    self = PyCFunction_GET_SELF(func);
-    if (unlikely(Py_EnterRecursiveCall((char*)" while calling a Python object")))
-        return NULL;
-    result = cfunc(self, arg);
-    Py_LeaveRecursiveCall();
-    if (unlikely(!result) && unlikely(!PyErr_Occurred())) {
-        PyErr_SetString(
-            PyExc_SystemError,
-            "NULL result without error in PyObject_Call");
-    }
-    return result;
-}
-#endif
-
-/* PyObjectCallOneArg */
-      #if CYTHON_COMPILING_IN_CPYTHON
-static PyObject* __Pyx__PyObject_CallOneArg(PyObject *func, PyObject *arg) {
-    PyObject *result;
-    PyObject *args = PyTuple_New(1);
-    if (unlikely(!args)) return NULL;
-    Py_INCREF(arg);
-    PyTuple_SET_ITEM(args, 0, arg);
-    result = __Pyx_PyObject_Call(func, args, NULL);
-    Py_DECREF(args);
-    return result;
-}
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg) {
-#ifdef __Pyx_CyFunction_USED
-    if (likely(PyCFunction_Check(func) || PyObject_TypeCheck(func, __pyx_CyFunctionType))) {
-#else
-    if (likely(PyCFunction_Check(func))) {
-#endif
-        if (likely(PyCFunction_GET_FLAGS(func) & METH_O)) {
-            return __Pyx_PyObject_CallMethO(func, arg);
-        }
-    }
-    return __Pyx__PyObject_CallOneArg(func, arg);
-}
-#else
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg) {
-    PyObject *result;
-    PyObject *args = PyTuple_Pack(1, arg);
-    if (unlikely(!args)) return NULL;
-    result = __Pyx_PyObject_Call(func, args, NULL);
-    Py_DECREF(args);
-    return result;
-}
-#endif
-
-/* PyObjectCallNoArg */
-        #if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func) {
-#ifdef __Pyx_CyFunction_USED
-    if (likely(PyCFunction_Check(func) || PyObject_TypeCheck(func, __pyx_CyFunctionType))) {
-#else
-    if (likely(PyCFunction_Check(func))) {
-#endif
-        if (likely(PyCFunction_GET_FLAGS(func) & METH_NOARGS)) {
-            return __Pyx_PyObject_CallMethO(func, NULL);
-        }
-    }
-    return __Pyx_PyObject_Call(func, __pyx_empty_tuple, NULL);
-}
-#endif
 
 /* PyIntBinop */
           #if CYTHON_COMPILING_IN_CPYTHON

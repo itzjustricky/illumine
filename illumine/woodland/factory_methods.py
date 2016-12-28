@@ -21,6 +21,7 @@ from collections import OrderedDict
 from collections import Iterable
 
 import numpy as np
+from sklearn.dummy import DummyRegressor
 
 from .leaf_objects import SKTreeNode
 from .leaf_objects import LucidSKTree
@@ -65,24 +66,21 @@ def _accumulate_tree_attributes(sk_trees):
     accm_node_samples = []
     accm_features = []
     accm_thresholds = []
-    accm_children_right = []
 
     for sk_tree in sk_trees:
         accm_values.append(sk_tree.tree_.value)
         accm_node_samples.append(sk_tree.tree_.n_node_samples)
         accm_features.append(sk_tree.tree_.feature)
         accm_thresholds.append(sk_tree.tree_.threshold)
-        accm_children_right.append(sk_tree.tree_.children_right)
     return (
         accm_values,
         accm_node_samples,
         accm_features,
         accm_thresholds,
-        accm_children_right
     )
 
 
-def make_LucidSKTree(sk_tree, feature_names, float_precision=5,
+def make_LucidSKTree(sk_tree, feature_names, float_precision=10,
                      sort_by_index=True, tree_kw=None):
     """ Breakdown a tree's splits and returns the value of every leaf along
         with the path of splits that led to the leaf
@@ -111,7 +109,7 @@ def make_LucidSKTree(sk_tree, feature_names, float_precision=5,
         sk_tree, feature_names, float_precision, **tree_kw)[0]
 
 
-def make_LucidSKEnsemble(sk_ensemble, feature_names, float_precision=5,
+def make_LucidSKEnsemble(sk_ensemble, feature_names, float_precision=10,
                          init_estimator=None, tree_kw=None,
                          ensemble_kw=None, **kwargs):
     """ Breakdown a tree's splits and returns the value of every leaf along
@@ -146,20 +144,34 @@ def make_LucidSKEnsemble(sk_ensemble, feature_names, float_precision=5,
     elif not isinstance(ensemble_kw, dict):
         raise ValueError("tree_kw should be of type dict")
 
+    if isinstance(sk_ensemble.estimators_, np.ndarray):
+        ensemble_estimators = sk_ensemble.estimators_.ravel()
+    elif isinstance(sk_ensemble.estimators_, Iterable):
+        ensemble_estimators = sk_ensemble.estimators_
+
     ensemble_of_leaves = assemble_lucid_trees(
-        sk_ensemble.estimators_.ravel(),
+        ensemble_estimators,
         feature_names, float_precision, **tree_kw)
 
     if init_estimator is None:
-        init_estimator = sk_ensemble.init_
+        try:
+            init_estimator = sk_ensemble.init_
+        except AttributeError:
+            init_estimator = DummyRegressor(constant=0.0)
+            init_estimator.fit(np.zeros((10, len(feature_names))), np.zeros(10))
     elif not hasattr(init_estimator, 'predict'):
         raise ValueError(
             "The init_estimator should be an object with a predict "
             "function with function signature predict(self, X) "
             "where X is the feature matrix.")
 
+    try:
+        learning_rate = sk_ensemble.learning_rate
+    except AttributeError:
+        learning_rate = 1.0 / sk_ensemble.n_estimators
+
     return LucidSKEnsemble(
         ensemble_of_leaves, feature_names,
         init_estimator=init_estimator,
-        learning_rate=sk_ensemble.learning_rate,
+        learning_rate=learning_rate,
         **ensemble_kw)

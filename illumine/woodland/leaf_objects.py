@@ -37,38 +37,47 @@ class SKTreeNode(object):
         :param value (numeric): the value associated with the node
         :param n_samples (int): the number of samples that reach the node
         """
-        self.__path = path
-        self.__value = value
-        self.__n_samples = n_samples
+        self._path = path
+        self._value = value
+        self._n_samples = n_samples
 
-        self.__str_cache = None  # used to cache the string representation later
+        self._str_cache = None  # used to cache the string representation later
 
     def __str__(self):
-        if self.__str_cache is None:
+        if self._str_cache is None:
             node_strings = []
             keys = ["path", "value", "n_samples"]
             values = [self.path, self.value, self.n_samples]
 
             for key, val in zip(keys, values):
                 node_strings.append("{}: {}".format(key, val))
-            self.__str_cache = "({})".format(', '.join(node_strings))
+            self._str_cache = "({})".format(', '.join(node_strings))
 
-        return self.__str_cache
+        return self._str_cache
 
     def __repr__(self):
         return self.__str__()
 
     @property
     def path(self):
-        return self.__path
+        return self._path
 
     @property
     def value(self):
-        return self.__value
+        return self._value
 
     @property
     def n_samples(self):
-        return self.__n_samples
+        return self._n_samples
+
+    def __key(self):
+        return tuple(self.path)
+
+    def __eq__(self, other):
+        return self.__key() == other.__key()
+
+    def __hash__(self):
+        return hash(self.__key())
 
 
 class LucidSKTree(LeafDictionary):
@@ -85,7 +94,7 @@ class LucidSKTree(LeafDictionary):
         This class is NOT meant to be INHERITED from.
     """
 
-    def __init__(self, tree_leaves, feature_names, print_limit=30, create_deepcopy=True):
+    def __init__(self, tree_leaves, feature_names, print_limit=30):
         """ Construct the LucidSKTree object using a dictionary object indexed
             by the leaf's index in the pre-order traversal of the decision tree.
 
@@ -98,8 +107,6 @@ class LucidSKTree(LeafDictionary):
             were used to split the tree
         :param print_limit (int): configuration for how to print the LucidSKEnsemble
             out to the console
-        :param create_deepcopy (bool): indicates whether or not to make a deepcopy of
-            the tree_leaves argument passed into the __init__ function
         """
         if not isinstance(tree_leaves, dict):
             raise ValueError("A dictionary object with keys mapped to SKTreeNodes should ",
@@ -115,8 +122,7 @@ class LucidSKTree(LeafDictionary):
 
         super(LucidSKTree, self).__init__(
             tree_leaves,
-            print_limit=print_limit,
-            create_deepcopy=create_deepcopy)
+            print_limit=print_limit)
 
     @property
     def feature_names(self):
@@ -165,7 +171,7 @@ class LucidSKEnsemble(LeafDictionary):
     """
 
     def __init__(self, tree_ensemble, feature_names, init_estimator,
-                 learning_rate, print_limit=5, create_deepcopy=True):
+                 learning_rate, print_limit=5):
         """ Construct the LucidSKTree object using a dictionary object indexed
             by the leaf's index in the pre-order traversal of the decision tree.
 
@@ -208,7 +214,6 @@ class LucidSKEnsemble(LeafDictionary):
         super(LucidSKEnsemble, self).__init__(
             tree_ensemble,
             print_limit=print_limit,
-            create_deepcopy=create_deepcopy,
             str_kw=str_kw)
 
     @property
@@ -279,9 +284,9 @@ class LucidSKEnsemble(LeafDictionary):
         y_pred = np.zeros(X_df.shape[0])
         if self._compressed_ensemble is None:
             for lucid_tree in self:
-                y_pred += self._learning_rate * lucid_tree.predict(X_df)
+                y_pred += lucid_tree.predict(X_df)
 
-            return y_pred + self._init_estimator.predict(X_df).ravel()
+            return y_pred * self._learning_rate + self._init_estimator.predict(X_df).ravel()
         else:
             return self._compressed_ensemble.predict(X_df) \
                 + self._init_estimator.predict(X_df).ravel()
@@ -302,11 +307,8 @@ class LucidSKEnsemble(LeafDictionary):
                 continue
 
             for leaf_node in lucid_tree.values():
-                # sort to make path uniques since splits in
-                # different orders are still equivalent decision trees
-                leaf_path = ' & '.join(leaf_node.path)
-                unique_leaves[leaf_path] = \
-                    unique_leaves.get(leaf_path, 0) \
+                unique_leaves[leaf_node] = \
+                    unique_leaves.get(leaf_node, 0) \
                     + self._learning_rate * leaf_node.value
 
         self._compressed_ensemble = CompressedEnsemble(
@@ -342,7 +344,7 @@ class LeafDataStore(LeafDictionary):
         This class is NOT meant to be INHERITED from.
     """
 
-    def __init__(self, tree_leaves, print_limit=30, create_deepcopy=True):
+    def __init__(self, tree_leaves, print_limit=30):
         """ Construct the LucidSKTree object using a dictionary object indexed
             by the leaf's index in the pre-order traversal of the decision tree.
 
@@ -357,7 +359,6 @@ class LeafDataStore(LeafDictionary):
         super(LeafDataStore, self).__init__(
             tree_leaves,
             print_limit=print_limit,
-            create_deepcopy=create_deepcopy,
             str_kw=str_kw)
 
 
@@ -366,7 +367,7 @@ class CompressedEnsemble(LeafDictionary):
         LucidSKEnsemble.compress() method
     """
 
-    def __init__(self, tree_leaves, feature_names, print_limit=30, create_deepcopy=True):
+    def __init__(self, tree_leaves, feature_names, print_limit=30):
         """ Construct the LucidSKTree object using a dictionary object indexed
             by the leaf's index in the pre-order traversal of the decision tree.
 
@@ -384,7 +385,7 @@ class CompressedEnsemble(LeafDictionary):
         self._feature_names = feature_names
 
         super(CompressedEnsemble, self).__init__(
-            tree_leaves, print_limit, create_deepcopy)
+            tree_leaves, print_limit)
 
     @property
     def feature_names(self):
@@ -402,7 +403,7 @@ class CompressedEnsemble(LeafDictionary):
         if not all(X_df.columns == self.feature_names):
             raise ValueError("The passed dataframe should")
 
-        leaf_path, leaf_values = zip(*[(path, value) for path, value in self.items()])
-        leaf_path = [path_string.split(' & ') for path_string in leaf_path]
+        leaf_path, leaf_values = \
+            zip(*[(leaf_node.path, value) for leaf_node, value in self.items()])
 
         return create_prediction(X_df, leaf_path, leaf_values)
