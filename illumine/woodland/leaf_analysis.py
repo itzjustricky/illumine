@@ -48,8 +48,7 @@ def _gather_leaf_values(lucid_ensemble, X_activated, considered_leaves=None, **l
 
         for estimator_ind, active_leaf_ind in enumerate(active_leaves):
             active_leaf = lucid_ensemble[estimator_ind][active_leaf_ind]
-            path_str = ' & '.join(sorted(active_leaf.path))
-            leaf_dict.setdefault(path_str, []) \
+            leaf_dict.setdefault(active_leaf, []) \
                      .append(active_leaf.value)
 
     if considered_leaves is None:

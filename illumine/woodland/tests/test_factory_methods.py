@@ -1,4 +1,3 @@
-import bpdb
 """
     Description:
 
@@ -103,11 +102,12 @@ def test_LucidRF():
         np.testing.assert_almost_equal(arr1, arr2)
     """
 
+    """
     with StopWatch("Scikit-learn Random Forest prediction"):
         rf_pred = rf_regr.predict(X_df)
     with StopWatch("Lucid Random Forest (non-compressed)"):
         lucid_rf_pred = lucid_rf.predict(X_df)
-    # np.testing.assert_almost_equal(lucid_rf_pred, rf_pred)
+    np.testing.assert_almost_equal(lucid_rf_pred, rf_pred)
     with StopWatch("Compression of Lucid Random Forest"):
         lucid_rf.compress()
     print("{} unique nodes, {} total nodes, and {} tree estimators"
@@ -115,25 +115,25 @@ def test_LucidRF():
                   lucid_rf.total_leaves_count,
                   len(lucid_rf)))
 
-    bpdb.set_trace()  # ------------------------------ Breakpoint ------------------------------ #
     with StopWatch("Lucid Random Forest (compressed)"):
         crf_pred = lucid_rf.predict(X_df)
-    #np.testing.assert_almost_equal(crf_pred, rf_pred)
+    np.testing.assert_almost_equal(crf_pred, rf_pred)
+    """
 
 
 """
 if __name__ == "__main__":
     test_LucidSKTree()
-    test_LucidSKEnsemble()
+    test_LucidGBR()
 """
 
 # Set main function for debugging if error
 import bpdb, sys, traceback
 if __name__ == "__main__":
     try:
-        # test_LucidSKTree()
-        # test_LucidGBR()
-        test_LucidRF()
+        test_LucidSKTree()
+        test_LucidGBR()
+        # test_LucidRF()
     except:
         type, value, tb = sys.exc_info()
         traceback.print_exc()

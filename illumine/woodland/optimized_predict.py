@@ -34,26 +34,38 @@ def find_activated_for_split(X, col_index, rel, thres):
     [True, True, True, False, False]
     """
 
-    is_close = np.isclose(X[:, col_index], thres)
+    # is_close = np.isclose(X[:, col_index], thres)
 
     # a bitwise operations are needed to deal
     # with float precision issues
     if rel == '<=':
+        return X[:, col_index] <= thres
+        """
         return np.bitwise_or(
             X[:, col_index] <= thres, is_close)
+        """
     elif rel == '>':
+        return X[:, col_index] > thres
+        """
         return np.bitwise_and(
             X[:, col_index] > thres,
             np.bitwise_xor(X[:, col_index] > thres, is_close)
         )
+        """
     if rel == '<':
+        return X[:, col_index] < thres
+        """
         return np.bitwise_and(
             X[:, col_index] < thres,
             np.bitwise_xor(X[:, col_index] < thres, is_close)
         )
+        """
     elif rel == '>=':
+        return X[:, col_index] >= thres
+        """
         return np.bitwise_or(
             X[:, col_index] >= thres, is_close)
+        """
 
 
 def find_activated(X, f_map, leaf_path):
