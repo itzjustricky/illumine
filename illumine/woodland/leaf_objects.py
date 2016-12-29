@@ -16,12 +16,41 @@
 from copy import deepcopy
 from collections import Iterable
 from collections import OrderedDict
+from functools import total_ordering
 
 import numpy as np
 from pandas import DataFrame
 
 from ..core import LeafDictionary
 from .optimized_predict import create_prediction
+
+__all__ = ['LucidSKEnsemble', 'LucidSKTree']
+
+
+@total_ordering
+class LeafPath(object):
+    """ Object representation of the path to a leaf node """
+
+    def __init__(self, path):
+        self._path = path
+
+    def __str__(self):
+        return self._path.__str__()
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __key(self):
+        return self.__str__()
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+
+    def __lt__(self, other):
+        return hash(self) < hash(other)
 
 
 class SKTreeNode(object):
@@ -37,7 +66,7 @@ class SKTreeNode(object):
         :param value (numeric): the value associated with the node
         :param n_samples (int): the number of samples that reach the node
         """
-        self._path = path
+        self._path = LeafPath(path)
         self._value = value
         self._n_samples = n_samples
 
@@ -69,15 +98,6 @@ class SKTreeNode(object):
     @property
     def n_samples(self):
         return self._n_samples
-
-    def __key(self):
-        return tuple(self.path)
-
-    def __eq__(self, other):
-        return self.__key() == other.__key()
-
-    def __hash__(self):
-        return hash(self.__key())
 
 
 class LucidSKTree(LeafDictionary):
@@ -307,8 +327,8 @@ class LucidSKEnsemble(LeafDictionary):
                 continue
 
             for leaf_node in lucid_tree.values():
-                unique_leaves[leaf_node] = \
-                    unique_leaves.get(leaf_node, 0) \
+                unique_leaves[leaf_node.path] = \
+                    unique_leaves.get(leaf_node.path, 0) \
                     + self._learning_rate * leaf_node.value
 
         self._compressed_ensemble = CompressedEnsemble(
@@ -360,6 +380,12 @@ class LeafDataStore(LeafDictionary):
             tree_leaves,
             print_limit=print_limit,
             str_kw=str_kw)
+
+    def __reduce__(self):
+        return (self.__class__, (
+            self._seq,
+            self._print_limit)
+        )
 
 
 class CompressedEnsemble(LeafDictionary):
