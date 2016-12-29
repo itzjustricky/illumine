@@ -6,6 +6,8 @@
     @author: Ricky Chang
 """
 
+import os
+import pickle
 import numpy as np
 import pandas as pd
 
@@ -21,7 +23,8 @@ def test_gather_leaf_values():
     y = np.sin(X1).ravel() + np.cos(X2).ravel()
     X_df = pd.DataFrame(np.array([X1, X2]).T, columns=['x1', 'x2'])
 
-    clf = GradientBoostingRegressor(max_depth=1, n_estimators=3, random_state=3)
+    clf = GradientBoostingRegressor(
+        max_depth=1, n_estimators=3, random_state=3)
     clf.fit(X_df, y)
 
     # gather_leaf_values with gather_method='aggregate', gathers all the values
@@ -31,29 +34,29 @@ def test_gather_leaf_values():
         feature_names=X_df.columns,
         gather_method='aggregate')
 
-    expected_pairs = {
-        'x1<=7.05': -0.31863,
-        'x1<=7.15': -0.3451,
-        'x1<=3.35': 0.67753,
-        'x1>3.35': -0.34903,
-        'x1>7.05': 0.78009,
-        'x1>7.15': 0.88741
-    }
-    # Check the lengths are the same
-    # assert(len(expected_pairs) == len(leaf_values))
+    # extract the expected leaf_values from a pickle file
+    script_dir = os.path.dirname(__file__)
+    """
+    pickle.dump(leaf_values, open(os.path.join(
+        script_dir, 'test_material/expected_leaf_values.pkl'), 'wb')
+    )
 
-    # Check all the mean values are as expected
     """
-    for path, val in expected_pairs.items():
-        assert(val == round(np.mean(leaf_values[path]), 5))
-    """
+    expected_leaf_values = \
+        pickle.load(open(
+            os.path.join(script_dir, 'test_material/expected_leaf_values.pkl'),
+            'rb')
+        )
+
+    for key, val in expected_leaf_values.items():
+        np.testing.assert_almost_equal(leaf_values[key], val)
 
 
 """
 if __name__ == "__main__":
     test_gather_leaf_values()
-"""
 
+"""
 # Set main function for debugging if error
 import bpdb, sys, traceback
 if __name__ == "__main__":
