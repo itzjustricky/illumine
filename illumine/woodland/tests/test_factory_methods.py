@@ -34,12 +34,12 @@ def test_LucidSKTree():
         regr.fit(X_df, y)
 
         lucid_tree = make_LucidSKTree(
-            regr, feature_names=X_df.columns, float_precision=8)
+            regr, feature_names=X_df.columns, print_precision=3)
         lucid_pred = lucid_tree.predict(X_df)
         sk_pred = regr.predict(X_df)
 
         # test prediction outputted from LucidSKTree
-        np.testing.assert_almost_equal(lucid_pred, sk_pred)
+        np.testing.assert_approx_equal(lucid_pred, sk_pred)
 
 
 def test_LucidGBR():
@@ -54,7 +54,7 @@ def test_LucidGBR():
     gbr_regr.fit(X_df, y)
     with StopWatch("LucidSKEnsemble Gradient Boost construction"):
         lucid_gbr = make_LucidSKEnsemble(
-            gbr_regr, feature_names=X_df.columns, float_precision=8)
+            gbr_regr, feature_names=X_df.columns, print_precision=3)
 
     with StopWatch("Scikit-learn Gradient Boost prediction"):
         gbr_pred = gbr_regr.predict(X_df)
@@ -87,22 +87,18 @@ def test_LucidRF():
     y = np.sin(X1).ravel() + np.cos(X2).ravel()
     X_df = pd.DataFrame(np.array([X1, X2]).T, columns=['x1', 'x2'])
 
-    rf_regr = RandomForestRegressor(n_estimators=1000, max_depth=5)
+    rf_regr = RandomForestRegressor(n_estimators=1000, max_depth=5, bootstrap=False)
     rf_regr.fit(X_df, y)
     with StopWatch("LucidSKEnsemble Random Forest construction"):
         lucid_rf = make_LucidSKEnsemble(
-            rf_regr, feature_names=X_df.columns, float_precision=18)
+            rf_regr, feature_names=X_df.columns, print_precision=5)
 
-    """
-    X_array = X_df.values.astype(np.float32)
+    # If this is not float32 there are precision errors
+    # apparently DecisionTreeRegressor within RandomForestRegressor
+    # requires that the matrix be of type float32 so there is a
+    # type conversion from types to float32
+    X_df = X_df.astype(np.float32)
 
-    for est, estl in zip(rf_regr.estimators_, lucid_rf):
-        arr1 = est.tree_.predict(X_array).ravel()
-        arr2 = estl.predict(X_df)
-        np.testing.assert_almost_equal(arr1, arr2)
-    """
-
-    """
     with StopWatch("Scikit-learn Random Forest prediction"):
         rf_pred = rf_regr.predict(X_df)
     with StopWatch("Lucid Random Forest (non-compressed)"):
@@ -118,23 +114,23 @@ def test_LucidRF():
     with StopWatch("Lucid Random Forest (compressed)"):
         crf_pred = lucid_rf.predict(X_df)
     np.testing.assert_almost_equal(crf_pred, rf_pred)
-    """
 
 
-"""
 if __name__ == "__main__":
     test_LucidSKTree()
     test_LucidGBR()
-"""
+    test_LucidRF()
 
+"""
 # Set main function for debugging if error
 import bpdb, sys, traceback
 if __name__ == "__main__":
     try:
         test_LucidSKTree()
         test_LucidGBR()
-        # test_LucidRF()
+        test_LucidRF()
     except:
         type, value, tb = sys.exc_info()
         traceback.print_exc()
         bpdb.post_mortem(tb)
+"""
