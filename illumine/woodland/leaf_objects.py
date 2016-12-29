@@ -22,9 +22,9 @@ import numpy as np
 from pandas import DataFrame
 
 from ..core import LeafDictionary
-from .optimized_predict import create_prediction
+from .predict_methods import create_prediction
 
-__all__ = ['LucidSKEnsemble', 'LucidSKTree']
+__all__ = ['LeafPath', 'SKTreeNode', 'LucidSKEnsemble', 'LucidSKTree']
 
 
 @total_ordering
@@ -291,6 +291,10 @@ class LucidSKEnsemble(LeafDictionary):
             raise AttributeError(
                 "you must run the compress() method before "
                 "getting the compressed_ensemble.")
+
+    @property
+    def paths(self):
+        return np.array(list(self.compressed_ensemble.keys()))
 
     def __reduce__(self):
         return (self.__class__, (

@@ -13,7 +13,15 @@
 import numpy as np
 
 
-def find_activated_for_split(X, col_index, rel, thres):
+def _map_features_to_int(feature_names):
+    f_map = dict()
+    for ind, feature in enumerate(feature_names):
+        f_map[feature] = ind
+
+    return f_map
+
+
+def _find_activated_for_split(X, col_index, relation, threshold):
     """ Return a numpy.ndarray of booleans that
         indicate whether or not X satisfies
 
@@ -21,30 +29,30 @@ def find_activated_for_split(X, col_index, rel, thres):
         data to test condition on
     :param col_index (int): the index of the column to
         test the condition on
-    :param rel (string): the string that determines the
+    :param relation (string): the string that determines the
         relation to be tested (i.e. [<, <=, >=, >])
-    :param thres (numeric): number that X elements will be
+    :param threshold (numeric): number that X elements will be
         tested against
 
     >>> X = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
     >>> col_index = 1
-    >>> rel = '<='
-    >>> thres = 8
-    >>> determine_relation(X, int_repr, rel, thres)
+    >>> relation = '<='
+    >>> threshold = 8
+    >>> determine_relation(X, int_repr, relation, threshold)
     [True, True, True, False, False]
     """
 
-    if rel == '<=':
-        return X[:, col_index] <= thres
-    elif rel == '>':
-        return X[:, col_index] > thres
-    if rel == '<':
-        return X[:, col_index] < thres
-    elif rel == '>=':
-        return X[:, col_index] >= thres
+    if relation == '<=':
+        return X[:, col_index] <= threshold
+    elif relation == '>':
+        return X[:, col_index] > threshold
+    if relation == '<':
+        return X[:, col_index] < threshold
+    elif relation == '>=':
+        return X[:, col_index] >= threshold
 
 
-def find_activated(X, f_map, leaf_path):
+def _find_activated(X, f_map, leaf_path):
     """ Find the indices of the datapoints that satisfy
         a certain leaf_path
 
@@ -54,37 +62,29 @@ def find_activated(X, f_map, leaf_path):
     :param leaf_path (list or Iterable): list of splits
          that define the path for a terminal node
     """
-    condition_matrix = np.ones(X.shape, dtype=bool)
+    activation_matrix = np.ones(X.shape, dtype=bool)
 
     for tree_split in leaf_path:
         col_index = f_map[tree_split.feature_name]
 
-        condition_matrix[:, col_index] &= \
-            find_activated_for_split(
+        activation_matrix[:, col_index] &= \
+            _find_activated_for_split(
                 X, col_index=col_index,
-                rel=tree_split.relation,
-                thres=tree_split.threshold)
+                relation=tree_split.relation,
+                threshold=tree_split.threshold)
 
-    return np.all(condition_matrix, axis=1)
-
-
-def map_features_to_int(feature_names):
-    f_map = dict()
-    for ind, feature in enumerate(feature_names):
-        f_map[feature] = ind
-
-    return f_map
+    return np.all(activation_matrix, axis=1)
 
 
 def create_prediction(X_df, leaf_paths, leaf_values):
 
     # features integer representation
-    f_map = map_features_to_int(X_df.columns)
+    f_map = _map_features_to_int(X_df.columns)
     X_matrix = X_df.values
 
     y_pred = np.zeros(X_matrix.shape[0])
     for path, value in zip(leaf_paths, leaf_values):
-        y_pred += find_activated(X_matrix, f_map, path) \
+        y_pred += _find_activated(X_matrix, f_map, path) \
             * value
 
     return y_pred

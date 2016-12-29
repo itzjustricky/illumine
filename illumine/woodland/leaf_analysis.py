@@ -8,21 +8,22 @@
 
 import numpy as np
 from pandas import DataFrame
+
 from scipy.sparse import lil_matrix
 
+from .leaf_objects import LeafPath
 from .leaf_objects import LeafDataStore
 from .leaf_objects import LucidSKEnsemble
 
-from .optimized_predict import map_features_to_int
-from .optimized_predict import find_activated
 from .factory_methods import make_LucidSKEnsemble
+from .predict_methods import _map_features_to_int
+from .predict_methods import _find_activated
 
-__all__ = ['gather_leaf_values', 'get_tree_predictions',
-           'compute_activation']
+__all__ = ['gather_leaf_values', 'get_tree_predictions']
 
 
 # this method is not meant to be called outside this module
-def _gather_leaf_values(lucid_ensemble, X_activated, considered_leaves=None, **lds_kw):
+def _gather_leaf_values(lucid_ensemble, X_activated, considered_paths=None, **lds_kw):
     """ Iterate through the leaves activated from the data X and gather
         their values according to their paths as key values
 
@@ -35,7 +36,7 @@ def _gather_leaf_values(lucid_ensemble, X_activated, considered_leaves=None, **l
     :param X_activated: (N x k) matrix
         where N, k are the # of samples, estimators respectively
         It represents the leaves activated per data sample
-    :param considered_leaves: Default to None
+    :param considered_paths: Default to None
         a list of the leaves to be considered; if None then all leaves
         will be considered
     """
@@ -51,14 +52,14 @@ def _gather_leaf_values(lucid_ensemble, X_activated, considered_leaves=None, **l
             leaf_dict.setdefault(active_leaf.path, []) \
                      .append(active_leaf.value)
 
-    if considered_leaves is None:
+    if considered_paths is None:
         return LeafDataStore(leaf_dict, **lds_kw)
     else:
-        return LeafDataStore(dict((key, leaf_dict[key]) for key in considered_leaves),
+        return LeafDataStore(dict((key, leaf_dict[key]) for key in considered_paths),
                              **lds_kw)
 
 
-def gather_leaf_values(sk_ensemble, X, feature_names, considered_leaves=None,
+def gather_leaf_values(sk_ensemble, X, feature_names, considered_paths=None,
                        gather_method='aggregate', **lds_kw):
     """ This method is used to abstract away the _gather_leaf_values function so
         that a sk_ensemble and the original matrix data X is passed as arguments instead.
@@ -66,12 +67,12 @@ def gather_leaf_values(sk_ensemble, X, feature_names, considered_leaves=None,
     :param sk_ensemble: scikit-learn ensemble model object
     :param feature_names (list): list of names (strings) of the features that
         were used to split the tree
-    :param considered_leaves: Default to None
+    :param considered_paths: Default to None
         a list of the leaves to be considered; if None then all leaves will be considered
     :param lds_kw: TODO
     """
-    valid_gather_methods = ['aggregate',  # aggregate indicates to gather across all data samples
-                            'per-point']  # per-sample indicates to gather values per point
+    valid_gather_methods = ['aggregate',  # indicates to gather across all data samples
+                            'per-point']  # indicates to gather values per point
     if gather_method not in valid_gather_methods:
         raise ValueError(' '.join((
             "The gather_method argument passed was not valid."
@@ -86,13 +87,13 @@ def gather_leaf_values(sk_ensemble, X, feature_names, considered_leaves=None,
 
     if gather_method == 'aggregate':
         return _gather_leaf_values(
-            lucid_ensemble, all_activated_leaves, considered_leaves, **lds_kw)
+            lucid_ensemble, all_activated_leaves, considered_paths, **lds_kw)
     else:  # gather_method == 'per-point'
         lds_list = []
         for active_leaves in all_activated_leaves:
             point_lds = _gather_leaf_values(
                 lucid_ensemble, active_leaves.reshape(1, -1),
-                considered_leaves, create_deepcopy=False)
+                considered_paths, create_deepcopy=False)
             lds_list.append(point_lds)
         return lds_list
 
@@ -120,7 +121,7 @@ def get_tree_predictions(sk_ensemble, X, adjust_with_init=False):
     return leaf_values + adjustment[:, np.newaxis]
 
 
-def compute_activation(lucid_ensemble, X_df, considered_leaves=None):
+def compute_activation(lucid_ensemble, X_df, considered_paths=None):
     """ Compute an activation matrix to be used as vectors for
         clustering leaves together.
 
@@ -134,30 +135,27 @@ def compute_activation(lucid_ensemble, X_df, considered_leaves=None):
         raise ValueError("The passed lucid_ensemble argument should "
                          "be of type LucidSKEnsemble.")
 
-    f_map = map_features_to_int(X_df.columns)
+    f_map = _map_features_to_int(X_df.columns)
     X = X_df.values
 
-    if considered_leaves is not None:
-        if not all(map(lambda x: isinstance(x, str), considered_leaves)):
+    if considered_paths is not None:
+        if not all(map(lambda x: isinstance(x, LeafPath), considered_paths)):
             raise ValueError(
-                "All elements of considered_leaves should be of type string; "
-                "the elements are string representations of the leaf-paths.")
+                "All elements of considered_paths should be of type LeafPath.")
         filtered_leaves = \
-            dict(((key, lucid_ensemble.compressed_ensemble[key])
-                  for key in considered_leaves))
+            dict(((path, lucid_ensemble.compressed_ensemble[path])
+                  for path in considered_paths))
     else:
         filtered_leaves = lucid_ensemble.compressed_ensemble
 
-    leaf_paths = []
     activation_matrix = lil_matrix(
-        (X_df.shape[0], lucid_ensemble.unique_leaves_count),
+        (X_df.shape[0], len(filtered_leaves)),
         dtype=bool)
 
     for ind, leaf_pair in enumerate(filtered_leaves.items()):
         path, value = leaf_pair
 
-        leaf_paths.append(path)
-        activated_indices = find_activated(X, f_map, path.split(' & '))
-        activation_matrix[np.where(activated_indices)[0], ind] = 1
+        activated_indices = _find_activated(X, f_map, path)
+        activation_matrix[np.where(activated_indices)[0], ind] = True
 
-    return np.array(leaf_paths), activation_matrix.tocsr()
+    return activation_matrix.tocsr()
