@@ -7,11 +7,13 @@
      unique_leaves_per_sample : function
      get_tree_predictions : function
 
+     Notes:
+        The hash of an object depends on the print_precision
+        since the hash is of the str of path of the LucidSKTree
+
     TODO:
         * if in the future, experience make_LucidSKEnsemble bottleneck use
             multiprocessing library to unravel trees in parallel
-        * separate out leaf path retrieval algorithm from make_LucidSKTree
-        * add an extra parameter to choose which leaves to consider
 
     @author: Ricky
 """
@@ -32,7 +34,7 @@ from ._retrieve_leaf_paths import retrieve_tree_metas
 __all__ = ['make_LucidSKTree', 'make_LucidSKEnsemble']
 
 
-def assemble_lucid_trees(sk_trees, feature_names, float_precision, **tree_kw):
+def assemble_lucid_trees(sk_trees, feature_names, print_precision, **tree_kw):
     """ This function is used to gather the paths to all the
         leaves given some of the Scikit-learn attributes
         of a decision tree.
@@ -42,7 +44,7 @@ def assemble_lucid_trees(sk_trees, feature_names, float_precision, **tree_kw):
     tree_metas = retrieve_tree_metas(
         *_accumulate_tree_attributes(sk_trees),
         feature_names=np.array(feature_names),
-        float_precision=float_precision)
+        print_precision=print_precision)
     logging.getLogger(__name__).debug("Retrieved tree metas")
 
     lucid_trees = []
@@ -80,7 +82,7 @@ def _accumulate_tree_attributes(sk_trees):
     )
 
 
-def make_LucidSKTree(sk_tree, feature_names, float_precision=10,
+def make_LucidSKTree(sk_tree, feature_names, print_precision=10,
                      sort_by_index=True, tree_kw=None):
     """ Breakdown a tree's splits and returns the value of every leaf along
         with the path of splits that led to the leaf
@@ -93,8 +95,8 @@ def make_LucidSKTree(sk_tree, feature_names, float_precision=10,
     :param feature_names (list): list of names (strings) of the features that
         were used to split the tree
     :param sk_tree: scikit-learn tree object
-    :param float_precision (int): to determine what number the node
-        values, thresholds are rounded to
+    :param print_precision (int): to determine what number the node
+        values, thresholds are rounded to when printing
     :param tree_kw (dict): key-word arguments to be passed into
         LucidSKTree's constructor
 
@@ -106,10 +108,10 @@ def make_LucidSKTree(sk_tree, feature_names, float_precision=10,
     elif not isinstance(tree_kw, dict):
         raise ValueError("tree_kw should be of type dict")
     return assemble_lucid_trees(
-        sk_tree, feature_names, float_precision, **tree_kw)[0]
+        sk_tree, feature_names, print_precision, **tree_kw)[0]
 
 
-def make_LucidSKEnsemble(sk_ensemble, feature_names, float_precision=10,
+def make_LucidSKEnsemble(sk_ensemble, feature_names, print_precision=10,
                          init_estimator=None, tree_kw=None,
                          ensemble_kw=None, **kwargs):
     """ Breakdown a tree's splits and returns the value of every leaf along
@@ -125,8 +127,8 @@ def make_LucidSKEnsemble(sk_ensemble, feature_names, float_precision=10,
         were used to split the tree
     :param init_estimator (function): the initial estimator of the ensemble
         defaults to None, if None then equals Scikit-learn tree's initial estimator
-    :param float_precision (int): to determine what number the node
-        values, thresholds are rounded to
+    :param print_precision (int): to determine what number the node
+        values, thresholds are rounded to when printing
     :param tree_kw (dict): key-word arguments to be passed into
         LucidSKTree's constructor
     :param ensemble_kw (dict): key-word arguments to be passed into
@@ -151,7 +153,7 @@ def make_LucidSKEnsemble(sk_ensemble, feature_names, float_precision=10,
 
     ensemble_of_leaves = assemble_lucid_trees(
         ensemble_estimators,
-        feature_names, float_precision, **tree_kw)
+        feature_names, print_precision, **tree_kw)
 
     if init_estimator is None:
         try:
