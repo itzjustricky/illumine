@@ -36,12 +36,6 @@ def test_gather_leaf_values():
 
     # extract the expected leaf_values from a pickle file
     script_dir = os.path.dirname(__file__)
-    """
-    pickle.dump(leaf_values, open(os.path.join(
-        script_dir, 'test_material/expected_leaf_values.pkl'), 'wb')
-    )
-
-    """
     expected_leaf_values = \
         pickle.load(open(
             os.path.join(script_dir, 'test_material/expected_leaf_values.pkl'),
@@ -52,7 +46,6 @@ def test_gather_leaf_values():
         np.testing.assert_almost_equal(leaf_values[key], val)
 
 
-"""
 if __name__ == "__main__":
     test_gather_leaf_values()
 
@@ -66,3 +59,4 @@ if __name__ == "__main__":
         type, value, tb = sys.exc_info()
         traceback.print_exc()
         bpdb.post_mortem(tb)
+"""

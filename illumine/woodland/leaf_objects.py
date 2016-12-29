@@ -34,14 +34,21 @@ class LeafPath(object):
     def __init__(self, path):
         self._path = path
 
+    @property
+    def path(self):
+        return self._path
+
     def __str__(self):
-        return self._path.__str__()
+        return self.path.__str__()
 
     def __repr__(self):
         return self.__str__()
 
     def __key(self):
         return self.__str__()
+
+    def __iter__(self):
+        return self.path.__iter__()
 
     def __hash__(self):
         return hash(self.__key())

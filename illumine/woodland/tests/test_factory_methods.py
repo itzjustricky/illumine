@@ -39,7 +39,7 @@ def test_LucidSKTree():
         sk_pred = regr.predict(X_df)
 
         # test prediction outputted from LucidSKTree
-        np.testing.assert_approx_equal(lucid_pred, sk_pred)
+        np.testing.assert_almost_equal(lucid_pred, sk_pred)
 
 
 def test_LucidGBR():
@@ -116,6 +116,7 @@ def test_LucidRF():
     np.testing.assert_almost_equal(crf_pred, rf_pred)
 
 
+"""
 if __name__ == "__main__":
     test_LucidSKTree()
     test_LucidGBR()
@@ -133,4 +134,3 @@ if __name__ == "__main__":
         type, value, tb = sys.exc_info()
         traceback.print_exc()
         bpdb.post_mortem(tb)
-"""
