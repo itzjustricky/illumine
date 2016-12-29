@@ -9,14 +9,15 @@ cimport numpy as np
 
 
 @cython.cdivision(True)
-def retrieve_tree_metas(accm_values,
-                        accm_node_samples,
-                        accm_features,
-                        accm_thresholds,
+def retrieve_tree_metas(list accm_values,
+                        list accm_node_samples,
+                        list accm_features,
+                        list accm_thresholds,
                         np.ndarray feature_names,
-                        int float_precision):
-    tree_metas = []
+                        int print_precision):
+    cdef list tree_metas = []
 
+    cdef tuple tup
     for tup in zip(accm_values,
                    accm_node_samples,
                    accm_features,
@@ -28,11 +29,12 @@ def retrieve_tree_metas(accm_values,
             features=tup[2],
             thresholds=tup[3],
             feature_names=feature_names,
-            float_precision=float_precision)
+            print_precision=print_precision)
         )
     return tree_metas
 
 
+# maybe push out to a separate module
 cdef class TreeSplit:
     """ Representation of TreeSplit which contains
         feature_name, relation, threshold of a
@@ -42,17 +44,17 @@ cdef class TreeSplit:
     cdef str _feature_name
     cdef str _relation
     cdef double _threshold
-    cdef int _float_precision
+    cdef int _print_precision
 
     def __cinit__(self,
                   str feature_name,
                   str relation,
                   double threshold,
-                  int float_precision):
+                  int print_precision):
         self._feature_name = feature_name
         self._relation = relation
         self._threshold = threshold
-        self._float_precision = float_precision
+        self._print_precision = print_precision
 
     @property
     def feature_name(self):
@@ -76,10 +78,38 @@ cdef class TreeSplit:
         return "{}{}{}".format(
             self.feature_name,
             self.relation,
-            round(self.threshold, self._float_precision))
+            round(self.threshold, self._print_precision))
+
+    def __reduce__(self):
+        return (self.__class__, (
+            self._feature_name,
+            self._relation,
+            self._threshold,
+            self._print_precision)
+        )
 
     def __repr__(self):
         return self.__str__()
+
+    def __copy__(self):
+        return self
+
+    def __deepcopy__(self, memo):
+        return self
+
+    def __richcmp__(x, y, int op):
+        if op == 0:
+            return hash(x) < hash(y)
+        if op == 2:
+            return hash(x) == hash(y)
+        if op == 4:
+            return hash(x) > hash(y)
+        if op == 1:
+            return hash(x) <= hash(y)
+        if op == 3:
+            return hash(x) != hash(y)
+        if op == 5:
+            return hash(x) >= hash(y)
 
 
 cdef retrieve_leaf_path(np.ndarray[double, ndim=3] values,
@@ -87,7 +117,7 @@ cdef retrieve_leaf_path(np.ndarray[double, ndim=3] values,
                         np.ndarray[long, ndim=1] features,
                         np.ndarray[double, ndim=1] thresholds,
                         np.ndarray feature_names,
-                        int float_precision):
+                        int print_precision):
     """ Gather all the leaves of a tree and keep track of the
         paths that define the leaf.
 
@@ -121,19 +151,16 @@ cdef retrieve_leaf_path(np.ndarray[double, ndim=3] values,
                 feature_name=feature_names[features[node_index]],
                 relation='<=',
                 threshold=thresholds[node_index],
-                float_precision=float_precision
+                print_precision=print_precision
             )
             leaf_path.append(tree_split)
-            # tmp_split = leaf_path.pop()
-            # print(tmp_split.relation)
 
         else:  # visiting leaf
             tree_meta.append((
-                node_index,                            # leaf's index in pre-order traversal
-                leaf_path.copy(),                      # path to the leaf
-                float(round(values[node_index][0][0],  # leaf value
-                            float_precision)),
-                node_samples[node_index]               # number of samples at leaf
+                node_index,                 # leaf's index in pre-order traversal
+                leaf_path.copy(),           # path to the leaf
+                values[node_index][0][0],   # leaf value
+                node_samples[node_index]    # number of samples at leaf
             ))
 
             if len(tracker_stack) > 0 and tracker_stack[-1] == 2:
@@ -147,7 +174,7 @@ cdef retrieve_leaf_path(np.ndarray[double, ndim=3] values,
                     feature_name=tmp_split.feature_name,
                     relation='>',
                     threshold=tmp_split.threshold,
-                    float_precision=float_precision
+                    print_precision=print_precision
                 )
                 leaf_path.append(new_split)
 
