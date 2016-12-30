@@ -1,6 +1,7 @@
 """
     Description:
-        Methods for analyzing tree nodes following the Scikit-Learn API
+        The functions in this module are used to create
+        the objects in the leaf_objects.py module.
 
      make_LucidSKTree : factory method for LucidSKTree;
      make_LucidSKEnsemble : factory method for LucidSKEnsemble;
@@ -11,9 +12,6 @@
         The hash of an object depends on the print_precision
         since the hash is of the str of path of the LucidSKTree
 
-    TODO:
-        * if in the future, experience make_LucidSKEnsemble bottleneck use
-            multiprocessing library to unravel trees in parallel
 
     @author: Ricky
 """
