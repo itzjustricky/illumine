@@ -294,7 +294,7 @@ class LucidSKEnsemble(LeafDictionary):
 
     @property
     def paths(self):
-        return np.array(list(self.compressed_ensemble.keys()))
+        return self.compressed_ensemble.keys()
 
     def __reduce__(self):
         return (self.__class__, (
