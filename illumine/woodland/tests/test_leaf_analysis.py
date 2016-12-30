@@ -1,7 +1,7 @@
 """
     Description:
-
-
+        Test cases for the methods in
+        leaf_analysis.py module.
 
     @author: Ricky Chang
 """
@@ -70,12 +70,11 @@ def test_compute_activation():
     assert(activation_matrix.shape == (100, 50))
 
 
-"""
 if __name__ == "__main__":
     test_gather_leaf_values()
     test_compute_activation()
-"""
 
+"""
 # Set main function for debugging if error
 import bpdb, sys, traceback
 if __name__ == "__main__":
@@ -86,3 +85,4 @@ if __name__ == "__main__":
         type, value, tb = sys.exc_info()
         traceback.print_exc()
         bpdb.post_mortem(tb)
+"""
