@@ -1,7 +1,7 @@
 """
     Description:
-
-
+        Unit tests for methods in factory_methods and
+        testing the methods of the objects in leaf_objects
 
     @author: Ricky Chang
 """
