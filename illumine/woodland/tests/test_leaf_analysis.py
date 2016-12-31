@@ -63,7 +63,7 @@ def test_compute_activation():
         gbr_regr, feature_names=X_df.columns, print_precision=3)
     lucid_ensemble.compress()
 
-    considered_paths = lucid_ensemble.paths[:50]  # only consider the first 50 paths
+    considered_paths = list(lucid_ensemble.paths)[:50]  # only consider the first 50 paths
     activation_matrix = \
         compute_activation(lucid_ensemble, X_df, considered_paths=considered_paths)
 
