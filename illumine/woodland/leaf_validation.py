@@ -7,6 +7,8 @@
     @author: Ricky Chang
 """
 
+import logging
+from collection import Iterable
 import numpy as np
 
 from .leaf_objects import LucidSKEnsemble
@@ -118,12 +120,21 @@ def score_leaf_group(leaf_group, lucid_ensemble,
         activated_indices &= _find_activated(X, f_map, path)
 
     n_activated = np.sum(activated_indices)
-    if np.sum(activated_indices) < required_threshold:
+    logging.getLogger(__name__).debug(
+        "The # of activated indices is {}".format(n_activated))
+
+    if not isinstance(y_true, Iterable):
+        raise ValueError("The passed y_true argument is not iterable.")
+    if not isinstance(y_true, np.ndarray):
+        y_true = np.array(y_true)
+
+    if n_activated < required_threshold:
         group_score = -np.inf
     else:
         group_score = score_function(
             value * np.ones(n_activated),
             y_true[np.where(activated_indices)[0]])
+
         if normalize_score:
             group_score /= n_activated
 
