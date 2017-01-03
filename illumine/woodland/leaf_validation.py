@@ -28,6 +28,9 @@ def score_leaves(lucid_ensemble, X_df, y_true,
         The score will be calculated only over the data-points
         where the leaf is activated.
 
+        The y_true value will be adjusted by any init_estimator
+        that the lucid_ensemble has.
+
     :param lucid_ensemble (LucidSKEnsemble): a compressed LucidSKEnsemble
         object used to extract leaves and
     :param X_df (pandas.DataFrame): the X matrix to score the leaves on
@@ -61,6 +64,12 @@ def score_leaves(lucid_ensemble, X_df, y_true,
     else:
         filtered_leaves = lucid_ensemble.compressed_ensemble
 
+    if not isinstance(y_true, Iterable):
+        raise ValueError("The passed y_true argument is not iterable.")
+    if not isinstance(y_true, np.ndarray):
+        y_true = np.array(y_true)
+    y_adjusted = y_true - lucid_ensemble._init_estimator.predict(X_df)
+
     scores = dict()
     for ind, leaf_pair in enumerate(filtered_leaves.items()):
         path, value = leaf_pair
@@ -70,9 +79,10 @@ def score_leaves(lucid_ensemble, X_df, y_true,
         if np.sum(activated_indices) < required_threshold:
             scores[path] = -np.inf
         else:
+            # calling
             scores[path] = score_function(
                 value * np.ones(n_activated),
-                y_true[np.where(activated_indices)[0]])
+                y_adjusted[np.where(activated_indices)[0]])
             if normalize_score:
                 scores[path] /= n_activated
 
@@ -85,6 +95,9 @@ def score_leaf_group(leaf_group, lucid_ensemble,
     """ Score leaves based on some passed score_function.
         The score will be calculated only over the data-points
         where the leaf is activated.
+
+        The y_true value will be adjusted by any init_estimator
+        that the lucid_ensemble has.
 
     :param leaf_group (array-like type): a list of SKTreeNodLeafPaths
         The scoring will be done as a cumulative of the leaves in
@@ -129,12 +142,13 @@ def score_leaf_group(leaf_group, lucid_ensemble,
         raise ValueError("The passed y_true argument is not iterable.")
     if not isinstance(y_true, np.ndarray):
         y_true = np.array(y_true)
+    y_adjusted = y_true - lucid_ensemble._init_estimator.predict(X_df)
 
     if n_activated < required_threshold:
         group_score = -np.inf
     else:
         y1 = accm_value * np.ones(n_activated)
-        y2 = y_true[np.where(activated_indices)[0]].ravel()
+        y2 = y_adjusted[np.where(activated_indices)[0]].ravel()
         if y1.shape != y2.shape:
             raise ValueError(
                 "The passed y_true argument should "
