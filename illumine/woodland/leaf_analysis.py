@@ -126,7 +126,16 @@ def compute_activation(lucid_ensemble, X_df, considered_paths=None):
         clustering leaves together.
 
         This function requires that lucid_ensemble is compressed, i.e.
-        the compress() method was called.
+        the compress() method was called. The 3olumn index of activation_matrix
+        returned coincides with the index of a leaf-path in
+        lucid_ensemble.compressed_ensemble.
+
+    :returns: a scipy sparse csr_matrix with shape (n, m)
+        where n is the # of rows for X_df, m is the # of unique leaves.
+
+        It is a binary matrix with values in {0, 1}.
+        A value of 1 in entry row i, column j indicates that leaf is
+        activated for datapoint i, leaf j.
     """
     if not isinstance(X_df, DataFrame):
         raise ValueError("The passed X_df argument should be of type DataFrame.")
@@ -159,3 +168,24 @@ def compute_activation(lucid_ensemble, X_df, considered_paths=None):
         activation_matrix[np.where(activated_indices)[0], ind] = True
 
     return activation_matrix.tocsr()
+
+
+def count_group_activation(leaf_group, lucid_ensemble, X_df):
+    """ Count the # of times all the leaves in the leaf_group
+        are all activated
+
+    :param leaf_group (array-like type): a list of SKTreeNodLeafPaths
+        The scoring will be done as a cumulative of the leaves in
+        the leaf_group.
+    :param lucid_ensemble (LucidSKEnsemble): a compressed LucidSKEnsemble
+        object used to extract leaves and
+    :param X_df (pandas.DataFrame): the X matrix to score the leaves on
+    """
+    f_map = _map_features_to_int(X_df.columns)
+    X = X_df.values
+
+    activated_indices = np.ones(X.shape[0], dtype=bool)
+    for path in leaf_group:
+        activated_indices &= _find_activated(X, f_map, path)
+
+    return np.sum(activated_indices)
