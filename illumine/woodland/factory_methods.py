@@ -12,6 +12,12 @@
         The hash of an object depends on the print_precision
         since the hash is of the str of path of the LucidSKTree
 
+    TODO:
+        * The make_LucidSKTree function may be better inside
+            the LucidSKTree __init__ function. As well as for
+            LucidSKEnsemble.
+            - problems .. it makes the __reduce__ process
+                less clean
 
     @author: Ricky
 """
@@ -41,7 +47,7 @@ def assemble_lucid_trees(sk_trees, feature_names, print_precision, **tree_kw):
         "Starting to enter retrieve_tree_metas function")
     tree_metas = retrieve_tree_metas(
         *_accumulate_tree_attributes(sk_trees),
-        feature_names=np.array(feature_names),
+        feature_names=list(map(str, feature_names)),
         print_precision=print_precision)
     logging.getLogger(__name__).debug("Retrieved tree metas")
 
