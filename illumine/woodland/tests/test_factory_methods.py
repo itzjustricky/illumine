@@ -78,6 +78,16 @@ def test_LucidGBR():
     # test the compressed prediction
     np.testing.assert_almost_equal(cgbr_pred, gbr_pred)
 
+    # test comparison, compare the leaves of two
+    # LucidSKEnsembles made from the the same arguments
+    lucid_gbr2 = make_LucidSKEnsemble(
+        gbr_regr, feature_names=X_df.columns, print_precision=3)
+    lucid_gbr2.compress()
+
+    assert(set(lucid_gbr.paths) == set(lucid_gbr2.paths))
+    assert(lucid_gbr.total_leaves_count == lucid_gbr2.total_leaves_count)
+    assert(lucid_gbr.unique_leaves_count == lucid_gbr2.unique_leaves_count)
+
 
 def test_LucidRF():
 
@@ -114,6 +124,16 @@ def test_LucidRF():
     with StopWatch("Lucid Random Forest (compressed)"):
         crf_pred = lucid_rf.predict(X_df)
     np.testing.assert_almost_equal(crf_pred, rf_pred)
+
+    # test comparison, compare the leaves of two
+    # LucidSKEnsembles made from the the same arguments
+    lucid_rf2 = make_LucidSKEnsemble(
+        rf_regr, feature_names=X_df.columns, print_precision=3)
+    lucid_rf2.compress()
+
+    assert(set(lucid_rf.paths) == set(lucid_rf2.paths))
+    assert(lucid_rf.total_leaves_count == lucid_rf2.total_leaves_count)
+    assert(lucid_rf.unique_leaves_count == lucid_rf2.unique_leaves_count)
 
 
 if __name__ == "__main__":
