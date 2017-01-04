@@ -68,7 +68,7 @@ def score_leaves(lucid_ensemble, X_df, y_true,
         raise ValueError("The passed y_true argument is not iterable.")
     if not isinstance(y_true, np.ndarray):
         y_true = np.array(y_true)
-    y_adjusted = y_true - lucid_ensemble._init_estimator.predict(X_df).ravel()
+    y_adjusted = y_true.ravel() - lucid_ensemble._init_estimator.predict(X_df).ravel()
 
     scores = dict()
     for ind, leaf_pair in enumerate(filtered_leaves.items()):
@@ -146,7 +146,7 @@ def score_leaf_group(leaf_group, lucid_ensemble,
         raise ValueError("The passed y_true argument is not iterable.")
     if not isinstance(y_true, np.ndarray):
         y_true = np.array(y_true)
-    y_adjusted = y_true - lucid_ensemble._init_estimator.predict(X_df).ravel()
+    y_adjusted = y_true.ravel() - lucid_ensemble._init_estimator.predict(X_df).ravel()
 
     if n_activated < required_threshold:
         group_score = -np.inf
