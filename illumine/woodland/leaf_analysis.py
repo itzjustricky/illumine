@@ -19,7 +19,9 @@ from .factory_methods import make_LucidSKEnsemble
 from .predict_methods import _map_features_to_int
 from .predict_methods import _find_activated
 
-__all__ = ['gather_leaf_values', 'get_tree_predictions']
+__all__ = ['gather_leaf_values', 'get_tree_predictions',
+           'compute_activation', 'count_group_activation',
+           'max_activation']
 
 
 # this method is not meant to be called outside this module
@@ -170,13 +172,13 @@ def compute_activation(lucid_ensemble, X_df, considered_paths=None):
     return activation_matrix.tocsr()
 
 
-def count_group_activation(leaf_group, lucid_ensemble, X_df):
-    """ Count the # of times all the leaves in the leaf_group
+def count_group_activation(path_group, lucid_ensemble, X_df):
+    """ Count the # of times all the leaves in the path_group
         are all activated
 
-    :param leaf_group (array-like type): a list of SKTreeNodLeafPaths
+    :param path_group (array-like type): a list of LeafPaths
         The scoring will be done as a cumulative of the leaves in
-        the leaf_group.
+        the path_group.
     :param lucid_ensemble (LucidSKEnsemble): a compressed LucidSKEnsemble
         object used to extract leaves and
     :param X_df (pandas.DataFrame): the X matrix to score the leaves on
@@ -185,7 +187,28 @@ def count_group_activation(leaf_group, lucid_ensemble, X_df):
     X = X_df.values
 
     activated_indices = np.ones(X.shape[0], dtype=bool)
-    for path in leaf_group:
+    for path in path_group:
         activated_indices &= _find_activated(X, f_map, path)
 
     return np.sum(activated_indices)
+
+
+def max_activation(candidate_paths, lucid_ensemble, X_df):
+    """ Find the max # of activations over a list of
+        candidate paths
+
+    :param candidate_paths (array-like type): a list of LeafPaths
+    :param lucid_ensemble (LucidSKEnsemble): a compressed LucidSKEnsemble
+        object used to extract leaves and
+    :param X_df (pandas.DataFrame): the X matrix to score the leaves on
+    """
+    f_map = _map_features_to_int(X_df.columns)
+    X = X_df.values
+    max_activation = 0
+
+    for path in candidate_paths:
+        max_activation = max(
+            max_activation,
+            np.sum(_find_activated(X, f_map, path)))
+
+    return max_activation
