@@ -68,11 +68,9 @@ cdef class TreeSplit:
     def threshold(self):
         return self._threshold
 
-    def __key(self):
-        return self.__str__()
-
-    def __hash__(self):
-        return hash(self.__key())
+    @property
+    def print_precision(self):
+        return self._print_precision
 
     def __str__(self):
         return "{}{}{}".format(
@@ -99,17 +97,17 @@ cdef class TreeSplit:
 
     def __richcmp__(x, y, int op):
         if op == 0:
-            return hash(x) < hash(y)
+            return str(x) < str(y)
         if op == 2:
-            return hash(x) == hash(y)
+            return str(x) == str(y)
         if op == 4:
-            return hash(x) > hash(y)
+            return str(x) > str(y)
         if op == 1:
-            return hash(x) <= hash(y)
+            return str(x) <= str(y)
         if op == 3:
-            return hash(x) != hash(y)
+            return str(x) != str(y)
         if op == 5:
-            return hash(x) >= hash(y)
+            return str(x) >= str(y)
 
 
 cdef retrieve_leaf_path(np.ndarray[double, ndim=3] values,
