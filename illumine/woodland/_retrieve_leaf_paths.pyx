@@ -13,7 +13,7 @@ def retrieve_tree_metas(list accm_values,
                         list accm_node_samples,
                         list accm_features,
                         list accm_thresholds,
-                        np.ndarray feature_names,
+                        list feature_names,
                         int print_precision):
     cdef list tree_metas = []
 
@@ -116,7 +116,7 @@ cdef retrieve_leaf_path(np.ndarray[double, ndim=3] values,
                         np.ndarray[long, ndim=1] node_samples,
                         np.ndarray[long, ndim=1] features,
                         np.ndarray[double, ndim=1] thresholds,
-                        np.ndarray feature_names,
+                        list feature_names,
                         int print_precision):
     """ Gather all the leaves of a tree and keep track of the
         paths that define the leaf.
