@@ -32,11 +32,22 @@ class LeafPath(object):
     """ Object representation of the path to a leaf node """
 
     def __init__(self, path):
+        """ The initializer for LeafPath
+
+        :param path (list): a list of TreeSplit objects which
+            is defined in a Cython module.
+
+            A TreeSplit represent a single split in feature data X.
+        """
         self._path = path
+        self._key = None
 
     @property
     def path(self):
         return self._path
+
+    def __iter__(self):
+        return self.path.__iter__()
 
     def __str__(self):
         return self.path.__str__()
@@ -44,20 +55,32 @@ class LeafPath(object):
     def __repr__(self):
         return self.__str__()
 
-    def __key(self):
-        return self.__str__()
+    @property
+    def key(self):
+        """ The key attribute is used for sorting and
+            defining the hash of the LeafPath object
+        """
+        if self._key is None:
+            self._key = ''
+            # let the key be composed of the feature_names then
+            # the numbers this allows more informative sorting
+            for split in self.path:
+                self._key += split.feature_name
+            for split in self.path:
+                self._key += split.relation
+                self._key += str(round(
+                    split.threshold, split.print_precision))
 
-    def __iter__(self):
-        return self.path.__iter__()
+        return self._key
 
     def __hash__(self):
-        return hash(self.__key())
+        return hash(self.key)
 
     def __eq__(self, other):
-        return hash(self) == hash(other)
+        return self.key == other.key
 
     def __lt__(self, other):
-        return hash(self) < hash(other)
+        return self.key < other.key
 
 
 class SKTreeNode(object):
