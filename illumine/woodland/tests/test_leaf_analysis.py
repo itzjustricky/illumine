@@ -6,8 +6,6 @@
     @author: Ricky Chang
 """
 
-import os
-import pickle
 import numpy as np
 import pandas as pd
 
@@ -19,6 +17,9 @@ from illumine.woodland import make_LucidSKEnsemble
 
 
 def test_gather_leaf_values():
+    """ This tests just makes sure nothing breaks when
+        calling gather leaf values
+    """
     X1 = np.arange(0, 10, 0.1)
     X2 = np.arange(10, 20, 0.1)
 
@@ -31,21 +32,10 @@ def test_gather_leaf_values():
 
     # gather_leaf_values with gather_method='aggregate', gathers all the values
     # for a given unique leaf/terminal-node
-    leaf_values = gather_leaf_values(
+    gather_leaf_values(
         clf, X_df,
         feature_names=X_df.columns,
         gather_method='aggregate')
-
-    # extract the expected leaf_values from a pickle file
-    script_dir = os.path.dirname(__file__)
-    expected_leaf_values = \
-        pickle.load(open(
-            os.path.join(script_dir, 'test_material/expected_leaf_values.pkl'),
-            'rb')
-        )
-
-    for key, val in expected_leaf_values.items():
-        np.testing.assert_almost_equal(leaf_values[key], val)
 
 
 def test_compute_activation():
