@@ -81,10 +81,7 @@ def gather_leaf_values(lucid_ensemble, X_df, feature_names, considered_paths=Non
         )))
 
     # Get a matrix of all the leaves activated
-    # all_activated_leaves = sk_ensemble.apply(X)
     all_activated_leaves = lucid_ensemble.apply(X_df)
-    # lucid_ensemble = make_LucidSKEnsemble(
-    # sk_ensemble, feature_names=feature_names)
 
     if gather_method == 'aggregate':
         return _gather_leaf_values(
