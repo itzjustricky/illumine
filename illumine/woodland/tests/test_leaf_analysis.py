@@ -14,6 +14,8 @@ from sklearn.ensemble import GradientBoostingRegressor
 from illumine.woodland import gather_leaf_values
 from illumine.woodland import compute_activation
 from illumine.woodland import make_LucidSKEnsemble
+from illumine.woodland import count_group_activation
+from illumine.woodland import max_activation
 
 
 def test_gather_leaf_values():
@@ -26,14 +28,17 @@ def test_gather_leaf_values():
     y = np.sin(X1).ravel() + np.cos(X2).ravel()
     X_df = pd.DataFrame(np.array([X1, X2]).T, columns=['x1', 'x2'])
 
-    clf = GradientBoostingRegressor(
+    regr = GradientBoostingRegressor(
         max_depth=1, n_estimators=3, random_state=3)
-    clf.fit(X_df, y)
+    regr.fit(X_df, y)
+    lucid_ensemble = make_LucidSKEnsemble(
+        regr, feature_names=X_df.columns, print_precision=3)
+    lucid_ensemble.compress()
 
-    # gather_leaf_values with gather_method='aggregate', gathers all the values
-    # for a given unique leaf/terminal-node
+    # gather_leaf_values with gather_method='aggregate',
+    # gathers all the values for a given unique leaf/terminal-node
     gather_leaf_values(
-        clf, X_df,
+        lucid_ensemble, X_df,
         feature_names=X_df.columns,
         gather_method='aggregate')
 
@@ -53,11 +58,15 @@ def test_compute_activation():
         gbr_regr, feature_names=X_df.columns, print_precision=3)
     lucid_ensemble.compress()
 
-    considered_paths = list(lucid_ensemble.paths)[:50]  # only consider the first 50 paths
+    considered_paths = list(lucid_ensemble.paths)[:10]  # only consider the first 50 paths
     activation_matrix = \
         compute_activation(lucid_ensemble, X_df, considered_paths=considered_paths)
 
-    assert(activation_matrix.shape == (100, 50))
+    assert(activation_matrix.shape == (100, len(considered_paths)))
+
+    # Just make sure the following two programs run
+    assert(count_group_activation(considered_paths, lucid_ensemble, X_df) < len(considered_paths))
+    assert(max_activation(considered_paths, lucid_ensemble, X_df) < X_df.shape[0])
 
 
 if __name__ == "__main__":
@@ -69,8 +78,8 @@ if __name__ == "__main__":
 import bpdb, sys, traceback
 if __name__ == "__main__":
     try:
-        # test_gather_leaf_values()
-        test_compute_activation()
+        test_gather_leaf_values()
+        # test_compute_activation()
     except:
         type, value, tb = sys.exc_info()
         traceback.print_exc()

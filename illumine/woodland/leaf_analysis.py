@@ -15,7 +15,6 @@ from .leaf_objects import LeafPath
 from .leaf_objects import LeafDataStore
 from .leaf_objects import LucidSKEnsemble
 
-from .factory_methods import make_LucidSKEnsemble
 from .predict_methods import _map_features_to_int
 from .predict_methods import _find_activated
 
@@ -29,8 +28,7 @@ def _gather_leaf_values(lucid_ensemble, X_activated, considered_paths=None, **ld
     """ Iterate through the leaves activated from the data X and gather
         their values according to their paths as key values
 
-        The make_LucidSKEnsemble function is an expensive function to call, so
-        this part of the function was separated away.
+        Function used in gather_leaf_values.
 
     :param lucid_ensemble: LucidSKEnsemble object which maps the tree index
         number to a LucidSKTree object; this tree is used to access data
@@ -61,10 +59,10 @@ def _gather_leaf_values(lucid_ensemble, X_activated, considered_paths=None, **ld
                              **lds_kw)
 
 
-def gather_leaf_values(sk_ensemble, X, feature_names, considered_paths=None,
+def gather_leaf_values(lucid_ensemble, X_df, feature_names, considered_paths=None,
                        gather_method='aggregate', **lds_kw):
-    """ This method is used to abstract away the _gather_leaf_values function so
-        that a sk_ensemble and the original matrix data X is passed as arguments instead.
+    """ This method is used to abstract away the _gather_leaf_values function so that a
+        sk_ensemble and the original matrix data X_df is passed as arguments instead.
 
     :param sk_ensemble: scikit-learn ensemble model object
     :param feature_names (list): list of names (strings) of the features that
@@ -83,9 +81,10 @@ def gather_leaf_values(sk_ensemble, X, feature_names, considered_paths=None,
         )))
 
     # Get a matrix of all the leaves activated
-    all_activated_leaves = sk_ensemble.apply(X)
-    lucid_ensemble = make_LucidSKEnsemble(
-        sk_ensemble, feature_names=feature_names,)
+    # all_activated_leaves = sk_ensemble.apply(X)
+    all_activated_leaves = lucid_ensemble.apply(X_df)
+    # lucid_ensemble = make_LucidSKEnsemble(
+    # sk_ensemble, feature_names=feature_names)
 
     if gather_method == 'aggregate':
         return _gather_leaf_values(
@@ -163,9 +162,7 @@ def compute_activation(lucid_ensemble, X_df, considered_paths=None):
         (X_df.shape[0], len(filtered_leaves)),
         dtype=bool)
 
-    for ind, leaf_pair in enumerate(filtered_leaves.items()):
-        path, value = leaf_pair
-
+    for ind, path in enumerate(filtered_leaves.keys()):
         activated_indices = _find_activated(X, f_map, path)
         activation_matrix[np.where(activated_indices)[0], ind] = True
 
@@ -183,14 +180,12 @@ def count_group_activation(path_group, lucid_ensemble, X_df):
         object used to extract leaves and
     :param X_df (pandas.DataFrame): the X matrix to score the leaves on
     """
-    f_map = _map_features_to_int(X_df.columns)
-    X = X_df.values
-
-    activated_indices = np.ones(X.shape[0], dtype=bool)
-    for path in path_group:
-        activated_indices &= _find_activated(X, f_map, path)
-
-    return np.sum(activated_indices)
+    return np.sum(np.all(
+        compute_activation(
+            lucid_ensemble=lucid_ensemble,
+            X_df=X_df, considered_paths=path_group).toarray(),
+        axis=1)
+    )
 
 
 def max_activation(candidate_paths, lucid_ensemble, X_df):
@@ -202,13 +197,9 @@ def max_activation(candidate_paths, lucid_ensemble, X_df):
         object used to extract leaves and
     :param X_df (pandas.DataFrame): the X matrix to score the leaves on
     """
-    f_map = _map_features_to_int(X_df.columns)
-    X = X_df.values
-    max_activation = 0
-
-    for path in candidate_paths:
-        max_activation = max(
-            max_activation,
-            np.sum(_find_activated(X, f_map, path)))
-
-    return max_activation
+    return np.max(np.sum(
+        compute_activation(
+            lucid_ensemble=lucid_ensemble,
+            X_df=X_df, considered_paths=candidate_paths).toarray(),
+        axis=0)
+    )
