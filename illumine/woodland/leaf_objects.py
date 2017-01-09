@@ -23,6 +23,7 @@ from pandas import DataFrame
 
 from ..core import LeafDictionary
 from .predict_methods import create_prediction
+from .predict_methods import create_apply
 
 __all__ = ['LeafPath', 'SKTreeNode', 'LucidSKEnsemble', 'LucidSKTree']
 
@@ -178,9 +179,32 @@ class LucidSKTree(LeafDictionary):
     def feature_names(self):
         return self._feature_names
 
+    def apply(self, X_df):
+        """ Apply trees in Tree to a pandas DataFrame.
+            The DataFrame columns should be the same as
+            the feature_names attribute.
+        """
+        activated_indices = np.zeros(X_df.shape[0], dtype=int)
+        # this indicates the trained tree had no splits
+        # this is possible in Scikit-learn
+        if len(self) == 1:
+            return activated_indices
+
+        if not isinstance(X_df, DataFrame):
+            raise ValueError("Predictions must be done on a Pandas dataframe")
+        if not all(X_df.columns == self.feature_names):
+            raise ValueError("The passed pandas DataFrame columns should equal the "
+                             "contain the feature_names attribute of the LucidSKTree")
+
+        leaf_paths, leaf_indices = \
+            zip(*[(leaf.path, leaf_ind) for leaf_ind, leaf in self.items()])
+
+        return create_apply(X_df, leaf_paths, leaf_indices)
+
     def predict(self, X_df):
         """ Create predictions from a pandas DataFrame.
-            The DataFrame should have the same.
+            The DataFrame columns should be the same as
+            the feature_names attribute.
         """
         y_pred = np.zeros(X_df.shape[0])
         # this indicates the trained tree had no splits
@@ -194,10 +218,10 @@ class LucidSKTree(LeafDictionary):
             raise ValueError("The passed pandas DataFrame columns should equal the "
                              "contain the feature_names attribute of the LucidSKTree")
 
-        leaf_path, leaf_values = \
+        leaf_paths, leaf_values = \
             zip(*[(leaf.path, leaf.value) for leaf in self.values()])
 
-        return create_prediction(X_df, leaf_path, leaf_values)
+        return create_prediction(X_df, leaf_paths, leaf_values)
 
     def __reduce__(self):
         return (self.__class__, (
@@ -267,6 +291,11 @@ class LucidSKEnsemble(LeafDictionary):
             str_kw=str_kw)
 
     @property
+    def n_estimators(self):
+        """ The # of tree-estimators in the ensemble """
+        return len(self)
+
+    @property
     def feature_names(self):
         """ The name of the features that were used
             to train the scikit-learn model
@@ -328,13 +357,24 @@ class LucidSKEnsemble(LeafDictionary):
             self._print_limit)
         )
 
-    def predict(self, X_df):
-        if not isinstance(X_df, DataFrame):
-            raise ValueError("Predictions must be done on a Pandas dataframe")
-        if not all(X_df.columns == self.feature_names):
-            raise ValueError("The passed pandas DataFrame columns should equal the "
-                             "contain the feature_names attribute of the LucidSKTree")
+    def apply(self, X_df):
+        """ Apply estimators in Tree to a pandas DataFrame.
+            The DataFrame columns should be the same as
+            the feature_names attribute.
+        """
+        activated_indices = np.zeros(
+            (X_df.shape[0], self.n_estimators),
+            dtype=int)
+        for ind, lucid_tree in enumerate(self):
+            activated_indices[:, ind] = lucid_tree.apply(X_df)
 
+        return activated_indices
+
+    def predict(self, X_df):
+        """ Create predictions from a pandas DataFrame.
+            The DataFrame columns should be the same as
+            the feature_names attribute.
+        """
         y_pred = np.zeros(X_df.shape[0])
         if self._compressed_ensemble is None:
             for lucid_tree in self:

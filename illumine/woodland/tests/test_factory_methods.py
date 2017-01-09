@@ -59,11 +59,12 @@ def test_LucidGBR():
     with StopWatch("Scikit-learn Gradient Boost prediction"):
         gbr_pred = gbr_regr.predict(X_df)
 
-    with StopWatch("Lucid Gradient Boost (non-compressed)"):
+    with StopWatch("Lucid Gradient Boost (non-compressed) prediction"):
         lucid_gbr_pred = lucid_gbr.predict(X_df)
 
     # test prediction outputted from LucidSKEnsemble
     np.testing.assert_almost_equal(lucid_gbr_pred, gbr_pred)
+    assert(np.all(gbr_regr.apply(X_df) == lucid_gbr.apply(X_df)))
 
     with StopWatch("Compression of Lucid Gradient Boost"):
         lucid_gbr.compress()
@@ -72,7 +73,7 @@ def test_LucidGBR():
                   lucid_gbr.total_leaves_count,
                   len(lucid_gbr)))
 
-    with StopWatch("Lucid Gradient Boost (compressed)"):
+    with StopWatch("Lucid Gradient Boost (compressed) prediction"):
         cgbr_pred = lucid_gbr.predict(X_df)
 
     # test the compressed prediction
@@ -111,9 +112,13 @@ def test_LucidRF():
 
     with StopWatch("Scikit-learn Random Forest prediction"):
         rf_pred = rf_regr.predict(X_df)
-    with StopWatch("Lucid Random Forest (non-compressed)"):
+    with StopWatch("Lucid Random Forest (non-compressed) prediction"):
         lucid_rf_pred = lucid_rf.predict(X_df)
+
+    # test prediction outputted from LucidSKEnsemble
     np.testing.assert_almost_equal(lucid_rf_pred, rf_pred)
+    assert(np.all(rf_regr.apply(X_df) == lucid_rf.apply(X_df)))
+
     with StopWatch("Compression of Lucid Random Forest"):
         lucid_rf.compress()
     print("{} unique nodes, {} total nodes, and {} tree estimators"
@@ -121,7 +126,7 @@ def test_LucidRF():
                   lucid_rf.total_leaves_count,
                   len(lucid_rf)))
 
-    with StopWatch("Lucid Random Forest (compressed)"):
+    with StopWatch("Lucid Random Forest (compressed) prediction"):
         crf_pred = lucid_rf.predict(X_df)
     np.testing.assert_almost_equal(crf_pred, rf_pred)
 

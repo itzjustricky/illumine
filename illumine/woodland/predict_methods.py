@@ -38,7 +38,7 @@ def _find_activated_for_split(X, col_index, relation, threshold):
     >>> col_index = 1
     >>> relation = '<='
     >>> threshold = 8
-    >>> determine_relation(X, int_repr, relation, threshold)
+    >>> _find_activated_for_split(X, col_index, relation, threshold)
     [True, True, True, False, False]
     """
 
@@ -88,3 +88,16 @@ def create_prediction(X_df, leaf_paths, leaf_values):
             * value
 
     return y_pred
+
+
+def create_apply(X_df, leaf_paths, leaf_indices):
+    # features integer representation
+    f_map = _map_features_to_int(X_df.columns)
+    X_matrix = X_df.values
+
+    activated_indices = np.zeros(X_matrix.shape[0])
+    for path, index in zip(leaf_paths, leaf_indices):
+        activated_indices += \
+            _find_activated(X_matrix, f_map, path) * index
+
+    return activated_indices
