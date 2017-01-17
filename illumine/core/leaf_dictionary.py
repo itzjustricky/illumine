@@ -1,6 +1,6 @@
 """
     Description:
-        LeafDictionary serves as a base class for classes that
+        LeafDictionary serves as a base class
 
 
     @author: Ricky Chang
@@ -30,9 +30,8 @@ class LeafDictionary(object):
             raise ValueError("The passed type {} is not iterable".format(type(tree_leaves)))
 
         self._seq = tree_leaves
-        self._str_cache = None  # used to cache the string representation later
-        self._len = len(tree_leaves)
-        self._print_limit = print_limit  # limit for how many SKTreeNode objects to print
+        self._str_cache = None              # used to cache the string repr.
+        self._print_limit = print_limit     # limit for how many SKTreeNode objects to print
 
         if str_kw is None:
             self._str_kw = dict()
@@ -44,6 +43,16 @@ class LeafDictionary(object):
         # If the passed sequence is a dictionary set dictionary attributes
         if isinstance(tree_leaves, dict):
             self._set_dictionary_attr(self._seq)
+
+    def pop(self, key):
+        """ Remove an element from the underlying sequence object """
+        self._str_cache = None
+        try:
+            self._seq.pop(key)
+        except AttributeError:
+            raise AttributeError(
+                "pop method not supported for LeafDictionary made from type {}"
+                .format(type(self._seq)))
 
     def _get_dictionary_attr(self, cls_dict):
         """ Method to create dictionary attributes to be set
@@ -87,7 +96,7 @@ class LeafDictionary(object):
         return self.__str__()
 
     def __len__(self):
-        return self._len
+        return len(self._seq)
 
     def __str__(self):
         if self._str_cache is None:
