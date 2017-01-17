@@ -27,6 +27,7 @@ from collections import Iterable
 
 import numpy as np
 from sklearn.dummy import DummyRegressor
+from sklearn.metrics import mean_squared_error
 
 from .leaf_objects import SKTreeNode
 from .leaf_objects import LucidSKTree
@@ -44,6 +45,7 @@ def assemble_lucid_trees(sk_trees, feature_names, print_precision, **tree_kw):
     """
     tree_metas = retrieve_tree_metas(
         *_accumulate_tree_attributes(sk_trees),
+        # must be changed to strings to be passed into Cython function
         feature_names=list(map(str, feature_names)),
         print_precision=print_precision)
 
@@ -155,6 +157,7 @@ def make_LucidSKEnsemble(sk_ensemble, feature_names, print_precision=10,
         ensemble_estimators,
         feature_names, print_precision, **tree_kw)
 
+    # Retrieve the initial estimator for the ensemble
     if init_estimator is None:
         try:
             init_estimator = sk_ensemble.init_
@@ -167,6 +170,11 @@ def make_LucidSKEnsemble(sk_ensemble, feature_names, print_precision=10,
             "function with function signature predict(self, X) "
             "where X is the feature matrix.")
 
+    try:  # retrieve loss function if there is one
+        loss_function = sk_ensemble.loss_
+    except AttributeError:  # if None default to mean_squared_error
+        loss_function = mean_squared_error
+
     try:
         learning_rate = sk_ensemble.learning_rate
     except AttributeError:
@@ -175,5 +183,6 @@ def make_LucidSKEnsemble(sk_ensemble, feature_names, print_precision=10,
     return LucidSKEnsemble(
         ensemble_of_leaves, feature_names,
         init_estimator=init_estimator,
+        loss_function=loss_function,
         learning_rate=learning_rate,
         **ensemble_kw)

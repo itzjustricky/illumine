@@ -13,19 +13,25 @@
     @author: Ricky
 """
 
+import logging
 from copy import deepcopy
 from collections import Iterable
 from collections import OrderedDict
 from functools import total_ordering
 
 import numpy as np
+from scipy.sparse import lil_matrix
 from pandas import DataFrame
 
 from ..core import LeafDictionary
+
 from .predict_methods import create_prediction
 from .predict_methods import create_apply
+from .predict_methods import _map_features_to_int
+from .predict_methods import _find_activated
 
-__all__ = ['LeafPath', 'SKTreeNode', 'LucidSKEnsemble', 'LucidSKTree']
+__all__ = ['LeafPath', 'SKTreeNode', 'LucidSKTree',
+           'LucidSKEnsemble', 'CompressedEnsemble']
 
 
 @total_ordering
@@ -244,7 +250,7 @@ class LucidSKEnsemble(LeafDictionary):
         This class is NOT meant to be INHERITED from.
     """
 
-    def __init__(self, tree_ensemble, feature_names, init_estimator,
+    def __init__(self, tree_ensemble, feature_names, init_estimator, loss_function,
                  learning_rate, print_limit=5):
         """ Construct the LucidSKTree object using a dictionary object indexed
             by the leaf's index in the pre-order traversal of the decision tree.
@@ -268,10 +274,8 @@ class LucidSKEnsemble(LeafDictionary):
         self._feature_names = feature_names
         self._learning_rate = learning_rate
         self._unique_leaves_count = None
-        self._total_leaves_count = None
-
-        # this object will be created if compress method is called
-        self._compressed_ensemble = None
+        self._leaves_count = None
+        self._loss = deepcopy(loss_function)
 
         if not hasattr(init_estimator, 'predict'):
             raise ValueError(
@@ -279,11 +283,9 @@ class LucidSKEnsemble(LeafDictionary):
                 "function with function signature predict(self, X) "
                 "where X is the feature matrix.")
         else:
-            # this must be deepcopied to make LucidSKEnsemble pickeable
             self._init_estimator = deepcopy(init_estimator)
 
-        str_kw = {"print_format": "Estimator {}\n============\n{}",
-                  "print_with_index": True}
+        str_kw = {"print_format": "Estimator {}\n{}"}
 
         super(LucidSKEnsemble, self).__init__(
             tree_ensemble,
@@ -296,63 +298,22 @@ class LucidSKEnsemble(LeafDictionary):
         return len(self)
 
     @property
+    def learning_rate(self):
+        return self._learning_rate
+
+    @property
     def feature_names(self):
         """ The name of the features that were used
             to train the scikit-learn model
         """
         return self._feature_names
 
-    @property
-    def total_leaves_count(self):
-        """ The # of total leaves in the Ensemble, i.e. certain
-            unique leaves may be counted more than once.
-        """
-        if self._total_leaves_count is None:
-            cnt = 0
-            for lucid_tree in self:
-                cnt += len(lucid_tree)
-            self._total_leaves_count = cnt
-        return self._total_leaves_count
-
-    @property
-    def unique_leaves_count(self):
-        """ The # of unique leaves in the Ensemble """
-        if not self.is_compressed:
-            raise AttributeError(
-                "you must run the compress() method before "
-                "getting unique_leaves_count.")
-        else:
-            return self._unique_leaves_count
-
-    @property
-    def is_compressed(self):
-        """ Boolean to indicate whether or not the LucidSKEnsemble
-            object is compressed or not.
-        """
-        return self._compressed_ensemble is not None
-
-    @property
-    def compressed_ensemble(self):
-        """ The actual CompressedEnsemble object.
-            The compress() method must be called before
-            trying to get this object.
-        """
-        if self.is_compressed:
-            return self._compressed_ensemble
-        else:
-            raise AttributeError(
-                "you must run the compress() method before "
-                "getting the compressed_ensemble.")
-
-    @property
-    def paths(self):
-        return self.compressed_ensemble.keys()
-
     def __reduce__(self):
         return (self.__class__, (
             self._seq,
             self.feature_names,
             self._init_estimator,
+            self._loss,
             self._learning_rate,
             self._print_limit)
         )
@@ -370,23 +331,26 @@ class LucidSKEnsemble(LeafDictionary):
 
         return activated_indices
 
+    def score(self, y_true, y_pred, score_function=None):
+        if score_function is None:
+            return -1.0 * self._loss(y_true, y_pred)
+        else:
+            return score_function(y_true, y_pred)
+
     def predict(self, X_df):
         """ Create predictions from a pandas DataFrame.
             The DataFrame columns should be the same as
             the feature_names attribute.
         """
         y_pred = np.zeros(X_df.shape[0])
-        if self._compressed_ensemble is None:
-            for lucid_tree in self:
-                y_pred += lucid_tree.predict(X_df)
+        for lucid_tree in self:
+            y_pred += lucid_tree.predict(X_df)
 
-            return y_pred * self._learning_rate + self._init_estimator.predict(X_df).ravel()
-        else:
-            return self._compressed_ensemble.predict(X_df) \
-                + self._init_estimator.predict(X_df).ravel()
+        return y_pred * self.learning_rate + \
+            self._init_estimator.predict(X_df).ravel()
 
     def compress(self, **kwargs):
-        """ Create a CompressedEnsemble object which aggregates all
+        """ Output a CompressedEnsemble object which aggregates all
             the values of leaves with the same paths.
 
             This is useful if the # of unique leaves is smaller
@@ -403,11 +367,88 @@ class LucidSKEnsemble(LeafDictionary):
             for leaf_node in lucid_tree.values():
                 unique_leaves[leaf_node.path] = \
                     unique_leaves.get(leaf_node.path, 0) \
-                    + self._learning_rate * leaf_node.value
+                    + self.learning_rate * leaf_node.value
 
-        self._compressed_ensemble = CompressedEnsemble(
-            unique_leaves, self.feature_names, **kwargs)
-        self._unique_leaves_count = len(self._compressed_ensemble)
+        return CompressedEnsemble(
+            unique_leaves,
+            self.feature_names,
+            self._init_estimator,
+            self._loss,
+            **kwargs)
+
+    def _find_worst_estimator(self, X_df, y_true, score_function=None):
+        """ Find the best score that comes from excluding an estimator
+
+        :returns: the index of the estimator index that should be removed
+            a value of -1 will be returned if the best score by removing
+            an estimator is worst than the score achieved using all estimators
+        """
+        # prediction matrix is an nxm matrix
+        # where n is # of data-points and m is the # of estimators
+        # the ith column is the preditcions made by the mth estimator
+        pred_matrix = np.zeros((X_df.shape[0], self.n_estimators))
+        init_pred = self._init_estimator.predict(X_df).ravel()
+        logging.getLogger(__name__).debug(
+            'The pred_matrix has shape {}'.format(pred_matrix.shape))
+
+        for est_ind, lucid_tree in enumerate(self):
+            pred_matrix[:, est_ind] = lucid_tree.predict(X_df)
+        pred_matrix *= self.learning_rate
+        orig_score = self.score(
+            y_true, np.sum(pred_matrix, axis=1) + init_pred, score_function)
+        logging.getLogger(__name__).debug(
+            'The score before estimator pruning is {}'.format(pred_matrix.shape))
+
+        worst_ind, best_score = 0, -np.inf
+        for est_ind in range(self.n_estimators):
+            y_pred = \
+                np.sum(np.delete(pred_matrix, est_ind, axis=1), axis=1) + \
+                init_pred
+
+            curr_score = self.score(
+                y_true=y_true,
+                y_pred=y_pred,
+                score_function=score_function)
+            if curr_score > best_score:
+                worst_ind = est_ind
+                best_score = curr_score
+
+        logging.getLogger(__name__).debug(
+            'The best-score is {} from pruning an estimator'
+            .format(best_score, worst_ind))
+
+        if orig_score > best_score:
+            return -1
+        else:
+            return worst_ind
+
+    def prune_by_estimator(self, X_df, y_true,
+                           score_function=None, n_prunes=None):
+        """ Prune out estimators from the ensemble over data
+            in X_df (feature variables) and y (target variable)
+
+        :param X_df (pandas.DataFrame): the feature matrix over
+            which predictions will be made
+        :param y (1d vector): the vector of target variables
+            used to evaluate the score
+        :param score_function (function): the function that decides
+            the scoring; by default, the negative loss function is used
+        :param n_prunes: decides the # of prunes to do over the
+            estimators. Defaults to None, if None then it will
+            prune until score of the ensemble does not degrade
+            from taking out an estimator
+        """
+        if n_prunes is None:
+            n_prunes = self.n_estimators
+
+        for prune_ind in range(n_prunes):
+            worst_estimator = self._find_worst_estimator(X_df, y_true, score_function)
+            if worst_estimator == -1:  # if the best score < previous best score
+                break
+            self.pop(worst_estimator)
+
+        logging.getLogger(__name__).info(
+            'Finished with {} prunes'.format(prune_ind))
 
 
 class LeafDataStore(LeafDictionary):
@@ -446,8 +487,7 @@ class LeafDataStore(LeafDictionary):
             (inner & leaf nodes)
         """
         if not isinstance(tree_leaves, dict):
-            raise ValueError("A dictionary object with keys mapped to lists "
-                             "of values should be passed into the constructor.")
+            raise ValueError("The passed tree_leaves needs to be a dict object")
         str_kw = {"print_format": "path: {}\n{}"}
 
         super(LeafDataStore, self).__init__(
@@ -467,22 +507,26 @@ class CompressedEnsemble(LeafDictionary):
         LucidSKEnsemble.compress() method
     """
 
-    def __init__(self, tree_leaves, feature_names, print_limit=30):
+    def __init__(self, tree_leaves, feature_names, init_estimator,
+                 loss_function, print_limit=30):
         """ Construct the LucidSKTree object using a dictionary object indexed
             by the leaf's index in the pre-order traversal of the decision tree.
 
             The leaf's index is in set [0, k-1] where k is the # of nodes (inner & leaf nodes)
             This object should be constructed using LucidSKEnsemble.compress() method
         """
-        if not isinstance(tree_leaves, dict):
-            raise ValueError("A dictionary object with keys mapped to SKTreeNodes should ",
-                             "be passed into the constructor.")
+        if not isinstance(tree_leaves, OrderedDict):
+            raise ValueError("An OrderedDict object with keys mapped to LeafPath objects "
+                             "should be passed into the constructor. CompressedEnsemble "
+                             "methods rely on the order of the passed tree_leaves.")
 
         if not isinstance(feature_names, Iterable):
             raise ValueError(
                 "feature_names should be an iterable object containing the "
                 "feature names that the tree was trained on")
         self._feature_names = feature_names
+        self._init_estimator = deepcopy(init_estimator)
+        self._loss = loss_function
 
         super(CompressedEnsemble, self).__init__(
             tree_leaves, print_limit)
@@ -494,6 +538,29 @@ class CompressedEnsemble(LeafDictionary):
         """
         return self._feature_names
 
+    @property
+    def leaves(self):
+        return self.keys()
+
+    @property
+    def n_leaves(self):
+        return len(self)
+
+    def __reduce__(self):
+        return (self.__class__, (
+            self._seq,
+            self.feature_names,
+            self._init_estimator,
+            self._loss,
+            self._print_limit)
+        )
+
+    def score(self, y_true, y_pred, score_function=None):
+        if score_function is None:
+            return -1.0 * self._loss(y_true, y_pred)
+        else:
+            return score_function(y_true, y_pred)
+
     def predict(self, X_df):
         """ Create predictions from a pandas DataFrame.
             The DataFrame should have the same.
@@ -504,6 +571,124 @@ class CompressedEnsemble(LeafDictionary):
             raise ValueError("The passed dataframe should")
 
         leaf_path, leaf_values = \
-            zip(*[(leaf_node.path, value) for leaf_node, value in self.items()])
+            zip(*[(leaf_path, self[leaf_path]) for leaf_path in self.leaves])
 
-        return create_prediction(X_df, leaf_path, leaf_values)
+        return create_prediction(X_df, leaf_path, leaf_values) + \
+            self._init_estimator.predict(X_df).ravel()
+
+    def compute_activation(self, X_df, considered_paths=None):
+        """ Compute an activation matrix, see below for more details.
+
+        :returns: a scipy sparse csr_matrix with shape (n, m)
+            where n is the # of rows for X_df, m is the # of unique leaves.
+
+            It is a binary matrix with values in {0, 1}.
+            A value of 1 in entry row i, column j indicates that leaf is
+            activated for datapoint i, leaf j.
+        """
+        if not isinstance(X_df, DataFrame):
+            raise ValueError("The passed X_df argument should be of type DataFrame.")
+
+        f_map = _map_features_to_int(X_df.columns)
+        X = X_df.values
+
+        if considered_paths is not None:
+            if not all(map(lambda x: isinstance(x, LeafPath), considered_paths)):
+                raise ValueError(
+                    "All elements of considered_paths should be of type LeafPath.")
+            filtered_leaves = \
+                dict([(path, self[path])
+                     for path in considered_paths])
+        else:
+            filtered_leaves = self
+
+        activation_matrix = lil_matrix(
+            (X_df.shape[0], len(filtered_leaves)),
+            dtype=bool)
+        # Make sure the activation_matrix is initialized
+        # with False boolean values
+        assert(activation_matrix.sum() == 0)
+
+        for ind, path in enumerate(filtered_leaves.keys()):
+            activated_indices = _find_activated(X, f_map, path)
+            activation_matrix[np.where(activated_indices)[0], ind] = True
+
+        return activation_matrix.tocsr()
+
+    def _find_worst_leaf(self, X_df, y_true, score_function=None):
+        """ Find the best score that comes from excluding an estimator
+
+        :returns: the index of the estimator index that should be removed
+            a value of -1 will be returned if the best score by removing
+            an estimator is worst than the score achieved using all estimators
+        """
+        # prediction matrix is an nxm matrix
+        # where n is # of data-points and m is the # of unique leaves
+        # the ith column is the preditcions made by the mth estimator
+        pred_matrix = np.zeros((X_df.shape[0], self.n_leaves))
+        init_pred = self._init_estimator.predict(X_df).ravel()
+        logging.getLogger(__name__).debug(
+            'The pred_matrix has shape {}'.format(pred_matrix.shape))
+
+        activation_matrix = self.compute_activation(
+            X_df, considered_paths=None)
+
+        for ind, leaf_value in enumerate(self.values()):
+            pred_matrix[:, ind] = activation_matrix[:, ind].toarray().ravel() * leaf_value
+
+        orig_score = self.score(
+            y_true, np.sum(pred_matrix, axis=1) + init_pred, score_function)
+        logging.getLogger(__name__).debug(
+            'The score before estimator pruning is {}'.format(pred_matrix.shape))
+
+        worst_leaf, best_score = 0, -np.inf
+        for leaf_ind, leaf in enumerate(self.leaves):
+            y_pred = \
+                np.sum(np.delete(pred_matrix, leaf_ind, axis=1), axis=1) + \
+                init_pred
+
+            curr_score = self.score(
+                y_true=y_true,
+                y_pred=y_pred,
+                score_function=score_function)
+            if curr_score > best_score:
+                worst_leaf = leaf
+                best_score = curr_score
+
+        logging.getLogger(__name__).debug(
+            'The best-score is {} from pruning leaf {}'
+            .format(best_score, worst_leaf))
+
+        if orig_score > best_score:
+            return None
+        else:
+            return worst_leaf
+
+    def prune_by_leaves(self, X_df, y_true,
+                        score_function=None, n_prunes=None):
+        """ Prune out estimators from the ensemble over data
+            in X_df (feature variables) and y (target variable)
+
+        :param X_df (pandas.DataFrame): the feature matrix over
+            which predictions will be made
+        :param y (1d vector): the vector of target variables
+            used to evaluate the score
+        :param score_function (function): the function that decides
+            the scoring; by default, the negative loss function is used
+        :param n_prunes: decides the # of prunes to do over the
+            estimators. Defaults to None, if None then it will
+            prune until score of the ensemble does not degrade
+            from taking out an estimator
+        """
+        if n_prunes is None:
+            n_prunes = self.n_leaves
+
+        for prune_ind in range(n_prunes):
+            worst_leaf = self._find_worst_leaf(X_df, y_true, score_function)
+            if worst_leaf is None:  # if the best score < previous best score
+                break
+            self.pop(worst_leaf)
+
+        logging.getLogger(__name__).info(
+            'Finished with {} prunes with {} left'
+            .format(prune_ind, self.n_leaves))
