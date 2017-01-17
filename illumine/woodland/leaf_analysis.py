@@ -7,20 +7,11 @@
 """
 
 import numpy as np
-from pandas import DataFrame
 
-from scipy.sparse import lil_matrix
-
-from .leaf_objects import LeafPath
 from .leaf_objects import LeafDataStore
 from .leaf_objects import LucidSKEnsemble
 
-from .predict_methods import _map_features_to_int
-from .predict_methods import _find_activated
-
-__all__ = ['gather_leaf_values', 'get_tree_predictions',
-           'compute_activation', 'count_group_activation',
-           'max_activation']
+__all__ = ['gather_leaf_values', 'get_tree_predictions']
 
 
 # this method is not meant to be called outside this module
@@ -117,89 +108,3 @@ def get_tree_predictions(sk_ensemble, X, adjust_with_init=False):
         leaf_values[:, ind] = estimator.predict(X)
 
     return leaf_values + adjustment[:, np.newaxis]
-
-
-def compute_activation(lucid_ensemble, X_df, considered_paths=None):
-    """ Compute an activation matrix to be used as vectors for
-        clustering leaves together.
-
-        This function requires that lucid_ensemble is compressed, i.e.
-        the compress() method was called. The 3olumn index of activation_matrix
-        returned coincides with the index of a leaf-path in
-        lucid_ensemble.compressed_ensemble.
-
-    :returns: a scipy sparse csr_matrix with shape (n, m)
-        where n is the # of rows for X_df, m is the # of unique leaves.
-
-        It is a binary matrix with values in {0, 1}.
-        A value of 1 in entry row i, column j indicates that leaf is
-        activated for datapoint i, leaf j.
-    """
-    if not isinstance(X_df, DataFrame):
-        raise ValueError("The passed X_df argument should be of type DataFrame.")
-
-    if not isinstance(lucid_ensemble, LucidSKEnsemble):
-        raise ValueError("The passed lucid_ensemble argument should "
-                         "be of type LucidSKEnsemble.")
-
-    f_map = _map_features_to_int(X_df.columns)
-    X = X_df.values
-
-    if considered_paths is not None:
-        if not all(map(lambda x: isinstance(x, LeafPath), considered_paths)):
-            raise ValueError(
-                "All elements of considered_paths should be of type LeafPath.")
-        filtered_leaves = \
-            dict(((path, lucid_ensemble.compressed_ensemble[path])
-                  for path in considered_paths))
-    else:
-        filtered_leaves = lucid_ensemble.compressed_ensemble
-
-    activation_matrix = lil_matrix(
-        (X_df.shape[0], len(filtered_leaves)),
-        dtype=bool)
-    # Make sure the activation_matrix is initialized
-    # with False boolean values
-    assert(activation_matrix.sum() == 0)
-
-    for ind, path in enumerate(filtered_leaves.keys()):
-        activated_indices = _find_activated(X, f_map, path)
-        activation_matrix[np.where(activated_indices)[0], ind] = True
-
-    return activation_matrix.tocsr()
-
-
-def count_group_activation(path_group, lucid_ensemble, X_df):
-    """ Count the # of times all the leaves in the path_group
-        are all activated
-
-    :param path_group (array-like type): a list of LeafPaths
-        The scoring will be done as a cumulative of the leaves in
-        the path_group.
-    :param lucid_ensemble (LucidSKEnsemble): a compressed LucidSKEnsemble
-        object used to extract leaves and
-    :param X_df (pandas.DataFrame): the X matrix to score the leaves on
-    """
-    return np.sum(np.all(
-        compute_activation(
-            lucid_ensemble=lucid_ensemble,
-            X_df=X_df, considered_paths=path_group).toarray(),
-        axis=1)
-    )
-
-
-def max_activation(candidate_paths, lucid_ensemble, X_df):
-    """ Find the max # of activations over a list of
-        candidate paths
-
-    :param candidate_paths (array-like type): a list of LeafPaths
-    :param lucid_ensemble (LucidSKEnsemble): a compressed LucidSKEnsemble
-        object used to extract leaves and
-    :param X_df (pandas.DataFrame): the X matrix to score the leaves on
-    """
-    return np.max(np.sum(
-        compute_activation(
-            lucid_ensemble=lucid_ensemble,
-            X_df=X_df, considered_paths=candidate_paths).toarray(),
-        axis=0)
-    )
