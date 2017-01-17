@@ -29,20 +29,20 @@ def test_score_leaves():
 
     lucid_ensemble = make_LucidSKEnsemble(
         gbr_regr, feature_names=X_df.columns, print_precision=3)
-    lucid_ensemble.compress()
+    compressed_ensemble = lucid_ensemble.compress()
 
     def sign_score_function(y_hat, y):
         return np.sum(np.sign(y_hat) == np.sign(y))
 
     leaf_scores = score_leaves(
-        lucid_ensemble, X_df, y,
+        compressed_ensemble, X_df, y,
         score_function=sign_score_function,
         required_threshold=X_df.shape[0] * 0.2,
         normalize_score=True)
 
     # Check all the leaf-paths in leaf_scores are in lucid_ensemble paths
-    for path in leaf_scores.keys():
-        assert(path in lucid_ensemble.paths)
+    for leaf in leaf_scores.keys():
+        assert(leaf in compressed_ensemble.leaves)
 
 
 def test_score_leaf_groups():
@@ -58,20 +58,20 @@ def test_score_leaf_groups():
 
     lucid_ensemble = make_LucidSKEnsemble(
         gbr_regr, feature_names=X_df.columns, print_precision=3)
-    lucid_ensemble.compress()
+    compressed_ensemble = lucid_ensemble.compress()
 
     def sign_score_function(y_hat, y):
         return np.sum(np.sign(y_hat) == np.sign(y))
 
     leaf_scores = score_leaves(
-        lucid_ensemble, X_df, y,
+        compressed_ensemble, X_df, y,
         score_function=sign_score_function,
         normalize_score=True)
 
-    leaf_group = list(lucid_ensemble.paths)[0]
+    leaf_group = list(compressed_ensemble.leaves)[0]
 
     leaf_group_score = score_leaf_group(
-        [leaf_group], lucid_ensemble, X_df, y,
+        [leaf_group], compressed_ensemble, X_df, y,
         score_function=sign_score_function,
         normalize_score=True)
 
