@@ -87,6 +87,16 @@ def create_prediction(X_df, leaf_paths, leaf_values):
 
 
 def create_apply(X_df, leaf_paths, leaf_indices):
+    """ Creates a nxm matrix of integers
+        where n is the # of sample-data
+              m is the # of estimators
+        Note:
+        Leaf indices are derived from the order in the
+        preorder traversal of the decision tree.
+
+        Each entry of the matrix gives an index
+        of which leaf was activated in an estimator.
+    """
     # features integer representation
     f_map = _map_features_to_int(X_df.columns)
     X_matrix = X_df.values
