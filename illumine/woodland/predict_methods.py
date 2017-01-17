@@ -3,10 +3,6 @@
         Methods to optimize the prediction
         function of the lucid tree.
 
-    TODO:
-        I should be able to easily move parts of
-        the function to Cython to make it even faster
-
     @author: Ricky Chang
 """
 
