@@ -158,6 +158,9 @@ def compute_activation(lucid_ensemble, X_df, considered_paths=None):
     activation_matrix = lil_matrix(
         (X_df.shape[0], len(filtered_leaves)),
         dtype=bool)
+    # Make sure the activation_matrix is initialized
+    # with False boolean values
+    assert(activation_matrix.sum() == 0)
 
     for ind, path in enumerate(filtered_leaves.keys()):
         activated_indices = _find_activated(X, f_map, path)
