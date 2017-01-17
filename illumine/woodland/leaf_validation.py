@@ -9,10 +9,11 @@
 
 import logging
 from collections import Iterable
+
 import numpy as np
 
-from .leaf_objects import LucidSKEnsemble
 from .leaf_objects import LeafPath
+from .leaf_objects import CompressedEnsemble
 
 from .predict_methods import _map_features_to_int
 from .predict_methods import _find_activated
@@ -21,7 +22,7 @@ from .predict_methods import _find_activated
 __all__ = ['score_leaves', 'score_leaf_group']
 
 
-def score_leaves(lucid_ensemble, X_df, y_true,
+def score_leaves(compressed_ensemble, X_df, y_true,
                  score_function, required_threshold=0,
                  considered_paths=None, normalize_score=False):
     """ Score leaves based on some passed score_function.
@@ -29,10 +30,10 @@ def score_leaves(lucid_ensemble, X_df, y_true,
         where the leaf is activated.
 
         The y_true value will be adjusted by any init_estimator
-        that the lucid_ensemble has.
+        that the compressed_ensemble has.
 
-    :param lucid_ensemble (LucidSKEnsemble): a compressed LucidSKEnsemble
-        object used to extract leaves and
+    :param compressed_ensemble (CompressedEnsemble): a CompressedEnsemble
+        object used to extract leaves
     :param X_df (pandas.DataFrame): the X matrix to score the leaves on
     :param y_true (array-like type): the y values which the X matrix will
         be tested against
@@ -40,16 +41,16 @@ def score_leaves(lucid_ensemble, X_df, y_true,
         function signature of score(X, y)
     :param considered_paths (array-like type): a list of SKTreeNodLeafPath; only
         the LeafPath in considered_paths will be considered. Defaults
-        to None, if None then all leaves in lucid_ensemble will be considered.
+        to None, if None then all leaves in compressed_ensemble will be considered.
     :param required_threshold (int): if a leaf is activated less than the
         required_threshold # of times then it will be given a rank of -inf
     :param normalize_score (bool): indicates whether or not to normalize
         the score by the # of activated indices for a certain leaf
     """
-    if not isinstance(lucid_ensemble, LucidSKEnsemble):
+    if not isinstance(compressed_ensemble, CompressedEnsemble):
         raise ValueError(
-            "The passed argument lucid_ensemble should "
-            "be an instance of LucidSKEnsemble")
+            "The passed argument compressed_ensemble should "
+            "be an instance of CompressedEnsemble")
 
     f_map = _map_features_to_int(X_df.columns)
     X = X_df.values
@@ -59,16 +60,16 @@ def score_leaves(lucid_ensemble, X_df, y_true,
             raise ValueError(
                 "All elements of considered_paths should be of type LeafPath.")
         filtered_leaves = \
-            dict(((path, lucid_ensemble.compressed_ensemble[path])
+            dict(((path, compressed_ensemble[path])
                   for path in considered_paths))
     else:
-        filtered_leaves = lucid_ensemble.compressed_ensemble
+        filtered_leaves = compressed_ensemble
 
     if not isinstance(y_true, Iterable):
         raise ValueError("The passed y_true argument is not iterable.")
     if not isinstance(y_true, np.ndarray):
         y_true = np.array(y_true)
-    y_adjusted = y_true.ravel() - lucid_ensemble._init_estimator.predict(X_df).ravel()
+    y_adjusted = y_true.ravel() - compressed_ensemble._init_estimator.predict(X_df).ravel()
 
     scores = dict()
     for ind, leaf_pair in enumerate(filtered_leaves.items()):
@@ -93,7 +94,7 @@ def score_leaves(lucid_ensemble, X_df, y_true,
     return scores
 
 
-def score_leaf_group(leaf_group, lucid_ensemble,
+def score_leaf_group(leaf_group, compressed_ensemble,
                      X_df, y_true, score_function,
                      required_threshold=0, normalize_score=False):
     """ Score leaves based on some passed score_function.
@@ -101,13 +102,13 @@ def score_leaf_group(leaf_group, lucid_ensemble,
         where the leaf is activated.
 
         The y_true value will be adjusted by any init_estimator
-        that the lucid_ensemble has.
+        that the compressed_ensemble has.
 
     :param leaf_group (array-like type): a list of SKTreeNodLeafPaths
         The scoring will be done as a cumulative of the leaves in
         the leaf_group.
-    :param lucid_ensemble (LucidSKEnsemble): a compressed LucidSKEnsemble
-        object used to extract leaves and
+    :param compressed_ensemble (CompressedEnsemble): a CompressedEnsemble
+        object used to extract leaves
     :param X_df (pandas.DataFrame): the X matrix to score the leaves on
     :param y_true (array-like type): the y values which the X matrix will
         be tested against
@@ -119,16 +120,16 @@ def score_leaf_group(leaf_group, lucid_ensemble,
         the score by the # of activated indices for a certain leaf
     """
 
-    if not isinstance(lucid_ensemble, LucidSKEnsemble):
+    if not isinstance(compressed_ensemble, CompressedEnsemble):
         raise ValueError(
-            "The passed argument lucid_ensemble should "
-            "be an instance of LucidSKEnsemble")
+            "The passed argument compressed_ensemble should "
+            "be an instance of CompressedEnsemble")
 
     f_map = _map_features_to_int(X_df.columns)
     X = X_df.values
 
     filtered_leaves = \
-        dict(((path, lucid_ensemble.compressed_ensemble[path])
+        dict(((path, compressed_ensemble[path])
               for path in leaf_group))
 
     accm_value = 0
@@ -146,7 +147,7 @@ def score_leaf_group(leaf_group, lucid_ensemble,
         raise ValueError("The passed y_true argument is not iterable.")
     if not isinstance(y_true, np.ndarray):
         y_true = np.array(y_true)
-    y_adjusted = y_true.ravel() - lucid_ensemble._init_estimator.predict(X_df).ravel()
+    y_adjusted = y_true.ravel() - compressed_ensemble._init_estimator.predict(X_df).ravel()
 
     if n_activated < required_threshold:
         group_score = -np.inf
