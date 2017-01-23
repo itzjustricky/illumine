@@ -30,6 +30,8 @@ from .predict_methods import create_apply
 from .predict_methods import _map_features_to_int
 from .predict_methods import _find_activated
 
+from ..utils.array_check import flatten_1darray
+
 __all__ = ['LeafPath', 'SKTreeNode', 'LucidSKTree',
            'LucidSKEnsemble', 'CompressedEnsemble']
 
@@ -237,6 +239,52 @@ class LucidSKTree(LeafDictionary):
         )
 
 
+# Find the worst component of prediction; used in
+# LucidSKEnsemble and CompressedEnsemble for pruning
+def _find_worst(ensemble_model, y_true, y_pred,
+                pred_matrix, score_function):
+    """ Used to find the worst column in the pred_matrix
+
+    :param ensemble_model: should be a LucidSKEnsemble or
+        CompressedEnsemble object
+    :param y_true (np.ndarray): the values of the true target variables
+    :param y_pred (np.ndarray): the values of the outputted predicted
+        target variabels
+    :param pred_matrix (np.ndarray): a matrix of nxm of which each
+        column is a component of the prediction
+        (i.e. prediction for the jth datapoint is the sum of row j)
+    """
+    orig_score = ensemble_model.score(y_true, y_pred, score_function)
+
+    logging.getLogger(__name__).debug(
+        'The score before pruning is {}'.format(orig_score))
+
+    worst_ind, best_score = 0, -np.inf
+    for ind in range(pred_matrix.shape[1]):
+        y_pred_tmp = y_pred - pred_matrix[:, ind]
+
+        curr_score = ensemble_model.score(
+            y_true=y_true,
+            y_pred=y_pred_tmp,
+            score_function=score_function)
+
+        if curr_score > best_score:
+            logging.getLogger(__name__).debug(
+                'The score was updated to {} without column {}.'
+                .format(curr_score, ind))
+            worst_ind = ind
+            best_score = curr_score
+
+    logging.getLogger(__name__).debug(
+        'The best-score is {} from pruning'
+        .format(best_score, worst_ind))
+
+    if orig_score > best_score:
+        return -1
+    else:
+        return worst_ind
+
+
 class LucidSKEnsemble(LeafDictionary):
     """ Object representation of an ensemble of unraveled decision trees
         It is essentially a wrapper around a list where the ...
@@ -332,6 +380,7 @@ class LucidSKEnsemble(LeafDictionary):
         return activated_indices
 
     def score(self, y_true, y_pred, score_function=None):
+        y_true = flatten_1darray(y_true)
         if score_function is None:
             return -1.0 * self._loss(y_true, y_pred)
         else:
@@ -376,60 +425,14 @@ class LucidSKEnsemble(LeafDictionary):
             self._loss,
             **kwargs)
 
-    def _find_worst_estimator(self, X_df, y_true, score_function=None):
-        """ Find the best score that comes from excluding an estimator
-
-        :returns: the index of the estimator index that should be removed
-            a value of -1 will be returned if the best score by removing
-            an estimator is worst than the score achieved using all estimators
-        """
-        # prediction matrix is an nxm matrix
-        # where n is # of data-points and m is the # of estimators
-        # the ith column is the preditcions made by the mth estimator
-        pred_matrix = np.zeros((X_df.shape[0], self.n_estimators))
-        init_pred = self._init_estimator.predict(X_df).ravel()
-        logging.getLogger(__name__).debug(
-            'The pred_matrix has shape {}'.format(pred_matrix.shape))
-
-        for est_ind, lucid_tree in enumerate(self):
-            pred_matrix[:, est_ind] = lucid_tree.predict(X_df)
-        pred_matrix *= self.learning_rate
-        orig_score = self.score(
-            y_true, np.sum(pred_matrix, axis=1) + init_pred, score_function)
-        logging.getLogger(__name__).debug(
-            'The score before estimator pruning is {}'.format(pred_matrix.shape))
-
-        worst_ind, best_score = 0, -np.inf
-        for est_ind in range(self.n_estimators):
-            y_pred = \
-                np.sum(np.delete(pred_matrix, est_ind, axis=1), axis=1) + \
-                init_pred
-
-            curr_score = self.score(
-                y_true=y_true,
-                y_pred=y_pred,
-                score_function=score_function)
-            if curr_score > best_score:
-                worst_ind = est_ind
-                best_score = curr_score
-
-        logging.getLogger(__name__).debug(
-            'The best-score is {} from pruning an estimator'
-            .format(best_score, worst_ind))
-
-        if orig_score > best_score:
-            return -1
-        else:
-            return worst_ind
-
-    def prune_by_estimator(self, X_df, y_true,
-                           score_function=None, n_prunes=None):
+    def prune_by_estimators(self, X_df, y_true,
+                            score_function=None, n_prunes=None):
         """ Prune out estimators from the ensemble over data
             in X_df (feature variables) and y (target variable)
 
         :param X_df (pandas.DataFrame): the feature matrix over
             which predictions will be made
-        :param y (1d vector): the vector of target variables
+        :param y_true (1d vector): the vector of target variables
             used to evaluate the score
         :param score_function (function): the function that decides
             the scoring; by default, the negative loss function is used
@@ -440,15 +443,40 @@ class LucidSKEnsemble(LeafDictionary):
         """
         if n_prunes is None:
             n_prunes = self.n_estimators
+        y_true = flatten_1darray(y_true)
 
+        # pred_matrix is such that the sum of row j is
+        # the prediction for jth datapoint
+        pred_matrix = np.zeros((X_df.shape[0], self.n_estimators))
+        init_pred = self._init_estimator.predict(X_df).ravel()
+        logging.getLogger(__name__).debug(
+            'The pred_matrix has shape {}'.format(pred_matrix.shape))
+
+        for est_ind, lucid_tree in enumerate(self):
+            pred_matrix[:, est_ind] = lucid_tree.predict(X_df)
+        pred_matrix *= self.learning_rate
+        y_pred = np.sum(pred_matrix, axis=1).ravel() + init_pred
+
+        # prune phase
         for prune_ind in range(n_prunes):
-            worst_estimator = self._find_worst_estimator(X_df, y_true, score_function)
-            if worst_estimator == -1:  # if the best score < previous best score
+            worst_est_ind = _find_worst(
+                self, y_true, y_pred,
+                pred_matrix, score_function)
+            if worst_est_ind == -1:  # if no score improvement
                 break
-            self.pop(worst_estimator)
+            # updates to object state after finding worst estimator
+            logging.getLogger(__name__).debug(
+                'Deleting estimator {} in the {} prune'
+                .format(self[worst_est_ind], prune_ind))
+            self.pop(worst_est_ind)
+
+            # update to prediction value
+            y_pred = y_pred - pred_matrix[:, worst_est_ind]
+            pred_matrix = np.delete(pred_matrix, worst_est_ind, axis=1)
 
         logging.getLogger(__name__).info(
-            'Finished with {} prunes'.format(prune_ind))
+            'Finished with {} prunes with {} estimators left'
+            .format(prune_ind))
 
 
 class LeafDataStore(LeafDictionary):
@@ -556,6 +584,7 @@ class CompressedEnsemble(LeafDictionary):
         )
 
     def score(self, y_true, y_pred, score_function=None):
+        y_true = flatten_1darray(y_true)
         if score_function is None:
             return -1.0 * self._loss(y_true, y_pred)
         else:
@@ -587,7 +616,10 @@ class CompressedEnsemble(LeafDictionary):
             activated for datapoint i, leaf j.
         """
         if not isinstance(X_df, DataFrame):
-            raise ValueError("The passed X_df argument should be of type DataFrame.")
+            raise ValueError("Predictions must be done on a Pandas dataframe")
+        if not all(X_df.columns == self.feature_names):
+            raise ValueError("The passed pandas DataFrame columns should equal the "
+                             "contain the feature_names attribute of the LucidSKTree")
 
         f_map = _map_features_to_int(X_df.columns)
         X = X_df.values
@@ -615,55 +647,6 @@ class CompressedEnsemble(LeafDictionary):
 
         return activation_matrix.tocsr()
 
-    def _find_worst_leaf(self, X_df, y_true, score_function=None):
-        """ Find the best score that comes from excluding an estimator
-
-        :returns: the index of the estimator index that should be removed
-            a value of -1 will be returned if the best score by removing
-            an estimator is worst than the score achieved using all estimators
-        """
-        # prediction matrix is an nxm matrix
-        # where n is # of data-points and m is the # of unique leaves
-        # the ith column is the preditcions made by the mth estimator
-        pred_matrix = np.zeros((X_df.shape[0], self.n_leaves))
-        init_pred = self._init_estimator.predict(X_df).ravel()
-        logging.getLogger(__name__).debug(
-            'The pred_matrix has shape {}'.format(pred_matrix.shape))
-
-        activation_matrix = self.compute_activation(
-            X_df, considered_paths=None)
-
-        for ind, leaf_value in enumerate(self.values()):
-            pred_matrix[:, ind] = activation_matrix[:, ind].toarray().ravel() * leaf_value
-
-        orig_score = self.score(
-            y_true, np.sum(pred_matrix, axis=1) + init_pred, score_function)
-        logging.getLogger(__name__).debug(
-            'The score before estimator pruning is {}'.format(pred_matrix.shape))
-
-        worst_leaf, best_score = 0, -np.inf
-        for leaf_ind, leaf in enumerate(self.leaves):
-            y_pred = \
-                np.sum(np.delete(pred_matrix, leaf_ind, axis=1), axis=1) + \
-                init_pred
-
-            curr_score = self.score(
-                y_true=y_true,
-                y_pred=y_pred,
-                score_function=score_function)
-            if curr_score > best_score:
-                worst_leaf = leaf
-                best_score = curr_score
-
-        logging.getLogger(__name__).debug(
-            'The best-score is {} from pruning leaf {}'
-            .format(best_score, worst_leaf))
-
-        if orig_score > best_score:
-            return None
-        else:
-            return worst_leaf
-
     def prune_by_leaves(self, X_df, y_true,
                         score_function=None, n_prunes=None):
         """ Prune out estimators from the ensemble over data
@@ -682,13 +665,42 @@ class CompressedEnsemble(LeafDictionary):
         """
         if n_prunes is None:
             n_prunes = self.n_leaves
+        y_true = flatten_1darray(y_true)  # check y_true is flat
 
+        # pred_matrix is such that the sum of row j is
+        # the prediction for jth datapoint
+        pred_matrix = np.zeros((X_df.shape[0], self.n_leaves))
+        init_pred = self._init_estimator.predict(X_df).ravel()
+        logging.getLogger(__name__).debug(
+            'The pred_matrix has shape {}'.format(pred_matrix.shape))
+
+        f_map = _map_features_to_int(X_df.columns)
+        X = X_df.values
+
+        leaves = list(self.leaves)
+        for ind, path in enumerate(leaves):
+            activated_indices = _find_activated(X, f_map, path)
+            pred_matrix[:, ind] = activated_indices * self[path]
+
+        y_pred = np.sum(pred_matrix, axis=1).ravel() + init_pred
+        # prune phase
         for prune_ind in range(n_prunes):
-            worst_leaf = self._find_worst_leaf(X_df, y_true, score_function)
-            if worst_leaf is None:  # if the best score < previous best score
+            worst_leaf_ind = _find_worst(
+                self, y_true, y_pred,
+                pred_matrix, score_function)
+            if worst_leaf_ind == -1:  # if no score improvement
                 break
-            self.pop(worst_leaf)
+            # updates to object state after finding worst leaf
+            worst_leaf = leaves[worst_leaf_ind]
+            logging.getLogger(__name__).debug(
+                'Deleting leaf {} in the {} prune'.format(worst_leaf, prune_ind))
+            self.pop(leaves[worst_leaf_ind])
+            leaves.pop(worst_leaf_ind)
 
-        logging.getLogger(__name__).info(
-            'Finished with {} prunes with {} left'
+            # update to prediction value
+            y_pred = y_pred - pred_matrix[:, worst_leaf_ind]
+            pred_matrix = np.delete(pred_matrix, worst_leaf_ind, axis=1)
+
+        logging.getLogger(__name__).debug(
+            'Finished with {} prunes with {} leaves left'
             .format(prune_ind, self.n_leaves))
