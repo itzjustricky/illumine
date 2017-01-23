@@ -30,6 +30,8 @@ from .predict_methods import create_apply
 from .predict_methods import _map_features_to_int
 from .predict_methods import _find_activated
 
+from .find_prune_candidate import find_prune_candidates
+
 from ..utils.array_check import flatten_1darray
 
 __all__ = ['LeafPath', 'SKTreeNode', 'LucidSKTree',
@@ -242,7 +244,7 @@ class LucidSKTree(LeafDictionary):
 # Find the worst component of prediction; used in
 # LucidSKEnsemble and CompressedEnsemble for pruning
 def _find_worst(ensemble_model, y_true, y_pred,
-                pred_matrix, score_function, n_prunes):
+                pred_matrix, metric_function, n_prunes):
     """ Used to find the worst column in the pred_matrix
 
     :param ensemble_model: should be a LucidSKEnsemble or
@@ -255,7 +257,7 @@ def _find_worst(ensemble_model, y_true, y_pred,
         (i.e. prediction for the jth datapoint is the sum of row j)
     """
     prune_candidates = []
-    global_best_score = ensemble_model.score(y_true, y_pred, score_function)
+    global_best_score = ensemble_model.score(y_true, y_pred, metric_function)
 
     for prune_ind in range(n_prunes):
 
@@ -269,7 +271,7 @@ def _find_worst(ensemble_model, y_true, y_pred,
             curr_score = ensemble_model.score(
                 y_true=y_true,
                 y_pred=y_pred_tmp,
-                score_function=score_function)
+                metric_function=metric_function)
 
             if curr_score > local_best_score:
                 worst_ind = ind
@@ -296,7 +298,7 @@ class LucidSKEnsemble(LeafDictionary):
         This class is NOT meant to be INHERITED from.
     """
 
-    def __init__(self, tree_ensemble, feature_names, init_estimator, loss_function,
+    def __init__(self, tree_ensemble, feature_names, init_estimator,
                  learning_rate, print_limit=5):
         """ Construct the LucidSKTree object using a dictionary object indexed
             by the leaf's index in the pre-order traversal of the decision tree.
@@ -321,7 +323,6 @@ class LucidSKEnsemble(LeafDictionary):
         self._learning_rate = learning_rate
         self._unique_leaves_count = None
         self._leaves_count = None
-        self._loss = deepcopy(loss_function)
 
         if not hasattr(init_estimator, 'predict'):
             raise ValueError(
@@ -359,7 +360,6 @@ class LucidSKEnsemble(LeafDictionary):
             self._seq,
             self.feature_names,
             self._init_estimator,
-            self._loss,
             self._learning_rate,
             self._print_limit)
         )
@@ -376,13 +376,6 @@ class LucidSKEnsemble(LeafDictionary):
             activated_indices[:, ind] = lucid_tree.apply(X_df)
 
         return activated_indices
-
-    def score(self, y_true, y_pred, score_function=None):
-        y_true = flatten_1darray(y_true)
-        if score_function is None:
-            return -1.0 * self._loss(y_true, y_pred)
-        else:
-            return score_function(y_true, y_pred)
 
     def predict(self, X_df):
         """ Create predictions from a pandas DataFrame.
@@ -420,10 +413,9 @@ class LucidSKEnsemble(LeafDictionary):
             unique_leaves,
             self.feature_names,
             self._init_estimator,
-            self._loss,
             **kwargs)
 
-    def prune_by_estimators(self, X_df, y_true, score_function=None, n_prunes=None):
+    def prune_by_estimators(self, X_df, y_true, metric_function='rsquared', n_prunes=None):
         """ Prune out estimators from the ensemble over data
             in X_df (feature variables) and y (target variable)
 
@@ -431,8 +423,8 @@ class LucidSKEnsemble(LeafDictionary):
             which predictions will be made
         :param y_true (1d vector): the vector of target variables
             used to evaluate the score
-        :param score_function (function): the function that decides
-            the scoring; by default, the negative loss function is used
+        :param metric_function (str): the function that decides
+            the scoring; by default, the Rsquared is used
         :param n_prunes: decides the # of prunes to do over the
             estimators. Defaults to None, if None then it will
             prune until score of the ensemble does not degrade
@@ -458,9 +450,12 @@ class LucidSKEnsemble(LeafDictionary):
         pred_matrix *= self.learning_rate
         y_pred = np.sum(pred_matrix, axis=1).ravel() + init_pred
 
-        inds_to_prune = _find_worst(
-            self, y_true, y_pred,
-            pred_matrix, score_function, n_prunes)
+        # inds_to_prune = _find_worst(
+        #     y_true, y_pred,
+        #     pred_matrix, metric_function, n_prunes)
+        inds_to_prune = find_prune_candidates(
+            y_true, y_pred,
+            pred_matrix, metric_function, n_prunes)
 
         # go backwards so indexes are not modified
         for ind in sorted(inds_to_prune, reverse=True):
@@ -532,8 +527,8 @@ class CompressedEnsemble(LeafDictionary):
         LucidSKEnsemble.compress() method
     """
 
-    def __init__(self, tree_leaves, feature_names, init_estimator,
-                 loss_function, print_limit=30):
+    def __init__(self, tree_leaves, feature_names,
+                 init_estimator, print_limit=30):
         """ Construct the LucidSKTree object using a dictionary object indexed
             by the leaf's index in the pre-order traversal of the decision tree.
 
@@ -551,7 +546,6 @@ class CompressedEnsemble(LeafDictionary):
                 "feature names that the tree was trained on")
         self._feature_names = feature_names
         self._init_estimator = deepcopy(init_estimator)
-        self._loss = loss_function
 
         super(CompressedEnsemble, self).__init__(
             tree_leaves, print_limit)
@@ -576,16 +570,8 @@ class CompressedEnsemble(LeafDictionary):
             self._seq,
             self.feature_names,
             self._init_estimator,
-            self._loss,
             self._print_limit)
         )
-
-    def score(self, y_true, y_pred, score_function=None):
-        y_true = flatten_1darray(y_true)
-        if score_function is None:
-            return -1.0 * self._loss(y_true, y_pred)
-        else:
-            return score_function(y_true, y_pred)
 
     def predict(self, X_df):
         """ Create predictions from a pandas DataFrame.
@@ -644,8 +630,7 @@ class CompressedEnsemble(LeafDictionary):
 
         return activation_matrix.tocsr()
 
-    def prune_by_leaves(self, X_df, y_true,
-                        score_function=None, n_prunes=None):
+    def prune_by_leaves(self, X_df, y_true, metric_function='rsquared', n_prunes=None):
         """ Prune out estimators from the ensemble over data
             in X_df (feature variables) and y (target variable)
 
@@ -653,8 +638,8 @@ class CompressedEnsemble(LeafDictionary):
             which predictions will be made
         :param y (1d vector): the vector of target variables
             used to evaluate the score
-        :param score_function (function): the function that decides
-            the scoring; by default, the negative loss function is used
+        :param metric_function (str): the function that decides
+            the scoring; by default, the Rsquared is used
         :param n_prunes: decides the # of prunes to do over the
             estimators. Defaults to None, if None then it will
             prune until score of the ensemble does not degrade
@@ -685,9 +670,12 @@ class CompressedEnsemble(LeafDictionary):
         y_pred = np.sum(pred_matrix, axis=1).ravel() + init_pred
 
         # get which leaves to prune
-        inds_to_prune = _find_worst(
-            self, y_true, y_pred, pred_matrix,
-            score_function, n_prunes)
+        # inds_to_prune = _find_worst(
+        #     y_true, y_pred, pred_matrix,
+        #     metric_function, n_prunes)
+        inds_to_prune = find_prune_candidates(
+            y_true, y_pred, pred_matrix,
+            metric_function, n_prunes)
 
         for ind in sorted(inds_to_prune, reverse=True):
             worst_leaf = leaves[ind]

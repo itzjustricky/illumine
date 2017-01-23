@@ -27,7 +27,6 @@ from collections import Iterable
 
 import numpy as np
 from sklearn.dummy import DummyRegressor
-from sklearn.metrics import mean_squared_error
 
 from .leaf_objects import SKTreeNode
 from .leaf_objects import LucidSKTree
@@ -170,11 +169,6 @@ def make_LucidSKEnsemble(sk_ensemble, feature_names, print_precision=10,
             "function with function signature predict(self, X) "
             "where X is the feature matrix.")
 
-    try:  # retrieve loss function if there is one
-        loss_function = sk_ensemble.loss_
-    except AttributeError:  # if None default to mean_squared_error
-        loss_function = mean_squared_error
-
     try:
         learning_rate = sk_ensemble.learning_rate
     except AttributeError:
@@ -183,6 +177,5 @@ def make_LucidSKEnsemble(sk_ensemble, feature_names, print_precision=10,
     return LucidSKEnsemble(
         ensemble_of_leaves, feature_names,
         init_estimator=init_estimator,
-        loss_function=loss_function,
         learning_rate=learning_rate,
         **ensemble_kw)

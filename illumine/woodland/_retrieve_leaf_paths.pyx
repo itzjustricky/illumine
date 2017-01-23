@@ -5,6 +5,8 @@
 """
 
 cimport cython
+
+import numpy as np
 cimport numpy as np
 
 
@@ -129,6 +131,7 @@ cdef retrieve_leaf_path(np.ndarray[double, ndim=3] values,
         node_samples - # of samples that enter the leaf node from
             the training data
     """
+    cdef int n_splits
     n_splits = len(features)
 
     if n_splits == 0:
