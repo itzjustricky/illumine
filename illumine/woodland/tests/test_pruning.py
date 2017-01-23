@@ -12,7 +12,7 @@ import pandas as pd
 
 from sklearn.ensemble import GradientBoostingRegressor
 
-# from illumine.utils import StopWatch
+from illumine.utils import StopWatch
 from illumine.woodland import make_LucidSKEnsemble
 
 
@@ -33,10 +33,10 @@ def test_pruning():
         regr, feature_names=X_df.columns, print_precision=3)
     compressed_ensemble = lucid_ensemble.compress()
 
-    # prune by estimator
-    lucid_ensemble.prune_by_estimator(X_df, y)
-    # prune by leaf
-    compressed_ensemble.prune_by_leaves(X_df, y)
+    with StopWatch('Prune by estimator'):
+        lucid_ensemble.prune_by_estimators(X_df, y)
+    with StopWatch('Prune by leaf'):
+        compressed_ensemble.prune_by_leaves(X_df, y)
 
     ypred = regr.predict(X_df)
     ypred_after_eprune = lucid_ensemble.predict(X_df)
@@ -47,6 +47,7 @@ def test_pruning():
     assert(compressed_ensemble._loss(y, ypred_after_lprune) <= lucid_ensemble._loss(y, ypred))
 
 
+"""
 if __name__ == "__main__":
     test_pruning()
 """
@@ -59,4 +60,3 @@ if __name__ == "__main__":
         type, value, tb = sys.exc_info()
         traceback.print_exc()
         bpdb.post_mortem(tb)
-"""
