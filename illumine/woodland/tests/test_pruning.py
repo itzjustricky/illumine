@@ -33,10 +33,15 @@ def test_pruning():
         regr, feature_names=X_df.columns, print_precision=3)
     compressed_ensemble = lucid_ensemble.compress()
 
+    print("There are {} estimators in the ensemble".format(len(lucid_ensemble)))
     with StopWatch('Prune by estimator'):
         lucid_ensemble.prune_by_estimators(X_df, y, metric_function='mse')
+    print("There are {} estimators left after pruning".format(len(lucid_ensemble)))
+
+    print("There are {} leaves in the ensemble".format(len(compressed_ensemble)))
     with StopWatch('Prune by leaf'):
         compressed_ensemble.prune_by_leaves(X_df, y, metric_function='mse')
+    print("There are {} leaves left after pruning".format(len(compressed_ensemble)))
 
     ypred = regr.predict(X_df)
     ypred_after_eprune = lucid_ensemble.predict(X_df)

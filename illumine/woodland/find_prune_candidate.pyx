@@ -4,11 +4,10 @@
 
 """
 
+import logging
+
 cimport cython
 cimport numpy as np
-
-# import logging
-
 from numpy.math cimport INFINITY
 
 from ..core cimport metrics
@@ -54,7 +53,7 @@ def find_prune_candidates(np.ndarray[double, ndim=1] y_true,
         score_function = metrics.sign_match
     else:
         raise ValueError(
-            "An invalid metric_name was specified must be one of the following {}"
+            "Invalid metric_name was passed, metric_name must be in {}"
             .format(valid_functions))
 
     return _find_prune_candidates(
@@ -85,20 +84,28 @@ cdef _find_prune_candidates(np.ndarray[double, ndim=1] y_true,
             if ind in prune_candidates:
                 continue
 
-            y_pred_tmp = y_pred - \
-                pred_matrix[:, prune_candidates + [ind]].sum(axis=1)
-
+            y_pred_tmp = y_pred - pred_matrix[:, ind]
             curr_score = score_function(
                 y_true=y_true,
                 y_pred=y_pred_tmp)
 
             if curr_score > local_best_score:
+                logging.getLogger(__name__).debug(
+                    "For prune {} the best score was updated to {}"
+                    .format(prune_ind, curr_score))
                 worst_ind = ind
                 local_best_score = curr_score
 
         if global_best_score > local_best_score:
             return prune_candidates
         else:
+            logging.getLogger(__name__).debug(
+                "There are now {} prune candidate(s)"
+                .format(len(prune_candidates)))
+            # update y_pred to save computation
+            y_pred = y_pred - pred_matrix[:, worst_ind]
+
             global_best_score = local_best_score
             prune_candidates.append(worst_ind)
+
     return prune_candidates

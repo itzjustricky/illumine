@@ -408,6 +408,8 @@ class LucidSKEnsemble(LeafDictionary):
 
         inds_to_prune = find_prune_candidates(
             y_true, y_pred, pred_matrix, metric_function, n_prunes)
+        logging.getLogger(__name__).debug(
+            "{} prune candidates were found".format(len(inds_to_prune)))
 
         # go backwards so indexes are not modified
         for ind in sorted(inds_to_prune, reverse=True):

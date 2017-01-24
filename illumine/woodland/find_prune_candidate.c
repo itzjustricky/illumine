@@ -954,7 +954,7 @@ typedef npy_clongdouble __pyx_t_5numpy_clongdouble_t;
  */
 typedef npy_cdouble __pyx_t_5numpy_complex_t;
 
-/* "illumine/woodland/find_prune_candidate.pyx":18
+/* "illumine/woodland/find_prune_candidate.pyx":17
  * 
  * # define a function type
  * ctypedef double (*metric_f)(np.ndarray[double, ndim=1] y_true,             # <<<<<<<<<<<<<<
@@ -1159,6 +1159,9 @@ static CYTHON_INLINE int __Pyx_TypeTest(PyObject *obj, PyTypeObject *type);
 /* BufferFallbackError.proto */
 static void __Pyx_RaiseBufferFallbackError(void);
 
+/* GetModuleGlobalName.proto */
+static CYTHON_INLINE PyObject *__Pyx_GetModuleGlobalName(PyObject *name);
+
 /* ListAppend.proto */
 #if CYTHON_USE_PYLIST_INTERNALS && CYTHON_ASSUME_SAFE_MACROS
 static CYTHON_INLINE int __Pyx_PyList_Append(PyObject* list, PyObject* x) {
@@ -1232,6 +1235,9 @@ static int __Pyx__GetException(PyThreadState *tstate, PyObject **type, PyObject 
 #else
 static int __Pyx_GetException(PyObject **type, PyObject **value, PyObject **tb);
 #endif
+
+/* Import.proto */
+static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level);
 
 /* CodeObjectCache.proto */
 typedef struct {
@@ -1478,17 +1484,20 @@ static PyObject *__pyx_builtin_RuntimeError;
 static PyObject *__pyx_builtin_ImportError;
 static const char __pyx_k_lad[] = "lad";
 static const char __pyx_k_mse[] = "mse";
-static const char __pyx_k_sum[] = "sum";
-static const char __pyx_k_axis[] = "axis";
 static const char __pyx_k_main[] = "__main__";
+static const char __pyx_k_name[] = "__name__";
 static const char __pyx_k_test[] = "__test__";
+static const char __pyx_k_debug[] = "debug";
 static const char __pyx_k_range[] = "range";
 static const char __pyx_k_format[] = "format";
+static const char __pyx_k_import[] = "__import__";
 static const char __pyx_k_xrange[] = "xrange";
 static const char __pyx_k_y_pred[] = "y_pred";
 static const char __pyx_k_y_true[] = "y_true";
+static const char __pyx_k_logging[] = "logging";
 static const char __pyx_k_n_prunes[] = "n_prunes";
 static const char __pyx_k_rsquared[] = "rsquared";
+static const char __pyx_k_getLogger[] = "getLogger";
 static const char __pyx_k_ValueError[] = "ValueError";
 static const char __pyx_k_sign_match[] = "sign-match";
 static const char __pyx_k_ImportError[] = "ImportError";
@@ -1500,33 +1509,41 @@ static const char __pyx_k_valid_functions[] = "valid_functions";
 static const char __pyx_k_find_prune_candidates[] = "find_prune_candidates";
 static const char __pyx_k_ndarray_is_not_C_contiguous[] = "ndarray is not C contiguous";
 static const char __pyx_k_Cython_module_for_the_retrieve[] = "\n    Cython module for the retrieve_leaf_path\n    function used to build lucid-tree objects\n\n";
+static const char __pyx_k_There_are_now_prune_candidate_s[] = "There are now {} prune candidate(s)";
 static const char __pyx_k_home_itzjustricky_workspace_git[] = "/home/itzjustricky/workspace/gitdev/illumine/illumine/woodland/find_prune_candidate.pyx";
 static const char __pyx_k_numpy_core_multiarray_failed_to[] = "numpy.core.multiarray failed to import";
 static const char __pyx_k_unknown_dtype_code_in_numpy_pxd[] = "unknown dtype code in numpy.pxd (%d)";
-static const char __pyx_k_An_invalid_metric_name_was_speci[] = "An invalid metric_name was specified must be one of the following {}";
+static const char __pyx_k_For_prune_the_best_score_was_upd[] = "For prune {} the best score was updated to {}";
 static const char __pyx_k_Format_string_allocated_too_shor[] = "Format string allocated too short, see comment in numpy.pxd";
+static const char __pyx_k_Invalid_metric_name_was_passed_m[] = "Invalid metric_name was passed, metric_name must be in {}";
 static const char __pyx_k_Non_native_byte_order_not_suppor[] = "Non-native byte order not supported";
 static const char __pyx_k_illumine_woodland_find_prune_can[] = "illumine.woodland.find_prune_candidate";
 static const char __pyx_k_ndarray_is_not_Fortran_contiguou[] = "ndarray is not Fortran contiguous";
 static const char __pyx_k_numpy_core_umath_failed_to_impor[] = "numpy.core.umath failed to import";
 static const char __pyx_k_Format_string_allocated_too_shor_2[] = "Format string allocated too short.";
-static PyObject *__pyx_kp_s_An_invalid_metric_name_was_speci;
+static PyObject *__pyx_kp_s_For_prune_the_best_score_was_upd;
 static PyObject *__pyx_kp_u_Format_string_allocated_too_shor;
 static PyObject *__pyx_kp_u_Format_string_allocated_too_shor_2;
 static PyObject *__pyx_n_s_ImportError;
+static PyObject *__pyx_kp_s_Invalid_metric_name_was_passed_m;
 static PyObject *__pyx_kp_u_Non_native_byte_order_not_suppor;
 static PyObject *__pyx_n_s_RuntimeError;
+static PyObject *__pyx_kp_s_There_are_now_prune_candidate_s;
 static PyObject *__pyx_n_s_ValueError;
-static PyObject *__pyx_n_s_axis;
+static PyObject *__pyx_n_s_debug;
 static PyObject *__pyx_n_s_find_prune_candidates;
 static PyObject *__pyx_n_s_format;
+static PyObject *__pyx_n_s_getLogger;
 static PyObject *__pyx_kp_s_home_itzjustricky_workspace_git;
 static PyObject *__pyx_n_s_illumine_woodland_find_prune_can;
+static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_lad;
+static PyObject *__pyx_n_s_logging;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_metric_name;
 static PyObject *__pyx_n_s_mse;
 static PyObject *__pyx_n_s_n_prunes;
+static PyObject *__pyx_n_s_name;
 static PyObject *__pyx_kp_u_ndarray_is_not_C_contiguous;
 static PyObject *__pyx_kp_u_ndarray_is_not_Fortran_contiguou;
 static PyObject *__pyx_kp_s_numpy_core_multiarray_failed_to;
@@ -1536,7 +1553,6 @@ static PyObject *__pyx_n_s_range;
 static PyObject *__pyx_n_s_rsquared;
 static PyObject *__pyx_n_s_score_function;
 static PyObject *__pyx_kp_s_sign_match;
-static PyObject *__pyx_n_s_sum;
 static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_kp_u_unknown_dtype_code_in_numpy_pxd;
 static PyObject *__pyx_n_s_valid_functions;
@@ -1546,9 +1562,8 @@ static PyObject *__pyx_n_s_y_true;
 static PyObject *__pyx_pf_8illumine_8woodland_20find_prune_candidate_find_prune_candidates(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_y_true, PyArrayObject *__pyx_v_y_pred, PyArrayObject *__pyx_v_pred_matrix, PyObject *__pyx_v_metric_name, int __pyx_v_n_prunes); /* proto */
 static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info); /* proto */
-static PyObject *__pyx_int_1;
 static PyObject *__pyx_slice_;
-static PyObject *__pyx_tuple__2;
+static PyObject *__pyx_slice__2;
 static PyObject *__pyx_tuple__3;
 static PyObject *__pyx_tuple__4;
 static PyObject *__pyx_tuple__5;
@@ -1558,9 +1573,10 @@ static PyObject *__pyx_tuple__8;
 static PyObject *__pyx_tuple__9;
 static PyObject *__pyx_tuple__10;
 static PyObject *__pyx_tuple__11;
-static PyObject *__pyx_codeobj__12;
+static PyObject *__pyx_tuple__12;
+static PyObject *__pyx_codeobj__13;
 
-/* "illumine/woodland/find_prune_candidate.pyx":22
+/* "illumine/woodland/find_prune_candidate.pyx":21
  * 
  * 
  * def find_prune_candidates(np.ndarray[double, ndim=1] y_true,             # <<<<<<<<<<<<<<
@@ -1604,26 +1620,26 @@ static PyObject *__pyx_pw_8illumine_8woodland_20find_prune_candidate_1find_prune
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_y_pred)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("find_prune_candidates", 1, 5, 5, 1); __PYX_ERR(0, 22, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("find_prune_candidates", 1, 5, 5, 1); __PYX_ERR(0, 21, __pyx_L3_error)
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_pred_matrix)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("find_prune_candidates", 1, 5, 5, 2); __PYX_ERR(0, 22, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("find_prune_candidates", 1, 5, 5, 2); __PYX_ERR(0, 21, __pyx_L3_error)
         }
         case  3:
         if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_metric_name)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("find_prune_candidates", 1, 5, 5, 3); __PYX_ERR(0, 22, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("find_prune_candidates", 1, 5, 5, 3); __PYX_ERR(0, 21, __pyx_L3_error)
         }
         case  4:
         if (likely((values[4] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_n_prunes)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("find_prune_candidates", 1, 5, 5, 4); __PYX_ERR(0, 22, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("find_prune_candidates", 1, 5, 5, 4); __PYX_ERR(0, 21, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "find_prune_candidates") < 0)) __PYX_ERR(0, 22, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "find_prune_candidates") < 0)) __PYX_ERR(0, 21, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
       goto __pyx_L5_argtuple_error;
@@ -1638,20 +1654,20 @@ static PyObject *__pyx_pw_8illumine_8woodland_20find_prune_candidate_1find_prune
     __pyx_v_y_pred = ((PyArrayObject *)values[1]);
     __pyx_v_pred_matrix = ((PyArrayObject *)values[2]);
     __pyx_v_metric_name = ((PyObject*)values[3]);
-    __pyx_v_n_prunes = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_n_prunes == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 26, __pyx_L3_error)
+    __pyx_v_n_prunes = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_n_prunes == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 25, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("find_prune_candidates", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 22, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("find_prune_candidates", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 21, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("illumine.woodland.find_prune_candidate.find_prune_candidates", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_y_true), __pyx_ptype_5numpy_ndarray, 1, "y_true", 0))) __PYX_ERR(0, 22, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_y_pred), __pyx_ptype_5numpy_ndarray, 1, "y_pred", 0))) __PYX_ERR(0, 23, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_pred_matrix), __pyx_ptype_5numpy_ndarray, 1, "pred_matrix", 0))) __PYX_ERR(0, 24, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_metric_name), (&PyString_Type), 1, "metric_name", 1))) __PYX_ERR(0, 25, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_y_true), __pyx_ptype_5numpy_ndarray, 1, "y_true", 0))) __PYX_ERR(0, 21, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_y_pred), __pyx_ptype_5numpy_ndarray, 1, "y_pred", 0))) __PYX_ERR(0, 22, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_pred_matrix), __pyx_ptype_5numpy_ndarray, 1, "pred_matrix", 0))) __PYX_ERR(0, 23, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_metric_name), (&PyString_Type), 1, "metric_name", 1))) __PYX_ERR(0, 24, __pyx_L1_error)
   __pyx_r = __pyx_pf_8illumine_8woodland_20find_prune_candidate_find_prune_candidates(__pyx_self, __pyx_v_y_true, __pyx_v_y_pred, __pyx_v_pred_matrix, __pyx_v_metric_name, __pyx_v_n_prunes);
 
   /* function exit code */
@@ -1695,28 +1711,28 @@ static PyObject *__pyx_pf_8illumine_8woodland_20find_prune_candidate_find_prune_
   __pyx_pybuffernd_pred_matrix.rcbuffer = &__pyx_pybuffer_pred_matrix;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y_true.rcbuffer->pybuffer, (PyObject*)__pyx_v_y_true, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 22, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y_true.rcbuffer->pybuffer, (PyObject*)__pyx_v_y_true, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 21, __pyx_L1_error)
   }
   __pyx_pybuffernd_y_true.diminfo[0].strides = __pyx_pybuffernd_y_true.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_y_true.diminfo[0].shape = __pyx_pybuffernd_y_true.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y_pred.rcbuffer->pybuffer, (PyObject*)__pyx_v_y_pred, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 22, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y_pred.rcbuffer->pybuffer, (PyObject*)__pyx_v_y_pred, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 21, __pyx_L1_error)
   }
   __pyx_pybuffernd_y_pred.diminfo[0].strides = __pyx_pybuffernd_y_pred.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_y_pred.diminfo[0].shape = __pyx_pybuffernd_y_pred.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_pred_matrix.rcbuffer->pybuffer, (PyObject*)__pyx_v_pred_matrix, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 22, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_pred_matrix.rcbuffer->pybuffer, (PyObject*)__pyx_v_pred_matrix, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 21, __pyx_L1_error)
   }
   __pyx_pybuffernd_pred_matrix.diminfo[0].strides = __pyx_pybuffernd_pred_matrix.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_pred_matrix.diminfo[0].shape = __pyx_pybuffernd_pred_matrix.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_pred_matrix.diminfo[1].strides = __pyx_pybuffernd_pred_matrix.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_pred_matrix.diminfo[1].shape = __pyx_pybuffernd_pred_matrix.rcbuffer->pybuffer.shape[1];
 
-  /* "illumine/woodland/find_prune_candidate.pyx":43
+  /* "illumine/woodland/find_prune_candidate.pyx":42
  *     cdef metric_f score_function
  * 
  *     cdef list valid_functions = [             # <<<<<<<<<<<<<<
  *         'mse', 'lad', 'rsquared', 'sign-match'
  *     ]
  */
-  __pyx_t_1 = PyList_New(4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 43, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_n_s_mse);
   __Pyx_GIVEREF(__pyx_n_s_mse);
@@ -1733,18 +1749,18 @@ static PyObject *__pyx_pf_8illumine_8woodland_20find_prune_candidate_find_prune_
   __pyx_v_valid_functions = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "illumine/woodland/find_prune_candidate.pyx":47
+  /* "illumine/woodland/find_prune_candidate.pyx":46
  *     ]
  * 
  *     if metric_name == 'mse':             # <<<<<<<<<<<<<<
  *         score_function = metrics.negative_mse
  *     elif metric_name == 'lad':
  */
-  __pyx_t_2 = (__Pyx_PyString_Equals(__pyx_v_metric_name, __pyx_n_s_mse, Py_EQ)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 47, __pyx_L1_error)
+  __pyx_t_2 = (__Pyx_PyString_Equals(__pyx_v_metric_name, __pyx_n_s_mse, Py_EQ)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 46, __pyx_L1_error)
   __pyx_t_3 = (__pyx_t_2 != 0);
   if (__pyx_t_3) {
 
-    /* "illumine/woodland/find_prune_candidate.pyx":48
+    /* "illumine/woodland/find_prune_candidate.pyx":47
  * 
  *     if metric_name == 'mse':
  *         score_function = metrics.negative_mse             # <<<<<<<<<<<<<<
@@ -1753,7 +1769,7 @@ static PyObject *__pyx_pf_8illumine_8woodland_20find_prune_candidate_find_prune_
  */
     __pyx_v_score_function = __pyx_f_8illumine_4core_7metrics_negative_mse;
 
-    /* "illumine/woodland/find_prune_candidate.pyx":47
+    /* "illumine/woodland/find_prune_candidate.pyx":46
  *     ]
  * 
  *     if metric_name == 'mse':             # <<<<<<<<<<<<<<
@@ -1763,18 +1779,18 @@ static PyObject *__pyx_pf_8illumine_8woodland_20find_prune_candidate_find_prune_
     goto __pyx_L3;
   }
 
-  /* "illumine/woodland/find_prune_candidate.pyx":49
+  /* "illumine/woodland/find_prune_candidate.pyx":48
  *     if metric_name == 'mse':
  *         score_function = metrics.negative_mse
  *     elif metric_name == 'lad':             # <<<<<<<<<<<<<<
  *         score_function = metrics.negative_lad
  *     elif metric_name == 'rsquared':
  */
-  __pyx_t_3 = (__Pyx_PyString_Equals(__pyx_v_metric_name, __pyx_n_s_lad, Py_EQ)); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __pyx_t_3 = (__Pyx_PyString_Equals(__pyx_v_metric_name, __pyx_n_s_lad, Py_EQ)); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 48, __pyx_L1_error)
   __pyx_t_2 = (__pyx_t_3 != 0);
   if (__pyx_t_2) {
 
-    /* "illumine/woodland/find_prune_candidate.pyx":50
+    /* "illumine/woodland/find_prune_candidate.pyx":49
  *         score_function = metrics.negative_mse
  *     elif metric_name == 'lad':
  *         score_function = metrics.negative_lad             # <<<<<<<<<<<<<<
@@ -1783,7 +1799,7 @@ static PyObject *__pyx_pf_8illumine_8woodland_20find_prune_candidate_find_prune_
  */
     __pyx_v_score_function = __pyx_f_8illumine_4core_7metrics_negative_lad;
 
-    /* "illumine/woodland/find_prune_candidate.pyx":49
+    /* "illumine/woodland/find_prune_candidate.pyx":48
  *     if metric_name == 'mse':
  *         score_function = metrics.negative_mse
  *     elif metric_name == 'lad':             # <<<<<<<<<<<<<<
@@ -1793,18 +1809,18 @@ static PyObject *__pyx_pf_8illumine_8woodland_20find_prune_candidate_find_prune_
     goto __pyx_L3;
   }
 
-  /* "illumine/woodland/find_prune_candidate.pyx":51
+  /* "illumine/woodland/find_prune_candidate.pyx":50
  *     elif metric_name == 'lad':
  *         score_function = metrics.negative_lad
  *     elif metric_name == 'rsquared':             # <<<<<<<<<<<<<<
  *         score_function = metrics.rsquared
  *     elif metric_name == 'sign-match':
  */
-  __pyx_t_2 = (__Pyx_PyString_Equals(__pyx_v_metric_name, __pyx_n_s_rsquared, Py_EQ)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 51, __pyx_L1_error)
+  __pyx_t_2 = (__Pyx_PyString_Equals(__pyx_v_metric_name, __pyx_n_s_rsquared, Py_EQ)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 50, __pyx_L1_error)
   __pyx_t_3 = (__pyx_t_2 != 0);
   if (__pyx_t_3) {
 
-    /* "illumine/woodland/find_prune_candidate.pyx":52
+    /* "illumine/woodland/find_prune_candidate.pyx":51
  *         score_function = metrics.negative_lad
  *     elif metric_name == 'rsquared':
  *         score_function = metrics.rsquared             # <<<<<<<<<<<<<<
@@ -1813,7 +1829,7 @@ static PyObject *__pyx_pf_8illumine_8woodland_20find_prune_candidate_find_prune_
  */
     __pyx_v_score_function = __pyx_f_8illumine_4core_7metrics_rsquared;
 
-    /* "illumine/woodland/find_prune_candidate.pyx":51
+    /* "illumine/woodland/find_prune_candidate.pyx":50
  *     elif metric_name == 'lad':
  *         score_function = metrics.negative_lad
  *     elif metric_name == 'rsquared':             # <<<<<<<<<<<<<<
@@ -1823,18 +1839,18 @@ static PyObject *__pyx_pf_8illumine_8woodland_20find_prune_candidate_find_prune_
     goto __pyx_L3;
   }
 
-  /* "illumine/woodland/find_prune_candidate.pyx":53
+  /* "illumine/woodland/find_prune_candidate.pyx":52
  *     elif metric_name == 'rsquared':
  *         score_function = metrics.rsquared
  *     elif metric_name == 'sign-match':             # <<<<<<<<<<<<<<
  *         score_function = metrics.sign_match
  *     else:
  */
-  __pyx_t_3 = (__Pyx_PyString_Equals(__pyx_v_metric_name, __pyx_kp_s_sign_match, Py_EQ)); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_t_3 = (__Pyx_PyString_Equals(__pyx_v_metric_name, __pyx_kp_s_sign_match, Py_EQ)); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 52, __pyx_L1_error)
   __pyx_t_2 = (__pyx_t_3 != 0);
   if (__pyx_t_2) {
 
-    /* "illumine/woodland/find_prune_candidate.pyx":54
+    /* "illumine/woodland/find_prune_candidate.pyx":53
  *         score_function = metrics.rsquared
  *     elif metric_name == 'sign-match':
  *         score_function = metrics.sign_match             # <<<<<<<<<<<<<<
@@ -1843,7 +1859,7 @@ static PyObject *__pyx_pf_8illumine_8woodland_20find_prune_candidate_find_prune_
  */
     __pyx_v_score_function = __pyx_f_8illumine_4core_7metrics_sign_match;
 
-    /* "illumine/woodland/find_prune_candidate.pyx":53
+    /* "illumine/woodland/find_prune_candidate.pyx":52
  *     elif metric_name == 'rsquared':
  *         score_function = metrics.rsquared
  *     elif metric_name == 'sign-match':             # <<<<<<<<<<<<<<
@@ -1853,23 +1869,23 @@ static PyObject *__pyx_pf_8illumine_8woodland_20find_prune_candidate_find_prune_
     goto __pyx_L3;
   }
 
-  /* "illumine/woodland/find_prune_candidate.pyx":56
+  /* "illumine/woodland/find_prune_candidate.pyx":55
  *         score_function = metrics.sign_match
  *     else:
  *         raise ValueError(             # <<<<<<<<<<<<<<
- *             "An invalid metric_name was specified must be one of the following {}"
+ *             "Invalid metric_name was passed, metric_name must be in {}"
  *             .format(valid_functions))
  */
   /*else*/ {
 
-    /* "illumine/woodland/find_prune_candidate.pyx":58
+    /* "illumine/woodland/find_prune_candidate.pyx":57
  *         raise ValueError(
- *             "An invalid metric_name was specified must be one of the following {}"
+ *             "Invalid metric_name was passed, metric_name must be in {}"
  *             .format(valid_functions))             # <<<<<<<<<<<<<<
  * 
  *     return _find_prune_candidates(
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_An_invalid_metric_name_was_speci, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 58, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_Invalid_metric_name_was_passed_m, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 57, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_5 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -1882,13 +1898,13 @@ static PyObject *__pyx_pf_8illumine_8woodland_20find_prune_candidate_find_prune_
       }
     }
     if (!__pyx_t_5) {
-      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_valid_functions); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 58, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_valid_functions); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 57, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     } else {
       #if CYTHON_FAST_PYCALL
       if (PyFunction_Check(__pyx_t_4)) {
         PyObject *__pyx_temp[2] = {__pyx_t_5, __pyx_v_valid_functions};
-        __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 58, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 57, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_GOTREF(__pyx_t_1);
       } else
@@ -1896,47 +1912,47 @@ static PyObject *__pyx_pf_8illumine_8woodland_20find_prune_candidate_find_prune_
       #if CYTHON_FAST_PYCCALL
       if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
         PyObject *__pyx_temp[2] = {__pyx_t_5, __pyx_v_valid_functions};
-        __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 58, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 57, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_GOTREF(__pyx_t_1);
       } else
       #endif
       {
-        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 58, __pyx_L1_error)
+        __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 57, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
         __Pyx_INCREF(__pyx_v_valid_functions);
         __Pyx_GIVEREF(__pyx_v_valid_functions);
         PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_v_valid_functions);
-        __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 58, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 57, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       }
     }
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "illumine/woodland/find_prune_candidate.pyx":56
+    /* "illumine/woodland/find_prune_candidate.pyx":55
  *         score_function = metrics.sign_match
  *     else:
  *         raise ValueError(             # <<<<<<<<<<<<<<
- *             "An invalid metric_name was specified must be one of the following {}"
+ *             "Invalid metric_name was passed, metric_name must be in {}"
  *             .format(valid_functions))
  */
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 56, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 55, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_1);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_1);
     __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 56, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 55, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 56, __pyx_L1_error)
+    __PYX_ERR(0, 55, __pyx_L1_error)
   }
   __pyx_L3:;
 
-  /* "illumine/woodland/find_prune_candidate.pyx":60
+  /* "illumine/woodland/find_prune_candidate.pyx":59
  *             .format(valid_functions))
  * 
  *     return _find_prune_candidates(             # <<<<<<<<<<<<<<
@@ -1945,20 +1961,20 @@ static PyObject *__pyx_pf_8illumine_8woodland_20find_prune_candidate_find_prune_
  */
   __Pyx_XDECREF(__pyx_r);
 
-  /* "illumine/woodland/find_prune_candidate.pyx":65
+  /* "illumine/woodland/find_prune_candidate.pyx":64
  *         pred_matrix,
  *         score_function,
  *         n_prunes)             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_1 = __pyx_f_8illumine_8woodland_20find_prune_candidate__find_prune_candidates(((PyArrayObject *)__pyx_v_y_true), ((PyArrayObject *)__pyx_v_y_pred), ((PyArrayObject *)__pyx_v_pred_matrix), __pyx_v_score_function, __pyx_v_n_prunes); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_8illumine_8woodland_20find_prune_candidate__find_prune_candidates(((PyArrayObject *)__pyx_v_y_true), ((PyArrayObject *)__pyx_v_y_pred), ((PyArrayObject *)__pyx_v_pred_matrix), __pyx_v_score_function, __pyx_v_n_prunes); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 59, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "illumine/woodland/find_prune_candidate.pyx":22
+  /* "illumine/woodland/find_prune_candidate.pyx":21
  * 
  * 
  * def find_prune_candidates(np.ndarray[double, ndim=1] y_true,             # <<<<<<<<<<<<<<
@@ -1994,7 +2010,7 @@ static PyObject *__pyx_pf_8illumine_8woodland_20find_prune_candidate_find_prune_
   return __pyx_r;
 }
 
-/* "illumine/woodland/find_prune_candidate.pyx":68
+/* "illumine/woodland/find_prune_candidate.pyx":67
  * 
  * 
  * cdef _find_prune_candidates(np.ndarray[double, ndim=1] y_true,             # <<<<<<<<<<<<<<
@@ -2004,7 +2020,7 @@ static PyObject *__pyx_pf_8illumine_8woodland_20find_prune_candidate_find_prune_
 
 static PyObject *__pyx_f_8illumine_8woodland_20find_prune_candidate__find_prune_candidates(PyArrayObject *__pyx_v_y_true, PyArrayObject *__pyx_v_y_pred, PyArrayObject *__pyx_v_pred_matrix, __pyx_t_8illumine_8woodland_20find_prune_candidate_metric_f __pyx_v_score_function, int __pyx_v_n_prunes) {
   PyObject *__pyx_v_prune_candidates = 0;
-  CYTHON_UNUSED int __pyx_v_prune_ind;
+  int __pyx_v_prune_ind;
   int __pyx_v_worst_ind;
   double __pyx_v_local_best_score;
   double __pyx_v_global_best_score;
@@ -2031,13 +2047,21 @@ static PyObject *__pyx_f_8illumine_8woodland_20find_prune_candidate__find_prune_
   int __pyx_t_8;
   int __pyx_t_9;
   PyObject *__pyx_t_10 = NULL;
-  PyObject *__pyx_t_11 = NULL;
-  PyArrayObject *__pyx_t_12 = NULL;
+  PyArrayObject *__pyx_t_11 = NULL;
+  PyObject *__pyx_t_12 = NULL;
   PyObject *__pyx_t_13 = NULL;
   PyObject *__pyx_t_14 = NULL;
   PyObject *__pyx_t_15 = NULL;
-  int __pyx_t_16;
+  PyObject *__pyx_t_16 = NULL;
+  PyObject *__pyx_t_17 = NULL;
+  PyObject *__pyx_t_18 = NULL;
+  PyObject *__pyx_t_19 = NULL;
+  PyObject *__pyx_t_20 = NULL;
+  Py_ssize_t __pyx_t_21;
+  PyArrayObject *__pyx_t_22 = NULL;
+  int __pyx_t_23;
   __Pyx_RefNannySetupContext("_find_prune_candidates", 0);
+  __Pyx_INCREF((PyObject *)__pyx_v_y_pred);
   __pyx_pybuffer_y_pred_tmp.pybuffer.buf = NULL;
   __pyx_pybuffer_y_pred_tmp.refcount = 0;
   __pyx_pybuffernd_y_pred_tmp.data = NULL;
@@ -2056,33 +2080,33 @@ static PyObject *__pyx_f_8illumine_8woodland_20find_prune_candidate__find_prune_
   __pyx_pybuffernd_pred_matrix.rcbuffer = &__pyx_pybuffer_pred_matrix;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y_true.rcbuffer->pybuffer, (PyObject*)__pyx_v_y_true, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 68, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y_true.rcbuffer->pybuffer, (PyObject*)__pyx_v_y_true, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 67, __pyx_L1_error)
   }
   __pyx_pybuffernd_y_true.diminfo[0].strides = __pyx_pybuffernd_y_true.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_y_true.diminfo[0].shape = __pyx_pybuffernd_y_true.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y_pred.rcbuffer->pybuffer, (PyObject*)__pyx_v_y_pred, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 68, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y_pred.rcbuffer->pybuffer, (PyObject*)__pyx_v_y_pred, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 67, __pyx_L1_error)
   }
   __pyx_pybuffernd_y_pred.diminfo[0].strides = __pyx_pybuffernd_y_pred.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_y_pred.diminfo[0].shape = __pyx_pybuffernd_y_pred.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_pred_matrix.rcbuffer->pybuffer, (PyObject*)__pyx_v_pred_matrix, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 68, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_pred_matrix.rcbuffer->pybuffer, (PyObject*)__pyx_v_pred_matrix, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 67, __pyx_L1_error)
   }
   __pyx_pybuffernd_pred_matrix.diminfo[0].strides = __pyx_pybuffernd_pred_matrix.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_pred_matrix.diminfo[0].shape = __pyx_pybuffernd_pred_matrix.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_pred_matrix.diminfo[1].strides = __pyx_pybuffernd_pred_matrix.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_pred_matrix.diminfo[1].shape = __pyx_pybuffernd_pred_matrix.rcbuffer->pybuffer.shape[1];
 
-  /* "illumine/woodland/find_prune_candidate.pyx":74
+  /* "illumine/woodland/find_prune_candidate.pyx":73
  *                             int n_prunes):
  *     cdef list prune_candidates
  *     prune_candidates = []             # <<<<<<<<<<<<<<
  * 
  *     cdef int prune_ind, worst_ind
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 74, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 73, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_prune_candidates = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "illumine/woodland/find_prune_candidate.pyx":80
+  /* "illumine/woodland/find_prune_candidate.pyx":79
  *     cdef np.ndarray[double, ndim=1] y_pred_tmp
  * 
  *     global_best_score = score_function(y_true, y_pred)             # <<<<<<<<<<<<<<
@@ -2091,7 +2115,7 @@ static PyObject *__pyx_f_8illumine_8woodland_20find_prune_candidate__find_prune_
  */
   __pyx_v_global_best_score = __pyx_v_score_function(((PyArrayObject *)__pyx_v_y_true), ((PyArrayObject *)__pyx_v_y_pred));
 
-  /* "illumine/woodland/find_prune_candidate.pyx":81
+  /* "illumine/woodland/find_prune_candidate.pyx":80
  * 
  *     global_best_score = score_function(y_true, y_pred)
  *     for prune_ind in range(n_prunes):             # <<<<<<<<<<<<<<
@@ -2102,7 +2126,7 @@ static PyObject *__pyx_f_8illumine_8woodland_20find_prune_candidate__find_prune_
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_prune_ind = __pyx_t_3;
 
-    /* "illumine/woodland/find_prune_candidate.pyx":83
+    /* "illumine/woodland/find_prune_candidate.pyx":82
  *     for prune_ind in range(n_prunes):
  * 
  *         worst_ind, local_best_score = 0, -INFINITY             # <<<<<<<<<<<<<<
@@ -2114,7 +2138,7 @@ static PyObject *__pyx_f_8illumine_8woodland_20find_prune_candidate__find_prune_
     __pyx_v_worst_ind = __pyx_t_4;
     __pyx_v_local_best_score = __pyx_t_5;
 
-    /* "illumine/woodland/find_prune_candidate.pyx":84
+    /* "illumine/woodland/find_prune_candidate.pyx":83
  * 
  *         worst_ind, local_best_score = 0, -INFINITY
  *         for ind in xrange(pred_matrix.shape[1]):             # <<<<<<<<<<<<<<
@@ -2125,30 +2149,30 @@ static PyObject *__pyx_f_8illumine_8woodland_20find_prune_candidate__find_prune_
     for (__pyx_t_7 = 0; __pyx_t_7 < __pyx_t_6; __pyx_t_7+=1) {
       __pyx_v_ind = __pyx_t_7;
 
-      /* "illumine/woodland/find_prune_candidate.pyx":85
+      /* "illumine/woodland/find_prune_candidate.pyx":84
  *         worst_ind, local_best_score = 0, -INFINITY
  *         for ind in xrange(pred_matrix.shape[1]):
  *             if ind in prune_candidates:             # <<<<<<<<<<<<<<
  *                 continue
  * 
  */
-      __pyx_t_1 = __Pyx_PyInt_From_Py_intptr_t(__pyx_v_ind); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 85, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_From_Py_intptr_t(__pyx_v_ind); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 84, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_8 = (__Pyx_PySequence_ContainsTF(__pyx_t_1, __pyx_v_prune_candidates, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 85, __pyx_L1_error)
+      __pyx_t_8 = (__Pyx_PySequence_ContainsTF(__pyx_t_1, __pyx_v_prune_candidates, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 84, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_t_9 = (__pyx_t_8 != 0);
       if (__pyx_t_9) {
 
-        /* "illumine/woodland/find_prune_candidate.pyx":86
+        /* "illumine/woodland/find_prune_candidate.pyx":85
  *         for ind in xrange(pred_matrix.shape[1]):
  *             if ind in prune_candidates:
  *                 continue             # <<<<<<<<<<<<<<
  * 
- *             y_pred_tmp = y_pred - \
+ *             y_pred_tmp = y_pred - pred_matrix[:, ind]
  */
         goto __pyx_L5_continue;
 
-        /* "illumine/woodland/find_prune_candidate.pyx":85
+        /* "illumine/woodland/find_prune_candidate.pyx":84
  *         worst_ind, local_best_score = 0, -INFINITY
  *         for ind in xrange(pred_matrix.shape[1]):
  *             if ind in prune_candidates:             # <<<<<<<<<<<<<<
@@ -2157,24 +2181,16 @@ static PyObject *__pyx_f_8illumine_8woodland_20find_prune_candidate__find_prune_
  */
       }
 
-      /* "illumine/woodland/find_prune_candidate.pyx":89
+      /* "illumine/woodland/find_prune_candidate.pyx":87
+ *                 continue
  * 
- *             y_pred_tmp = y_pred - \
- *                 pred_matrix[:, prune_candidates + [ind]].sum(axis=1)             # <<<<<<<<<<<<<<
- * 
+ *             y_pred_tmp = y_pred - pred_matrix[:, ind]             # <<<<<<<<<<<<<<
  *             curr_score = score_function(
+ *                 y_true=y_true,
  */
-      __pyx_t_1 = __Pyx_PyInt_From_Py_intptr_t(__pyx_v_ind); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 89, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_From_Py_intptr_t(__pyx_v_ind); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 87, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_10 = PyList_New(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 89, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_10);
-      __Pyx_GIVEREF(__pyx_t_1);
-      PyList_SET_ITEM(__pyx_t_10, 0, __pyx_t_1);
-      __pyx_t_1 = 0;
-      __pyx_t_1 = PyNumber_Add(__pyx_v_prune_candidates, __pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 89, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-      __pyx_t_10 = PyTuple_New(2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 89, __pyx_L1_error)
+      __pyx_t_10 = PyTuple_New(2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 87, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_INCREF(__pyx_slice_);
       __Pyx_GIVEREF(__pyx_slice_);
@@ -2182,74 +2198,230 @@ static PyObject *__pyx_f_8illumine_8woodland_20find_prune_candidate__find_prune_
       __Pyx_GIVEREF(__pyx_t_1);
       PyTuple_SET_ITEM(__pyx_t_10, 1, __pyx_t_1);
       __pyx_t_1 = 0;
-      __pyx_t_1 = PyObject_GetItem(((PyObject *)__pyx_v_pred_matrix), __pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 89, __pyx_L1_error)
+      __pyx_t_1 = PyObject_GetItem(((PyObject *)__pyx_v_pred_matrix), __pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 87, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-      __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_sum); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 89, __pyx_L1_error)
+      __pyx_t_10 = PyNumber_Subtract(((PyObject *)__pyx_v_y_pred), __pyx_t_1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 87, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 89, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_axis, __pyx_int_1) < 0) __PYX_ERR(0, 89, __pyx_L1_error)
-      __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 89, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_11);
-      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-      /* "illumine/woodland/find_prune_candidate.pyx":88
- *                 continue
- * 
- *             y_pred_tmp = y_pred - \             # <<<<<<<<<<<<<<
- *                 pred_matrix[:, prune_candidates + [ind]].sum(axis=1)
- * 
- */
-      __pyx_t_1 = PyNumber_Subtract(((PyObject *)__pyx_v_y_pred), __pyx_t_11); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 88, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-      if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 88, __pyx_L1_error)
-      __pyx_t_12 = ((PyArrayObject *)__pyx_t_1);
+      if (!(likely(((__pyx_t_10) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_10, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 87, __pyx_L1_error)
+      __pyx_t_11 = ((PyArrayObject *)__pyx_t_10);
       {
         __Pyx_BufFmt_StackElem __pyx_stack[1];
         __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_y_pred_tmp.rcbuffer->pybuffer);
-        __pyx_t_4 = __Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y_pred_tmp.rcbuffer->pybuffer, (PyObject*)__pyx_t_12, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack);
+        __pyx_t_4 = __Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y_pred_tmp.rcbuffer->pybuffer, (PyObject*)__pyx_t_11, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack);
         if (unlikely(__pyx_t_4 < 0)) {
-          PyErr_Fetch(&__pyx_t_13, &__pyx_t_14, &__pyx_t_15);
+          PyErr_Fetch(&__pyx_t_12, &__pyx_t_13, &__pyx_t_14);
           if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y_pred_tmp.rcbuffer->pybuffer, (PyObject*)__pyx_v_y_pred_tmp, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {
-            Py_XDECREF(__pyx_t_13); Py_XDECREF(__pyx_t_14); Py_XDECREF(__pyx_t_15);
+            Py_XDECREF(__pyx_t_12); Py_XDECREF(__pyx_t_13); Py_XDECREF(__pyx_t_14);
             __Pyx_RaiseBufferFallbackError();
           } else {
-            PyErr_Restore(__pyx_t_13, __pyx_t_14, __pyx_t_15);
+            PyErr_Restore(__pyx_t_12, __pyx_t_13, __pyx_t_14);
           }
         }
         __pyx_pybuffernd_y_pred_tmp.diminfo[0].strides = __pyx_pybuffernd_y_pred_tmp.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_y_pred_tmp.diminfo[0].shape = __pyx_pybuffernd_y_pred_tmp.rcbuffer->pybuffer.shape[0];
-        if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 88, __pyx_L1_error)
+        if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 87, __pyx_L1_error)
       }
-      __pyx_t_12 = 0;
-      __Pyx_XDECREF_SET(__pyx_v_y_pred_tmp, ((PyArrayObject *)__pyx_t_1));
-      __pyx_t_1 = 0;
+      __pyx_t_11 = 0;
+      __Pyx_XDECREF_SET(__pyx_v_y_pred_tmp, ((PyArrayObject *)__pyx_t_10));
+      __pyx_t_10 = 0;
 
-      /* "illumine/woodland/find_prune_candidate.pyx":91
- *                 pred_matrix[:, prune_candidates + [ind]].sum(axis=1)
+      /* "illumine/woodland/find_prune_candidate.pyx":88
  * 
+ *             y_pred_tmp = y_pred - pred_matrix[:, ind]
  *             curr_score = score_function(             # <<<<<<<<<<<<<<
  *                 y_true=y_true,
  *                 y_pred=y_pred_tmp)
  */
       __pyx_v_curr_score = __pyx_v_score_function(((PyArrayObject *)__pyx_v_y_true), ((PyArrayObject *)__pyx_v_y_pred_tmp));
 
-      /* "illumine/woodland/find_prune_candidate.pyx":95
+      /* "illumine/woodland/find_prune_candidate.pyx":92
  *                 y_pred=y_pred_tmp)
  * 
  *             if curr_score > local_best_score:             # <<<<<<<<<<<<<<
- *                 worst_ind = ind
- *                 local_best_score = curr_score
+ *                 logging.getLogger(__name__).debug(
+ *                     "For prune {} the best score was updated to {}"
  */
       __pyx_t_9 = ((__pyx_v_curr_score > __pyx_v_local_best_score) != 0);
       if (__pyx_t_9) {
 
-        /* "illumine/woodland/find_prune_candidate.pyx":96
+        /* "illumine/woodland/find_prune_candidate.pyx":93
  * 
  *             if curr_score > local_best_score:
+ *                 logging.getLogger(__name__).debug(             # <<<<<<<<<<<<<<
+ *                     "For prune {} the best score was updated to {}"
+ *                     .format(prune_ind, curr_score))
+ */
+        __pyx_t_15 = __Pyx_GetModuleGlobalName(__pyx_n_s_logging); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 93, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_15);
+        __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_getLogger); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 93, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_16);
+        __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+        __pyx_t_15 = __Pyx_GetModuleGlobalName(__pyx_n_s_name); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 93, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_15);
+        __pyx_t_17 = NULL;
+        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_16))) {
+          __pyx_t_17 = PyMethod_GET_SELF(__pyx_t_16);
+          if (likely(__pyx_t_17)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_16);
+            __Pyx_INCREF(__pyx_t_17);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_16, function);
+          }
+        }
+        if (!__pyx_t_17) {
+          __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_16, __pyx_t_15); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 93, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+          __Pyx_GOTREF(__pyx_t_1);
+        } else {
+          #if CYTHON_FAST_PYCALL
+          if (PyFunction_Check(__pyx_t_16)) {
+            PyObject *__pyx_temp[2] = {__pyx_t_17, __pyx_t_15};
+            __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_16, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 93, __pyx_L1_error)
+            __Pyx_XDECREF(__pyx_t_17); __pyx_t_17 = 0;
+            __Pyx_GOTREF(__pyx_t_1);
+            __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+          } else
+          #endif
+          #if CYTHON_FAST_PYCCALL
+          if (__Pyx_PyFastCFunction_Check(__pyx_t_16)) {
+            PyObject *__pyx_temp[2] = {__pyx_t_17, __pyx_t_15};
+            __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_16, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 93, __pyx_L1_error)
+            __Pyx_XDECREF(__pyx_t_17); __pyx_t_17 = 0;
+            __Pyx_GOTREF(__pyx_t_1);
+            __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+          } else
+          #endif
+          {
+            __pyx_t_18 = PyTuple_New(1+1); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 93, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_18);
+            __Pyx_GIVEREF(__pyx_t_17); PyTuple_SET_ITEM(__pyx_t_18, 0, __pyx_t_17); __pyx_t_17 = NULL;
+            __Pyx_GIVEREF(__pyx_t_15);
+            PyTuple_SET_ITEM(__pyx_t_18, 0+1, __pyx_t_15);
+            __pyx_t_15 = 0;
+            __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_16, __pyx_t_18, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 93, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_1);
+            __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
+          }
+        }
+        __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+        __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_debug); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 93, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_16);
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+        /* "illumine/woodland/find_prune_candidate.pyx":95
+ *                 logging.getLogger(__name__).debug(
+ *                     "For prune {} the best score was updated to {}"
+ *                     .format(prune_ind, curr_score))             # <<<<<<<<<<<<<<
+ *                 worst_ind = ind
+ *                 local_best_score = curr_score
+ */
+        __pyx_t_18 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_For_prune_the_best_score_was_upd, __pyx_n_s_format); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 95, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_18);
+        __pyx_t_15 = __Pyx_PyInt_From_int(__pyx_v_prune_ind); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 95, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_15);
+        __pyx_t_17 = PyFloat_FromDouble(__pyx_v_curr_score); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 95, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_17);
+        __pyx_t_19 = NULL;
+        __pyx_t_4 = 0;
+        if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_18))) {
+          __pyx_t_19 = PyMethod_GET_SELF(__pyx_t_18);
+          if (likely(__pyx_t_19)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_18);
+            __Pyx_INCREF(__pyx_t_19);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_18, function);
+            __pyx_t_4 = 1;
+          }
+        }
+        #if CYTHON_FAST_PYCALL
+        if (PyFunction_Check(__pyx_t_18)) {
+          PyObject *__pyx_temp[3] = {__pyx_t_19, __pyx_t_15, __pyx_t_17};
+          __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_18, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 95, __pyx_L1_error)
+          __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+          __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
+        } else
+        #endif
+        #if CYTHON_FAST_PYCCALL
+        if (__Pyx_PyFastCFunction_Check(__pyx_t_18)) {
+          PyObject *__pyx_temp[3] = {__pyx_t_19, __pyx_t_15, __pyx_t_17};
+          __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_18, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 95, __pyx_L1_error)
+          __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+          __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
+        } else
+        #endif
+        {
+          __pyx_t_20 = PyTuple_New(2+__pyx_t_4); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 95, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_20);
+          if (__pyx_t_19) {
+            __Pyx_GIVEREF(__pyx_t_19); PyTuple_SET_ITEM(__pyx_t_20, 0, __pyx_t_19); __pyx_t_19 = NULL;
+          }
+          __Pyx_GIVEREF(__pyx_t_15);
+          PyTuple_SET_ITEM(__pyx_t_20, 0+__pyx_t_4, __pyx_t_15);
+          __Pyx_GIVEREF(__pyx_t_17);
+          PyTuple_SET_ITEM(__pyx_t_20, 1+__pyx_t_4, __pyx_t_17);
+          __pyx_t_15 = 0;
+          __pyx_t_17 = 0;
+          __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_18, __pyx_t_20, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 95, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
+        }
+        __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
+        __pyx_t_18 = NULL;
+        if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_16))) {
+          __pyx_t_18 = PyMethod_GET_SELF(__pyx_t_16);
+          if (likely(__pyx_t_18)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_16);
+            __Pyx_INCREF(__pyx_t_18);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_16, function);
+          }
+        }
+        if (!__pyx_t_18) {
+          __pyx_t_10 = __Pyx_PyObject_CallOneArg(__pyx_t_16, __pyx_t_1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 93, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __Pyx_GOTREF(__pyx_t_10);
+        } else {
+          #if CYTHON_FAST_PYCALL
+          if (PyFunction_Check(__pyx_t_16)) {
+            PyObject *__pyx_temp[2] = {__pyx_t_18, __pyx_t_1};
+            __pyx_t_10 = __Pyx_PyFunction_FastCall(__pyx_t_16, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 93, __pyx_L1_error)
+            __Pyx_XDECREF(__pyx_t_18); __pyx_t_18 = 0;
+            __Pyx_GOTREF(__pyx_t_10);
+            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          } else
+          #endif
+          #if CYTHON_FAST_PYCCALL
+          if (__Pyx_PyFastCFunction_Check(__pyx_t_16)) {
+            PyObject *__pyx_temp[2] = {__pyx_t_18, __pyx_t_1};
+            __pyx_t_10 = __Pyx_PyCFunction_FastCall(__pyx_t_16, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 93, __pyx_L1_error)
+            __Pyx_XDECREF(__pyx_t_18); __pyx_t_18 = 0;
+            __Pyx_GOTREF(__pyx_t_10);
+            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          } else
+          #endif
+          {
+            __pyx_t_20 = PyTuple_New(1+1); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 93, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_20);
+            __Pyx_GIVEREF(__pyx_t_18); PyTuple_SET_ITEM(__pyx_t_20, 0, __pyx_t_18); __pyx_t_18 = NULL;
+            __Pyx_GIVEREF(__pyx_t_1);
+            PyTuple_SET_ITEM(__pyx_t_20, 0+1, __pyx_t_1);
+            __pyx_t_1 = 0;
+            __pyx_t_10 = __Pyx_PyObject_Call(__pyx_t_16, __pyx_t_20, NULL); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 93, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_10);
+            __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
+          }
+        }
+        __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+        __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+
+        /* "illumine/woodland/find_prune_candidate.pyx":96
+ *                     "For prune {} the best score was updated to {}"
+ *                     .format(prune_ind, curr_score))
  *                 worst_ind = ind             # <<<<<<<<<<<<<<
  *                 local_best_score = curr_score
  * 
@@ -2257,7 +2429,7 @@ static PyObject *__pyx_f_8illumine_8woodland_20find_prune_candidate__find_prune_
         __pyx_v_worst_ind = __pyx_v_ind;
 
         /* "illumine/woodland/find_prune_candidate.pyx":97
- *             if curr_score > local_best_score:
+ *                     .format(prune_ind, curr_score))
  *                 worst_ind = ind
  *                 local_best_score = curr_score             # <<<<<<<<<<<<<<
  * 
@@ -2265,12 +2437,12 @@ static PyObject *__pyx_f_8illumine_8woodland_20find_prune_candidate__find_prune_
  */
         __pyx_v_local_best_score = __pyx_v_curr_score;
 
-        /* "illumine/woodland/find_prune_candidate.pyx":95
+        /* "illumine/woodland/find_prune_candidate.pyx":92
  *                 y_pred=y_pred_tmp)
  * 
  *             if curr_score > local_best_score:             # <<<<<<<<<<<<<<
- *                 worst_ind = ind
- *                 local_best_score = curr_score
+ *                 logging.getLogger(__name__).debug(
+ *                     "For prune {} the best score was updated to {}"
  */
       }
       __pyx_L5_continue:;
@@ -2291,7 +2463,7 @@ static PyObject *__pyx_f_8illumine_8woodland_20find_prune_candidate__find_prune_
  *         if global_best_score > local_best_score:
  *             return prune_candidates             # <<<<<<<<<<<<<<
  *         else:
- *             global_best_score = local_best_score
+ *             logging.getLogger(__name__).debug(
  */
       __Pyx_XDECREF(__pyx_r);
       __Pyx_INCREF(__pyx_v_prune_candidates);
@@ -2310,29 +2482,245 @@ static PyObject *__pyx_f_8illumine_8woodland_20find_prune_candidate__find_prune_
     /* "illumine/woodland/find_prune_candidate.pyx":102
  *             return prune_candidates
  *         else:
- *             global_best_score = local_best_score             # <<<<<<<<<<<<<<
- *             prune_candidates.append(worst_ind)
- *     return prune_candidates
+ *             logging.getLogger(__name__).debug(             # <<<<<<<<<<<<<<
+ *                 "There are now {} prune candidate(s)"
+ *                 .format(len(prune_candidates)))
  */
     /*else*/ {
+      __pyx_t_20 = __Pyx_GetModuleGlobalName(__pyx_n_s_logging); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 102, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_20);
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_20, __pyx_n_s_getLogger); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 102, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
+      __pyx_t_20 = __Pyx_GetModuleGlobalName(__pyx_n_s_name); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 102, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_20);
+      __pyx_t_18 = NULL;
+      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
+        __pyx_t_18 = PyMethod_GET_SELF(__pyx_t_1);
+        if (likely(__pyx_t_18)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
+          __Pyx_INCREF(__pyx_t_18);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_1, function);
+        }
+      }
+      if (!__pyx_t_18) {
+        __pyx_t_16 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_20); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 102, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
+        __Pyx_GOTREF(__pyx_t_16);
+      } else {
+        #if CYTHON_FAST_PYCALL
+        if (PyFunction_Check(__pyx_t_1)) {
+          PyObject *__pyx_temp[2] = {__pyx_t_18, __pyx_t_20};
+          __pyx_t_16 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 102, __pyx_L1_error)
+          __Pyx_XDECREF(__pyx_t_18); __pyx_t_18 = 0;
+          __Pyx_GOTREF(__pyx_t_16);
+          __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
+        } else
+        #endif
+        #if CYTHON_FAST_PYCCALL
+        if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
+          PyObject *__pyx_temp[2] = {__pyx_t_18, __pyx_t_20};
+          __pyx_t_16 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 102, __pyx_L1_error)
+          __Pyx_XDECREF(__pyx_t_18); __pyx_t_18 = 0;
+          __Pyx_GOTREF(__pyx_t_16);
+          __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
+        } else
+        #endif
+        {
+          __pyx_t_17 = PyTuple_New(1+1); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 102, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_17);
+          __Pyx_GIVEREF(__pyx_t_18); PyTuple_SET_ITEM(__pyx_t_17, 0, __pyx_t_18); __pyx_t_18 = NULL;
+          __Pyx_GIVEREF(__pyx_t_20);
+          PyTuple_SET_ITEM(__pyx_t_17, 0+1, __pyx_t_20);
+          __pyx_t_20 = 0;
+          __pyx_t_16 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_17, NULL); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 102, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_16);
+          __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
+        }
+      }
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_n_s_debug); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 102, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+
+      /* "illumine/woodland/find_prune_candidate.pyx":104
+ *             logging.getLogger(__name__).debug(
+ *                 "There are now {} prune candidate(s)"
+ *                 .format(len(prune_candidates)))             # <<<<<<<<<<<<<<
+ *             # update y_pred to save computation
+ *             y_pred = y_pred - pred_matrix[:, worst_ind]
+ */
+      __pyx_t_17 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_There_are_now_prune_candidate_s, __pyx_n_s_format); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 104, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_17);
+      __pyx_t_21 = PyList_GET_SIZE(__pyx_v_prune_candidates); if (unlikely(__pyx_t_21 == -1)) __PYX_ERR(0, 104, __pyx_L1_error)
+      __pyx_t_20 = PyInt_FromSsize_t(__pyx_t_21); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 104, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_20);
+      __pyx_t_18 = NULL;
+      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_17))) {
+        __pyx_t_18 = PyMethod_GET_SELF(__pyx_t_17);
+        if (likely(__pyx_t_18)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_17);
+          __Pyx_INCREF(__pyx_t_18);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_17, function);
+        }
+      }
+      if (!__pyx_t_18) {
+        __pyx_t_16 = __Pyx_PyObject_CallOneArg(__pyx_t_17, __pyx_t_20); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 104, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
+        __Pyx_GOTREF(__pyx_t_16);
+      } else {
+        #if CYTHON_FAST_PYCALL
+        if (PyFunction_Check(__pyx_t_17)) {
+          PyObject *__pyx_temp[2] = {__pyx_t_18, __pyx_t_20};
+          __pyx_t_16 = __Pyx_PyFunction_FastCall(__pyx_t_17, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 104, __pyx_L1_error)
+          __Pyx_XDECREF(__pyx_t_18); __pyx_t_18 = 0;
+          __Pyx_GOTREF(__pyx_t_16);
+          __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
+        } else
+        #endif
+        #if CYTHON_FAST_PYCCALL
+        if (__Pyx_PyFastCFunction_Check(__pyx_t_17)) {
+          PyObject *__pyx_temp[2] = {__pyx_t_18, __pyx_t_20};
+          __pyx_t_16 = __Pyx_PyCFunction_FastCall(__pyx_t_17, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 104, __pyx_L1_error)
+          __Pyx_XDECREF(__pyx_t_18); __pyx_t_18 = 0;
+          __Pyx_GOTREF(__pyx_t_16);
+          __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
+        } else
+        #endif
+        {
+          __pyx_t_15 = PyTuple_New(1+1); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 104, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_15);
+          __Pyx_GIVEREF(__pyx_t_18); PyTuple_SET_ITEM(__pyx_t_15, 0, __pyx_t_18); __pyx_t_18 = NULL;
+          __Pyx_GIVEREF(__pyx_t_20);
+          PyTuple_SET_ITEM(__pyx_t_15, 0+1, __pyx_t_20);
+          __pyx_t_20 = 0;
+          __pyx_t_16 = __Pyx_PyObject_Call(__pyx_t_17, __pyx_t_15, NULL); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 104, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_16);
+          __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+        }
+      }
+      __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
+      __pyx_t_17 = NULL;
+      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
+        __pyx_t_17 = PyMethod_GET_SELF(__pyx_t_1);
+        if (likely(__pyx_t_17)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
+          __Pyx_INCREF(__pyx_t_17);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_1, function);
+        }
+      }
+      if (!__pyx_t_17) {
+        __pyx_t_10 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_16); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 102, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+        __Pyx_GOTREF(__pyx_t_10);
+      } else {
+        #if CYTHON_FAST_PYCALL
+        if (PyFunction_Check(__pyx_t_1)) {
+          PyObject *__pyx_temp[2] = {__pyx_t_17, __pyx_t_16};
+          __pyx_t_10 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 102, __pyx_L1_error)
+          __Pyx_XDECREF(__pyx_t_17); __pyx_t_17 = 0;
+          __Pyx_GOTREF(__pyx_t_10);
+          __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+        } else
+        #endif
+        #if CYTHON_FAST_PYCCALL
+        if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
+          PyObject *__pyx_temp[2] = {__pyx_t_17, __pyx_t_16};
+          __pyx_t_10 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 102, __pyx_L1_error)
+          __Pyx_XDECREF(__pyx_t_17); __pyx_t_17 = 0;
+          __Pyx_GOTREF(__pyx_t_10);
+          __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+        } else
+        #endif
+        {
+          __pyx_t_15 = PyTuple_New(1+1); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 102, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_15);
+          __Pyx_GIVEREF(__pyx_t_17); PyTuple_SET_ITEM(__pyx_t_15, 0, __pyx_t_17); __pyx_t_17 = NULL;
+          __Pyx_GIVEREF(__pyx_t_16);
+          PyTuple_SET_ITEM(__pyx_t_15, 0+1, __pyx_t_16);
+          __pyx_t_16 = 0;
+          __pyx_t_10 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_15, NULL); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 102, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_10);
+          __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+        }
+      }
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+
+      /* "illumine/woodland/find_prune_candidate.pyx":106
+ *                 .format(len(prune_candidates)))
+ *             # update y_pred to save computation
+ *             y_pred = y_pred - pred_matrix[:, worst_ind]             # <<<<<<<<<<<<<<
+ * 
+ *             global_best_score = local_best_score
+ */
+      __pyx_t_10 = __Pyx_PyInt_From_int(__pyx_v_worst_ind); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 106, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_10);
+      __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 106, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_INCREF(__pyx_slice__2);
+      __Pyx_GIVEREF(__pyx_slice__2);
+      PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_slice__2);
+      __Pyx_GIVEREF(__pyx_t_10);
+      PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_10);
+      __pyx_t_10 = 0;
+      __pyx_t_10 = PyObject_GetItem(((PyObject *)__pyx_v_pred_matrix), __pyx_t_1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 106, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_10);
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __pyx_t_1 = PyNumber_Subtract(((PyObject *)__pyx_v_y_pred), __pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 106, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+      if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 106, __pyx_L1_error)
+      __pyx_t_22 = ((PyArrayObject *)__pyx_t_1);
+      {
+        __Pyx_BufFmt_StackElem __pyx_stack[1];
+        __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_y_pred.rcbuffer->pybuffer);
+        __pyx_t_4 = __Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y_pred.rcbuffer->pybuffer, (PyObject*)__pyx_t_22, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack);
+        if (unlikely(__pyx_t_4 < 0)) {
+          PyErr_Fetch(&__pyx_t_14, &__pyx_t_13, &__pyx_t_12);
+          if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_y_pred.rcbuffer->pybuffer, (PyObject*)__pyx_v_y_pred, &__Pyx_TypeInfo_double, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {
+            Py_XDECREF(__pyx_t_14); Py_XDECREF(__pyx_t_13); Py_XDECREF(__pyx_t_12);
+            __Pyx_RaiseBufferFallbackError();
+          } else {
+            PyErr_Restore(__pyx_t_14, __pyx_t_13, __pyx_t_12);
+          }
+        }
+        __pyx_pybuffernd_y_pred.diminfo[0].strides = __pyx_pybuffernd_y_pred.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_y_pred.diminfo[0].shape = __pyx_pybuffernd_y_pred.rcbuffer->pybuffer.shape[0];
+        if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 106, __pyx_L1_error)
+      }
+      __pyx_t_22 = 0;
+      __Pyx_DECREF_SET(__pyx_v_y_pred, ((PyArrayObject *)__pyx_t_1));
+      __pyx_t_1 = 0;
+
+      /* "illumine/woodland/find_prune_candidate.pyx":108
+ *             y_pred = y_pred - pred_matrix[:, worst_ind]
+ * 
+ *             global_best_score = local_best_score             # <<<<<<<<<<<<<<
+ *             prune_candidates.append(worst_ind)
+ * 
+ */
       __pyx_v_global_best_score = __pyx_v_local_best_score;
 
-      /* "illumine/woodland/find_prune_candidate.pyx":103
- *         else:
+      /* "illumine/woodland/find_prune_candidate.pyx":109
+ * 
  *             global_best_score = local_best_score
  *             prune_candidates.append(worst_ind)             # <<<<<<<<<<<<<<
+ * 
  *     return prune_candidates
  */
-      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_worst_ind); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 103, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_worst_ind); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 109, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_prune_candidates, __pyx_t_1); if (unlikely(__pyx_t_16 == -1)) __PYX_ERR(0, 103, __pyx_L1_error)
+      __pyx_t_23 = __Pyx_PyList_Append(__pyx_v_prune_candidates, __pyx_t_1); if (unlikely(__pyx_t_23 == -1)) __PYX_ERR(0, 109, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     }
   }
 
-  /* "illumine/woodland/find_prune_candidate.pyx":104
- *             global_best_score = local_best_score
+  /* "illumine/woodland/find_prune_candidate.pyx":111
  *             prune_candidates.append(worst_ind)
+ * 
  *     return prune_candidates             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
@@ -2340,7 +2728,7 @@ static PyObject *__pyx_f_8illumine_8woodland_20find_prune_candidate__find_prune_
   __pyx_r = __pyx_v_prune_candidates;
   goto __pyx_L0;
 
-  /* "illumine/woodland/find_prune_candidate.pyx":68
+  /* "illumine/woodland/find_prune_candidate.pyx":67
  * 
  * 
  * cdef _find_prune_candidates(np.ndarray[double, ndim=1] y_true,             # <<<<<<<<<<<<<<
@@ -2352,7 +2740,12 @@ static PyObject *__pyx_f_8illumine_8woodland_20find_prune_candidate__find_prune_
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_XDECREF(__pyx_t_11);
+  __Pyx_XDECREF(__pyx_t_15);
+  __Pyx_XDECREF(__pyx_t_16);
+  __Pyx_XDECREF(__pyx_t_17);
+  __Pyx_XDECREF(__pyx_t_18);
+  __Pyx_XDECREF(__pyx_t_19);
+  __Pyx_XDECREF(__pyx_t_20);
   { PyObject *__pyx_type, *__pyx_value, *__pyx_tb;
     __Pyx_PyThreadState_declare
     __Pyx_PyThreadState_assign
@@ -2373,6 +2766,7 @@ static PyObject *__pyx_f_8illumine_8woodland_20find_prune_candidate__find_prune_
   __pyx_L2:;
   __Pyx_XDECREF(__pyx_v_prune_candidates);
   __Pyx_XDECREF((PyObject *)__pyx_v_y_pred_tmp);
+  __Pyx_XDECREF((PyObject *)__pyx_v_y_pred);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
@@ -2547,7 +2941,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  * 
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 218, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 218, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -2603,7 +2997,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  * 
  *             info.buf = PyArray_DATA(self)
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 222, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 222, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -2912,7 +3306,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  *                 if   t == NPY_BYTE:        f = "b"
  *                 elif t == NPY_UBYTE:       f = "B"
  */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 259, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 259, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_Raise(__pyx_t_3, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3727,7 +4121,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  * 
  *         if ((child.byteorder == c'>' and little_endian) or
  */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 799, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 799, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_Raise(__pyx_t_3, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3795,7 +4189,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  *             # One could encode it in the format string and have Cython
  *             # complain instead, BUT: < and > in format strings also imply
  */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 803, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 803, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_Raise(__pyx_t_3, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3904,7 +4298,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  * 
  *             # Until ticket #99 is fixed, use integers to avoid warnings
  */
-        __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 823, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__8, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 823, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_Raise(__pyx_t_4, 0, 0, 0);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -4585,7 +4979,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_array(void) {
  * 
  * cdef inline int import_umath() except -1:
  */
-      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_builtin_ImportError, __pyx_tuple__8, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 989, __pyx_L5_except_error)
+      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_builtin_ImportError, __pyx_tuple__9, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 989, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_Raise(__pyx_t_8, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -4716,7 +5110,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_umath(void) {
  * 
  * cdef inline int import_ufunc() except -1:
  */
-      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_builtin_ImportError, __pyx_tuple__9, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 995, __pyx_L5_except_error)
+      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_builtin_ImportError, __pyx_tuple__10, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 995, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_Raise(__pyx_t_8, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -4844,7 +5238,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_ufunc(void) {
  *     except Exception:
  *         raise ImportError("numpy.core.umath failed to import")             # <<<<<<<<<<<<<<
  */
-      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_builtin_ImportError, __pyx_tuple__10, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 1001, __pyx_L5_except_error)
+      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_builtin_ImportError, __pyx_tuple__11, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 1001, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_Raise(__pyx_t_8, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -4915,23 +5309,29 @@ static struct PyModuleDef __pyx_moduledef = {
 #endif
 
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
-  {&__pyx_kp_s_An_invalid_metric_name_was_speci, __pyx_k_An_invalid_metric_name_was_speci, sizeof(__pyx_k_An_invalid_metric_name_was_speci), 0, 0, 1, 0},
+  {&__pyx_kp_s_For_prune_the_best_score_was_upd, __pyx_k_For_prune_the_best_score_was_upd, sizeof(__pyx_k_For_prune_the_best_score_was_upd), 0, 0, 1, 0},
   {&__pyx_kp_u_Format_string_allocated_too_shor, __pyx_k_Format_string_allocated_too_shor, sizeof(__pyx_k_Format_string_allocated_too_shor), 0, 1, 0, 0},
   {&__pyx_kp_u_Format_string_allocated_too_shor_2, __pyx_k_Format_string_allocated_too_shor_2, sizeof(__pyx_k_Format_string_allocated_too_shor_2), 0, 1, 0, 0},
   {&__pyx_n_s_ImportError, __pyx_k_ImportError, sizeof(__pyx_k_ImportError), 0, 0, 1, 1},
+  {&__pyx_kp_s_Invalid_metric_name_was_passed_m, __pyx_k_Invalid_metric_name_was_passed_m, sizeof(__pyx_k_Invalid_metric_name_was_passed_m), 0, 0, 1, 0},
   {&__pyx_kp_u_Non_native_byte_order_not_suppor, __pyx_k_Non_native_byte_order_not_suppor, sizeof(__pyx_k_Non_native_byte_order_not_suppor), 0, 1, 0, 0},
   {&__pyx_n_s_RuntimeError, __pyx_k_RuntimeError, sizeof(__pyx_k_RuntimeError), 0, 0, 1, 1},
+  {&__pyx_kp_s_There_are_now_prune_candidate_s, __pyx_k_There_are_now_prune_candidate_s, sizeof(__pyx_k_There_are_now_prune_candidate_s), 0, 0, 1, 0},
   {&__pyx_n_s_ValueError, __pyx_k_ValueError, sizeof(__pyx_k_ValueError), 0, 0, 1, 1},
-  {&__pyx_n_s_axis, __pyx_k_axis, sizeof(__pyx_k_axis), 0, 0, 1, 1},
+  {&__pyx_n_s_debug, __pyx_k_debug, sizeof(__pyx_k_debug), 0, 0, 1, 1},
   {&__pyx_n_s_find_prune_candidates, __pyx_k_find_prune_candidates, sizeof(__pyx_k_find_prune_candidates), 0, 0, 1, 1},
   {&__pyx_n_s_format, __pyx_k_format, sizeof(__pyx_k_format), 0, 0, 1, 1},
+  {&__pyx_n_s_getLogger, __pyx_k_getLogger, sizeof(__pyx_k_getLogger), 0, 0, 1, 1},
   {&__pyx_kp_s_home_itzjustricky_workspace_git, __pyx_k_home_itzjustricky_workspace_git, sizeof(__pyx_k_home_itzjustricky_workspace_git), 0, 0, 1, 0},
   {&__pyx_n_s_illumine_woodland_find_prune_can, __pyx_k_illumine_woodland_find_prune_can, sizeof(__pyx_k_illumine_woodland_find_prune_can), 0, 0, 1, 1},
+  {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
   {&__pyx_n_s_lad, __pyx_k_lad, sizeof(__pyx_k_lad), 0, 0, 1, 1},
+  {&__pyx_n_s_logging, __pyx_k_logging, sizeof(__pyx_k_logging), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_metric_name, __pyx_k_metric_name, sizeof(__pyx_k_metric_name), 0, 0, 1, 1},
   {&__pyx_n_s_mse, __pyx_k_mse, sizeof(__pyx_k_mse), 0, 0, 1, 1},
   {&__pyx_n_s_n_prunes, __pyx_k_n_prunes, sizeof(__pyx_k_n_prunes), 0, 0, 1, 1},
+  {&__pyx_n_s_name, __pyx_k_name, sizeof(__pyx_k_name), 0, 0, 1, 1},
   {&__pyx_kp_u_ndarray_is_not_C_contiguous, __pyx_k_ndarray_is_not_C_contiguous, sizeof(__pyx_k_ndarray_is_not_C_contiguous), 0, 1, 0, 0},
   {&__pyx_kp_u_ndarray_is_not_Fortran_contiguou, __pyx_k_ndarray_is_not_Fortran_contiguou, sizeof(__pyx_k_ndarray_is_not_Fortran_contiguou), 0, 1, 0, 0},
   {&__pyx_kp_s_numpy_core_multiarray_failed_to, __pyx_k_numpy_core_multiarray_failed_to, sizeof(__pyx_k_numpy_core_multiarray_failed_to), 0, 0, 1, 0},
@@ -4941,7 +5341,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_rsquared, __pyx_k_rsquared, sizeof(__pyx_k_rsquared), 0, 0, 1, 1},
   {&__pyx_n_s_score_function, __pyx_k_score_function, sizeof(__pyx_k_score_function), 0, 0, 1, 1},
   {&__pyx_kp_s_sign_match, __pyx_k_sign_match, sizeof(__pyx_k_sign_match), 0, 0, 1, 0},
-  {&__pyx_n_s_sum, __pyx_k_sum, sizeof(__pyx_k_sum), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
   {&__pyx_kp_u_unknown_dtype_code_in_numpy_pxd, __pyx_k_unknown_dtype_code_in_numpy_pxd, sizeof(__pyx_k_unknown_dtype_code_in_numpy_pxd), 0, 1, 0, 0},
   {&__pyx_n_s_valid_functions, __pyx_k_valid_functions, sizeof(__pyx_k_valid_functions), 0, 0, 1, 1},
@@ -4951,12 +5350,12 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 56, __pyx_L1_error)
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 81, __pyx_L1_error)
+  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 55, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 80, __pyx_L1_error)
   #if PY_MAJOR_VERSION >= 3
-  __pyx_builtin_xrange = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_xrange) __PYX_ERR(0, 84, __pyx_L1_error)
+  __pyx_builtin_xrange = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_xrange) __PYX_ERR(0, 83, __pyx_L1_error)
   #else
-  __pyx_builtin_xrange = __Pyx_GetBuiltinName(__pyx_n_s_xrange); if (!__pyx_builtin_xrange) __PYX_ERR(0, 84, __pyx_L1_error)
+  __pyx_builtin_xrange = __Pyx_GetBuiltinName(__pyx_n_s_xrange); if (!__pyx_builtin_xrange) __PYX_ERR(0, 83, __pyx_L1_error)
   #endif
   __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_n_s_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(1, 799, __pyx_L1_error)
   __pyx_builtin_ImportError = __Pyx_GetBuiltinName(__pyx_n_s_ImportError); if (!__pyx_builtin_ImportError) __PYX_ERR(1, 989, __pyx_L1_error)
@@ -4969,16 +5368,27 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "illumine/woodland/find_prune_candidate.pyx":89
+  /* "illumine/woodland/find_prune_candidate.pyx":87
+ *                 continue
  * 
- *             y_pred_tmp = y_pred - \
- *                 pred_matrix[:, prune_candidates + [ind]].sum(axis=1)             # <<<<<<<<<<<<<<
- * 
+ *             y_pred_tmp = y_pred - pred_matrix[:, ind]             # <<<<<<<<<<<<<<
  *             curr_score = score_function(
+ *                 y_true=y_true,
  */
-  __pyx_slice_ = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice_)) __PYX_ERR(0, 89, __pyx_L1_error)
+  __pyx_slice_ = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice_)) __PYX_ERR(0, 87, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_slice_);
   __Pyx_GIVEREF(__pyx_slice_);
+
+  /* "illumine/woodland/find_prune_candidate.pyx":106
+ *                 .format(len(prune_candidates)))
+ *             # update y_pred to save computation
+ *             y_pred = y_pred - pred_matrix[:, worst_ind]             # <<<<<<<<<<<<<<
+ * 
+ *             global_best_score = local_best_score
+ */
+  __pyx_slice__2 = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice__2)) __PYX_ERR(0, 106, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_slice__2);
+  __Pyx_GIVEREF(__pyx_slice__2);
 
   /* "../../../anaconda2/envs/chimera/lib/python3.3/site-packages/Cython/Includes/numpy/__init__.pxd":218
  *             if ((flags & pybuf.PyBUF_C_CONTIGUOUS == pybuf.PyBUF_C_CONTIGUOUS)
@@ -4987,9 +5397,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
  */
-  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_C_contiguous); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(1, 218, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__2);
-  __Pyx_GIVEREF(__pyx_tuple__2);
+  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_C_contiguous); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(1, 218, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__3);
+  __Pyx_GIVEREF(__pyx_tuple__3);
 
   /* "../../../anaconda2/envs/chimera/lib/python3.3/site-packages/Cython/Includes/numpy/__init__.pxd":222
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
@@ -4998,9 +5408,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *             info.buf = PyArray_DATA(self)
  */
-  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_Fortran_contiguou); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(1, 222, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__3);
-  __Pyx_GIVEREF(__pyx_tuple__3);
+  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_Fortran_contiguou); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(1, 222, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__4);
+  __Pyx_GIVEREF(__pyx_tuple__4);
 
   /* "../../../anaconda2/envs/chimera/lib/python3.3/site-packages/Cython/Includes/numpy/__init__.pxd":259
  *                 if ((descr.byteorder == c'>' and little_endian) or
@@ -5009,9 +5419,9 @@ static int __Pyx_InitCachedConstants(void) {
  *                 if   t == NPY_BYTE:        f = "b"
  *                 elif t == NPY_UBYTE:       f = "B"
  */
-  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(1, 259, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__4);
-  __Pyx_GIVEREF(__pyx_tuple__4);
+  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(1, 259, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__5);
+  __Pyx_GIVEREF(__pyx_tuple__5);
 
   /* "../../../anaconda2/envs/chimera/lib/python3.3/site-packages/Cython/Includes/numpy/__init__.pxd":799
  * 
@@ -5020,9 +5430,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *         if ((child.byteorder == c'>' and little_endian) or
  */
-  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(1, 799, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__5);
-  __Pyx_GIVEREF(__pyx_tuple__5);
+  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(1, 799, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__6);
+  __Pyx_GIVEREF(__pyx_tuple__6);
 
   /* "../../../anaconda2/envs/chimera/lib/python3.3/site-packages/Cython/Includes/numpy/__init__.pxd":803
  *         if ((child.byteorder == c'>' and little_endian) or
@@ -5031,9 +5441,9 @@ static int __Pyx_InitCachedConstants(void) {
  *             # One could encode it in the format string and have Cython
  *             # complain instead, BUT: < and > in format strings also imply
  */
-  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(1, 803, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__6);
-  __Pyx_GIVEREF(__pyx_tuple__6);
+  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(1, 803, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__7);
+  __Pyx_GIVEREF(__pyx_tuple__7);
 
   /* "../../../anaconda2/envs/chimera/lib/python3.3/site-packages/Cython/Includes/numpy/__init__.pxd":823
  *             t = child.type_num
@@ -5042,9 +5452,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *             # Until ticket #99 is fixed, use integers to avoid warnings
  */
-  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor_2); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(1, 823, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__7);
-  __Pyx_GIVEREF(__pyx_tuple__7);
+  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor_2); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(1, 823, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__8);
+  __Pyx_GIVEREF(__pyx_tuple__8);
 
   /* "../../../anaconda2/envs/chimera/lib/python3.3/site-packages/Cython/Includes/numpy/__init__.pxd":989
  *         _import_array()
@@ -5053,9 +5463,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * cdef inline int import_umath() except -1:
  */
-  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_s_numpy_core_multiarray_failed_to); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(1, 989, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__8);
-  __Pyx_GIVEREF(__pyx_tuple__8);
+  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_kp_s_numpy_core_multiarray_failed_to); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(1, 989, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__9);
+  __Pyx_GIVEREF(__pyx_tuple__9);
 
   /* "../../../anaconda2/envs/chimera/lib/python3.3/site-packages/Cython/Includes/numpy/__init__.pxd":995
  *         _import_umath()
@@ -5064,30 +5474,30 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * cdef inline int import_ufunc() except -1:
  */
-  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_kp_s_numpy_core_umath_failed_to_impor); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(1, 995, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__9);
-  __Pyx_GIVEREF(__pyx_tuple__9);
+  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_kp_s_numpy_core_umath_failed_to_impor); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(1, 995, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__10);
+  __Pyx_GIVEREF(__pyx_tuple__10);
 
   /* "../../../anaconda2/envs/chimera/lib/python3.3/site-packages/Cython/Includes/numpy/__init__.pxd":1001
  *         _import_umath()
  *     except Exception:
  *         raise ImportError("numpy.core.umath failed to import")             # <<<<<<<<<<<<<<
  */
-  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_kp_s_numpy_core_umath_failed_to_impor); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(1, 1001, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__10);
-  __Pyx_GIVEREF(__pyx_tuple__10);
+  __pyx_tuple__11 = PyTuple_Pack(1, __pyx_kp_s_numpy_core_umath_failed_to_impor); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(1, 1001, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__11);
+  __Pyx_GIVEREF(__pyx_tuple__11);
 
-  /* "illumine/woodland/find_prune_candidate.pyx":22
+  /* "illumine/woodland/find_prune_candidate.pyx":21
  * 
  * 
  * def find_prune_candidates(np.ndarray[double, ndim=1] y_true,             # <<<<<<<<<<<<<<
  *                           np.ndarray[double, ndim=1] y_pred,
  *                           np.ndarray[double, ndim=2] pred_matrix,
  */
-  __pyx_tuple__11 = PyTuple_Pack(7, __pyx_n_s_y_true, __pyx_n_s_y_pred, __pyx_n_s_pred_matrix, __pyx_n_s_metric_name, __pyx_n_s_n_prunes, __pyx_n_s_score_function, __pyx_n_s_valid_functions); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 22, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__11);
-  __Pyx_GIVEREF(__pyx_tuple__11);
-  __pyx_codeobj__12 = (PyObject*)__Pyx_PyCode_New(5, 0, 7, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__11, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_itzjustricky_workspace_git, __pyx_n_s_find_prune_candidates, 22, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__12)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_tuple__12 = PyTuple_Pack(7, __pyx_n_s_y_true, __pyx_n_s_y_pred, __pyx_n_s_pred_matrix, __pyx_n_s_metric_name, __pyx_n_s_n_prunes, __pyx_n_s_score_function, __pyx_n_s_valid_functions); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 21, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__12);
+  __Pyx_GIVEREF(__pyx_tuple__12);
+  __pyx_codeobj__13 = (PyObject*)__Pyx_PyCode_New(5, 0, 7, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__12, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_itzjustricky_workspace_git, __pyx_n_s_find_prune_candidates, 21, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 21, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -5097,7 +5507,6 @@ static int __Pyx_InitCachedConstants(void) {
 
 static int __Pyx_InitGlobals(void) {
   if (__Pyx_InitStrings(__pyx_string_tab) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  __pyx_int_1 = PyInt_FromLong(1); if (unlikely(!__pyx_int_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -5214,16 +5623,28 @@ PyMODINIT_FUNC PyInit_find_prune_candidate(void)
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "illumine/woodland/find_prune_candidate.pyx":22
+  /* "illumine/woodland/find_prune_candidate.pyx":7
+ * """
+ * 
+ * import logging             # <<<<<<<<<<<<<<
+ * 
+ * cimport cython
+ */
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_logging, 0, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_logging, __pyx_t_2) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "illumine/woodland/find_prune_candidate.pyx":21
  * 
  * 
  * def find_prune_candidates(np.ndarray[double, ndim=1] y_true,             # <<<<<<<<<<<<<<
  *                           np.ndarray[double, ndim=1] y_pred,
  *                           np.ndarray[double, ndim=2] pred_matrix,
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8illumine_8woodland_20find_prune_candidate_1find_prune_candidates, NULL, __pyx_n_s_illumine_woodland_find_prune_can); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8illumine_8woodland_20find_prune_candidate_1find_prune_candidates, NULL, __pyx_n_s_illumine_woodland_find_prune_can); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 21, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_find_prune_candidates, __pyx_t_2) < 0) __PYX_ERR(0, 22, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_find_prune_candidates, __pyx_t_2) < 0) __PYX_ERR(0, 21, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "illumine/woodland/find_prune_candidate.pyx":1
@@ -6568,26 +6989,44 @@ bad:
      "Buffer acquisition failed on assignment; and then reacquiring the old buffer failed too!");
 }
 
+/* GetModuleGlobalName */
+      static CYTHON_INLINE PyObject *__Pyx_GetModuleGlobalName(PyObject *name) {
+    PyObject *result;
+#if !CYTHON_AVOID_BORROWED_REFS
+    result = PyDict_GetItem(__pyx_d, name);
+    if (likely(result)) {
+        Py_INCREF(result);
+    } else {
+#else
+    result = PyObject_GetItem(__pyx_d, name);
+    if (!result) {
+        PyErr_Clear();
+#endif
+        result = __Pyx_GetBuiltinName(name);
+    }
+    return result;
+}
+
 /* RaiseTooManyValuesToUnpack */
-      static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected) {
+        static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected) {
     PyErr_Format(PyExc_ValueError,
                  "too many values to unpack (expected %" CYTHON_FORMAT_SSIZE_T "d)", expected);
 }
 
 /* RaiseNeedMoreValuesToUnpack */
-      static CYTHON_INLINE void __Pyx_RaiseNeedMoreValuesError(Py_ssize_t index) {
+        static CYTHON_INLINE void __Pyx_RaiseNeedMoreValuesError(Py_ssize_t index) {
     PyErr_Format(PyExc_ValueError,
                  "need more than %" CYTHON_FORMAT_SSIZE_T "d value%.1s to unpack",
                  index, (index == 1) ? "" : "s");
 }
 
 /* RaiseNoneIterError */
-      static CYTHON_INLINE void __Pyx_RaiseNoneNotIterableError(void) {
+        static CYTHON_INLINE void __Pyx_RaiseNoneNotIterableError(void) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
 }
 
 /* SaveResetException */
-      #if CYTHON_FAST_THREAD_STATE
+        #if CYTHON_FAST_THREAD_STATE
 static CYTHON_INLINE void __Pyx__ExceptionSave(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
     *type = tstate->exc_type;
     *value = tstate->exc_value;
@@ -6611,7 +7050,7 @@ static CYTHON_INLINE void __Pyx__ExceptionReset(PyThreadState *tstate, PyObject 
 #endif
 
 /* PyErrExceptionMatches */
-      #if CYTHON_FAST_THREAD_STATE
+        #if CYTHON_FAST_THREAD_STATE
 static CYTHON_INLINE int __Pyx_PyErr_ExceptionMatchesInState(PyThreadState* tstate, PyObject* err) {
     PyObject *exc_type = tstate->curexc_type;
     if (exc_type == err) return 1;
@@ -6621,7 +7060,7 @@ static CYTHON_INLINE int __Pyx_PyErr_ExceptionMatchesInState(PyThreadState* tsta
 #endif
 
 /* GetException */
-      #if CYTHON_FAST_THREAD_STATE
+        #if CYTHON_FAST_THREAD_STATE
 static int __Pyx__GetException(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
 #else
 static int __Pyx_GetException(PyObject **type, PyObject **value, PyObject **tb) {
@@ -6681,8 +7120,82 @@ bad:
     return -1;
 }
 
+/* Import */
+          static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level) {
+    PyObject *empty_list = 0;
+    PyObject *module = 0;
+    PyObject *global_dict = 0;
+    PyObject *empty_dict = 0;
+    PyObject *list;
+    #if PY_VERSION_HEX < 0x03030000
+    PyObject *py_import;
+    py_import = __Pyx_PyObject_GetAttrStr(__pyx_b, __pyx_n_s_import);
+    if (!py_import)
+        goto bad;
+    #endif
+    if (from_list)
+        list = from_list;
+    else {
+        empty_list = PyList_New(0);
+        if (!empty_list)
+            goto bad;
+        list = empty_list;
+    }
+    global_dict = PyModule_GetDict(__pyx_m);
+    if (!global_dict)
+        goto bad;
+    empty_dict = PyDict_New();
+    if (!empty_dict)
+        goto bad;
+    {
+        #if PY_MAJOR_VERSION >= 3
+        if (level == -1) {
+            if (strchr(__Pyx_MODULE_NAME, '.')) {
+                #if PY_VERSION_HEX < 0x03030000
+                PyObject *py_level = PyInt_FromLong(1);
+                if (!py_level)
+                    goto bad;
+                module = PyObject_CallFunctionObjArgs(py_import,
+                    name, global_dict, empty_dict, list, py_level, NULL);
+                Py_DECREF(py_level);
+                #else
+                module = PyImport_ImportModuleLevelObject(
+                    name, global_dict, empty_dict, list, 1);
+                #endif
+                if (!module) {
+                    if (!PyErr_ExceptionMatches(PyExc_ImportError))
+                        goto bad;
+                    PyErr_Clear();
+                }
+            }
+            level = 0;
+        }
+        #endif
+        if (!module) {
+            #if PY_VERSION_HEX < 0x03030000
+            PyObject *py_level = PyInt_FromLong(level);
+            if (!py_level)
+                goto bad;
+            module = PyObject_CallFunctionObjArgs(py_import,
+                name, global_dict, empty_dict, list, py_level, NULL);
+            Py_DECREF(py_level);
+            #else
+            module = PyImport_ImportModuleLevelObject(
+                name, global_dict, empty_dict, list, level);
+            #endif
+        }
+    }
+bad:
+    #if PY_VERSION_HEX < 0x03030000
+    Py_XDECREF(py_import);
+    #endif
+    Py_XDECREF(empty_list);
+    Py_XDECREF(empty_dict);
+    return module;
+}
+
 /* CodeObjectCache */
-        static int __pyx_bisect_code_objects(__Pyx_CodeObjectCacheEntry* entries, int count, int code_line) {
+          static int __pyx_bisect_code_objects(__Pyx_CodeObjectCacheEntry* entries, int count, int code_line) {
     int start = 0, mid = 0, end = count - 1;
     if (end >= 0 && code_line > entries[end].code_line) {
         return count;
@@ -6762,7 +7275,7 @@ static void __pyx_insert_code_object(int code_line, PyCodeObject* code_object) {
 }
 
 /* AddTraceback */
-        #include "compile.h"
+          #include "compile.h"
 #include "frameobject.h"
 #include "traceback.h"
 static PyCodeObject* __Pyx_CreateCodeObjectForTraceback(
@@ -6863,8 +7376,8 @@ static void __Pyx_ReleaseBuffer(Py_buffer *view) {
 #endif
 
 
-        /* CIntFromPyVerify */
-        #define __PYX_VERIFY_RETURN_INT(target_type, func_type, func_value)\
+          /* CIntFromPyVerify */
+          #define __PYX_VERIFY_RETURN_INT(target_type, func_type, func_value)\
     __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 0)
 #define __PYX_VERIFY_RETURN_INT_EXC(target_type, func_type, func_value)\
     __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 1)
@@ -6886,7 +7399,7 @@ static void __Pyx_ReleaseBuffer(Py_buffer *view) {
     }
 
 /* CIntToPy */
-        static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value) {
+          static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value) {
     const int neg_one = (int) -1, const_zero = (int) 0;
     const int is_unsigned = neg_one > const_zero;
     if (is_unsigned) {
@@ -6917,7 +7430,7 @@ static void __Pyx_ReleaseBuffer(Py_buffer *view) {
 }
 
 /* CIntToPy */
-        static CYTHON_INLINE PyObject* __Pyx_PyInt_From_Py_intptr_t(Py_intptr_t value) {
+          static CYTHON_INLINE PyObject* __Pyx_PyInt_From_Py_intptr_t(Py_intptr_t value) {
     const Py_intptr_t neg_one = (Py_intptr_t) -1, const_zero = (Py_intptr_t) 0;
     const int is_unsigned = neg_one > const_zero;
     if (is_unsigned) {
@@ -6948,7 +7461,7 @@ static void __Pyx_ReleaseBuffer(Py_buffer *view) {
 }
 
 /* Declarations */
-        #if CYTHON_CCOMPLEX
+          #if CYTHON_CCOMPLEX
   #ifdef __cplusplus
     static CYTHON_INLINE __pyx_t_float_complex __pyx_t_float_complex_from_parts(float x, float y) {
       return ::std::complex< float >(x, y);
@@ -6968,7 +7481,7 @@ static void __Pyx_ReleaseBuffer(Py_buffer *view) {
 #endif
 
 /* Arithmetic */
-        #if CYTHON_CCOMPLEX
+          #if CYTHON_CCOMPLEX
 #else
     static CYTHON_INLINE int __Pyx_c_eq_float(__pyx_t_float_complex a, __pyx_t_float_complex b) {
        return (a.real == b.real) && (a.imag == b.imag);
@@ -7103,7 +7616,7 @@ static void __Pyx_ReleaseBuffer(Py_buffer *view) {
 #endif
 
 /* Declarations */
-        #if CYTHON_CCOMPLEX
+          #if CYTHON_CCOMPLEX
   #ifdef __cplusplus
     static CYTHON_INLINE __pyx_t_double_complex __pyx_t_double_complex_from_parts(double x, double y) {
       return ::std::complex< double >(x, y);
@@ -7123,7 +7636,7 @@ static void __Pyx_ReleaseBuffer(Py_buffer *view) {
 #endif
 
 /* Arithmetic */
-        #if CYTHON_CCOMPLEX
+          #if CYTHON_CCOMPLEX
 #else
     static CYTHON_INLINE int __Pyx_c_eq_double(__pyx_t_double_complex a, __pyx_t_double_complex b) {
        return (a.real == b.real) && (a.imag == b.imag);
@@ -7258,7 +7771,7 @@ static void __Pyx_ReleaseBuffer(Py_buffer *view) {
 #endif
 
 /* CIntToPy */
-        static CYTHON_INLINE PyObject* __Pyx_PyInt_From_enum__NPY_TYPES(enum NPY_TYPES value) {
+          static CYTHON_INLINE PyObject* __Pyx_PyInt_From_enum__NPY_TYPES(enum NPY_TYPES value) {
     const enum NPY_TYPES neg_one = (enum NPY_TYPES) -1, const_zero = (enum NPY_TYPES) 0;
     const int is_unsigned = neg_one > const_zero;
     if (is_unsigned) {
@@ -7289,7 +7802,7 @@ static void __Pyx_ReleaseBuffer(Py_buffer *view) {
 }
 
 /* CIntFromPy */
-        static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *x) {
+          static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *x) {
     const int neg_one = (int) -1, const_zero = (int) 0;
     const int is_unsigned = neg_one > const_zero;
 #if PY_MAJOR_VERSION < 3
@@ -7478,7 +7991,7 @@ raise_neg_overflow:
 }
 
 /* CIntFromPy */
-        static CYTHON_INLINE Py_intptr_t __Pyx_PyInt_As_Py_intptr_t(PyObject *x) {
+          static CYTHON_INLINE Py_intptr_t __Pyx_PyInt_As_Py_intptr_t(PyObject *x) {
     const Py_intptr_t neg_one = (Py_intptr_t) -1, const_zero = (Py_intptr_t) 0;
     const int is_unsigned = neg_one > const_zero;
 #if PY_MAJOR_VERSION < 3
@@ -7667,7 +8180,7 @@ raise_neg_overflow:
 }
 
 /* CIntToPy */
-        static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value) {
+          static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value) {
     const long neg_one = (long) -1, const_zero = (long) 0;
     const int is_unsigned = neg_one > const_zero;
     if (is_unsigned) {
@@ -7698,7 +8211,7 @@ raise_neg_overflow:
 }
 
 /* CIntFromPy */
-        static CYTHON_INLINE long __Pyx_PyInt_As_long(PyObject *x) {
+          static CYTHON_INLINE long __Pyx_PyInt_As_long(PyObject *x) {
     const long neg_one = (long) -1, const_zero = (long) 0;
     const int is_unsigned = neg_one > const_zero;
 #if PY_MAJOR_VERSION < 3
@@ -7887,7 +8400,7 @@ raise_neg_overflow:
 }
 
 /* CheckBinaryVersion */
-        static int __Pyx_check_binary_version(void) {
+          static int __Pyx_check_binary_version(void) {
     char ctversion[4], rtversion[4];
     PyOS_snprintf(ctversion, 4, "%d.%d", PY_MAJOR_VERSION, PY_MINOR_VERSION);
     PyOS_snprintf(rtversion, 4, "%s", Py_GetVersion());
@@ -7903,7 +8416,7 @@ raise_neg_overflow:
 }
 
 /* ModuleImport */
-        #ifndef __PYX_HAVE_RT_ImportModule
+          #ifndef __PYX_HAVE_RT_ImportModule
 #define __PYX_HAVE_RT_ImportModule
 static PyObject *__Pyx_ImportModule(const char *name) {
     PyObject *py_name = 0;
@@ -7921,7 +8434,7 @@ bad:
 #endif
 
 /* TypeImport */
-        #ifndef __PYX_HAVE_RT_ImportType
+          #ifndef __PYX_HAVE_RT_ImportType
 #define __PYX_HAVE_RT_ImportType
 static PyTypeObject *__Pyx_ImportType(const char *module_name, const char *class_name,
     size_t size, int strict)
@@ -7986,7 +8499,7 @@ bad:
 #endif
 
 /* FunctionImport */
-        #ifndef __PYX_HAVE_RT_ImportFunction
+          #ifndef __PYX_HAVE_RT_ImportFunction
 #define __PYX_HAVE_RT_ImportFunction
 static int __Pyx_ImportFunction(PyObject *module, const char *funcname, void (**f)(void), const char *sig) {
     PyObject *d = 0;
@@ -8040,7 +8553,7 @@ bad:
 #endif
 
 /* InitStrings */
-        static int __Pyx_InitStrings(__Pyx_StringTabEntry *t) {
+          static int __Pyx_InitStrings(__Pyx_StringTabEntry *t) {
     while (t->p) {
         #if PY_MAJOR_VERSION < 3
         if (t->is_unicode) {
