@@ -241,50 +241,6 @@ class LucidSKTree(LeafDictionary):
         )
 
 
-# Find the worst component of prediction; used in
-# LucidSKEnsemble and CompressedEnsemble for pruning
-def _find_worst(ensemble_model, y_true, y_pred,
-                pred_matrix, metric_function, n_prunes):
-    """ Used to find the worst column in the pred_matrix
-
-    :param ensemble_model: should be a LucidSKEnsemble or
-        CompressedEnsemble object
-    :param y_true (np.ndarray): the values of the true target variables
-    :param y_pred (np.ndarray): the values of the outputted predicted
-        target variabels
-    :param pred_matrix (np.ndarray): a matrix of nxm of which each
-        column is a component of the prediction
-        (i.e. prediction for the jth datapoint is the sum of row j)
-    """
-    prune_candidates = []
-    global_best_score = ensemble_model.score(y_true, y_pred, metric_function)
-
-    for prune_ind in range(n_prunes):
-
-        worst_ind, local_best_score = 0, -np.inf
-        for ind in (idx for idx in range(pred_matrix.shape[1])
-                    if idx not in prune_candidates):
-
-            y_pred_tmp = y_pred - \
-                np.sum(pred_matrix[:, prune_candidates + [ind]], axis=1)
-
-            curr_score = ensemble_model.score(
-                y_true=y_true,
-                y_pred=y_pred_tmp,
-                metric_function=metric_function)
-
-            if curr_score > local_best_score:
-                worst_ind = ind
-                local_best_score = curr_score
-
-        if global_best_score > local_best_score:
-            return prune_candidates
-        else:
-            global_best_score = local_best_score
-            prune_candidates.append(worst_ind)
-    return prune_candidates
-
-
 class LucidSKEnsemble(LeafDictionary):
     """ Object representation of an ensemble of unraveled decision trees
         It is essentially a wrapper around a list where the ...
@@ -415,7 +371,7 @@ class LucidSKEnsemble(LeafDictionary):
             self._init_estimator,
             **kwargs)
 
-    def prune_by_estimators(self, X_df, y_true, metric_function='rsquared', n_prunes=None):
+    def prune_by_estimators(self, X_df, y_true, metric_function='mse', n_prunes=None):
         """ Prune out estimators from the ensemble over data
             in X_df (feature variables) and y (target variable)
 
@@ -450,12 +406,8 @@ class LucidSKEnsemble(LeafDictionary):
         pred_matrix *= self.learning_rate
         y_pred = np.sum(pred_matrix, axis=1).ravel() + init_pred
 
-        # inds_to_prune = _find_worst(
-        #     y_true, y_pred,
-        #     pred_matrix, metric_function, n_prunes)
         inds_to_prune = find_prune_candidates(
-            y_true, y_pred,
-            pred_matrix, metric_function, n_prunes)
+            y_true, y_pred, pred_matrix, metric_function, n_prunes)
 
         # go backwards so indexes are not modified
         for ind in sorted(inds_to_prune, reverse=True):
@@ -463,9 +415,6 @@ class LucidSKEnsemble(LeafDictionary):
                 'Deleting estimator {}'.format(self[ind]))
             self.pop(ind)
 
-        print(
-            'Finished with {} prunes with {} estimators left'
-            .format(len(inds_to_prune), self.n_estimators))
         logging.getLogger(__name__).debug(
             'Finished with {} prunes with {} estimators left'
             .format(len(inds_to_prune), self.n_estimators))
@@ -630,7 +579,7 @@ class CompressedEnsemble(LeafDictionary):
 
         return activation_matrix.tocsr()
 
-    def prune_by_leaves(self, X_df, y_true, metric_function='rsquared', n_prunes=None):
+    def prune_by_leaves(self, X_df, y_true, metric_function='mse', n_prunes=None):
         """ Prune out estimators from the ensemble over data
             in X_df (feature variables) and y (target variable)
 
@@ -669,13 +618,8 @@ class CompressedEnsemble(LeafDictionary):
             pred_matrix[:, ind] = activated_indices * self[path]
         y_pred = np.sum(pred_matrix, axis=1).ravel() + init_pred
 
-        # get which leaves to prune
-        # inds_to_prune = _find_worst(
-        #     y_true, y_pred, pred_matrix,
-        #     metric_function, n_prunes)
         inds_to_prune = find_prune_candidates(
-            y_true, y_pred, pred_matrix,
-            metric_function, n_prunes)
+            y_true, y_pred, pred_matrix, metric_function, n_prunes)
 
         for ind in sorted(inds_to_prune, reverse=True):
             worst_leaf = leaves[ind]
@@ -684,9 +628,6 @@ class CompressedEnsemble(LeafDictionary):
             self.pop(leaves[ind])
             leaves.pop(ind)
 
-        print(
-            'Finished with {} prunes with {} leaves left'
-            .format(len(inds_to_prune), self.n_leaves))
         logging.getLogger(__name__).debug(
             'Finished with {} prunes with {} leaves left'
             .format(len(inds_to_prune), self.n_leaves))

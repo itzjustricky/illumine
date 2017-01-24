@@ -5,8 +5,9 @@
 """
 
 cimport cython
-import numpy as np
 cimport numpy as np
+
+# import logging
 
 from numpy.math cimport INFINITY
 
@@ -16,20 +17,6 @@ from ..core cimport metrics
 # define a function type
 ctypedef double (*metric_f)(np.ndarray[double, ndim=1] y_true,
                             np.ndarray[double, ndim=1] y_pred)
-
-
-cdef sum_rows(np.ndarray[double, ndim=2] pred_matrix):
-    cdef int n_rows, n_cols
-    n_rows = pred_matrix.shape[0]
-    n_cols = pred_matrix.shape[1]
-
-    cdef np.ndarray[double, ndim=1] sum_vector = \
-        np.zeros(n_rows, dtype=np.float64)
-
-    for row in xrange(n_rows):
-        for col in xrange(n_cols):
-            sum_vector[row] += pred_matrix[row][col]
-    return sum_vector
 
 
 def find_prune_candidates(np.ndarray[double, ndim=1] y_true,
@@ -91,7 +78,6 @@ cdef _find_prune_candidates(np.ndarray[double, ndim=1] y_true,
     cdef np.ndarray[double, ndim=1] y_pred_tmp
 
     global_best_score = score_function(y_true, y_pred)
-
     for prune_ind in range(n_prunes):
 
         worst_ind, local_best_score = 0, -INFINITY
@@ -99,9 +85,8 @@ cdef _find_prune_candidates(np.ndarray[double, ndim=1] y_true,
             if ind in prune_candidates:
                 continue
 
-            # print(pred_matrix[:, prune_candidates + [ind]])
             y_pred_tmp = y_pred - \
-                sum_rows(pred_matrix[:, prune_candidates + [ind]])
+                pred_matrix[:, prune_candidates + [ind]].sum(axis=1)
 
             curr_score = score_function(
                 y_true=y_true,

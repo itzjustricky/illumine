@@ -1,4 +1,3 @@
-import bpdb
 """
     Description:
 
@@ -10,6 +9,7 @@ import bpdb
 import numpy as np
 import pandas as pd
 
+from sklearn.metrics import mean_squared_error
 from sklearn.ensemble import GradientBoostingRegressor
 
 from illumine.utils import StopWatch
@@ -17,8 +17,8 @@ from illumine.woodland import make_LucidSKEnsemble
 
 
 def test_pruning():
-    """ Tests the pruning methods on both the LucidSKEnsemble
-        and the CompressedEnsemble object
+    """ Tests the pruning methods on both the objects
+        LucidSKEnsemble and the CompressedEnsemble
     """
     X1 = np.arange(0, 10, 0.1)
     X2 = np.arange(10, 20, 0.1)
@@ -34,22 +34,22 @@ def test_pruning():
     compressed_ensemble = lucid_ensemble.compress()
 
     with StopWatch('Prune by estimator'):
-        lucid_ensemble.prune_by_estimators(X_df, y)
+        lucid_ensemble.prune_by_estimators(X_df, y, metric_function='mse')
     with StopWatch('Prune by leaf'):
-        compressed_ensemble.prune_by_leaves(X_df, y)
+        compressed_ensemble.prune_by_leaves(X_df, y, metric_function='mse')
 
     ypred = regr.predict(X_df)
     ypred_after_eprune = lucid_ensemble.predict(X_df)
     ypred_after_lprune = compressed_ensemble.predict(X_df)
 
     # make sure the loss over which the prune happened is <= previous loss
-    assert(lucid_ensemble._loss(y, ypred_after_eprune) <= lucid_ensemble._loss(y, ypred))
-    assert(compressed_ensemble._loss(y, ypred_after_lprune) <= lucid_ensemble._loss(y, ypred))
+    assert(mean_squared_error(y, ypred_after_eprune) <= mean_squared_error(y, ypred))
+    assert(mean_squared_error(y, ypred_after_lprune) <= mean_squared_error(y, ypred))
 
 
-"""
 if __name__ == "__main__":
     test_pruning()
+
 """
 # Set main function for debugging if error
 import bpdb, sys, traceback
@@ -60,3 +60,4 @@ if __name__ == "__main__":
         type, value, tb = sys.exc_info()
         traceback.print_exc()
         bpdb.post_mortem(tb)
+"""
