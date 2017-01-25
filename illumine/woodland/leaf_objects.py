@@ -414,7 +414,7 @@ class LucidSKEnsemble(LeafDictionary):
         # go backwards so indexes are not modified
         for ind in sorted(inds_to_prune, reverse=True):
             logging.getLogger(__name__).debug(
-                'Deleting estimator {}'.format(self[ind]))
+                'Deleting estimator\n{}'.format(self[ind]))
             self.pop(ind)
 
         logging.getLogger(__name__).debug(
