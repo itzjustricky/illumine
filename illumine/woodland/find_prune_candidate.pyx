@@ -69,7 +69,8 @@ cdef _find_prune_candidates(np.ndarray[double, ndim=1] y_true,
                             np.ndarray[double, ndim=2] pred_matrix,
                             metric_f score_function,
                             int n_prunes):
-    cdef list prune_candidates
+    cdef list indices, prune_candidates
+    indices = list(range(pred_matrix.shape[1]))
     prune_candidates = []
 
     cdef int prune_ind, worst_ind
@@ -80,9 +81,10 @@ cdef _find_prune_candidates(np.ndarray[double, ndim=1] y_true,
     for prune_ind in range(n_prunes):
 
         worst_ind, local_best_score = 0, -INFINITY
-        for ind in xrange(pred_matrix.shape[1]):
-            if ind in prune_candidates:
-                continue
+        # for ind in xrange(pred_matrix.shape[1]):
+        for ind in indices:
+            # if ind in prune_candidates:
+            #     continue
 
             y_pred_tmp = y_pred - pred_matrix[:, ind]
             curr_score = score_function(
@@ -102,8 +104,9 @@ cdef _find_prune_candidates(np.ndarray[double, ndim=1] y_true,
             logging.getLogger(__name__).debug(
                 "There are now {} prune candidate(s)"
                 .format(len(prune_candidates)))
-            # update y_pred to save computation
+
             y_pred = y_pred - pred_matrix[:, worst_ind]
+            indices.remove(worst_ind)
 
             global_best_score = local_best_score
             prune_candidates.append(worst_ind)
