@@ -9,3 +9,8 @@ __pycache__/
 
 # IPython directory for state recording
 .ipynb_checkpoints/
+
+# Cython generated C files
+*.so
+*.c
+*.o
