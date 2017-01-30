@@ -32,28 +32,4 @@ lucid_gbr_pred = lucid_gbr.predict(X_df)
 # test prediction outputted from LucidSKEnsemble
 np.testing.assert_almost_equal(lucid_gbr_pred, gbr_pred)
 
-# Compress the ensemble object so internally leaves/terminal-nodes
-# with the same split paths are compressed into one object
-lucid_gbr.compress()
-print("{} unique nodes, {} total nodes, and {} tree estimators"
-      .format(lucid_gbr.unique_leaves_count,
-              lucid_gbr.total_leaves_count,
-              len(lucid_gbr)))
-```
-
-## Continuing from Last Example ...
-
-```
-# Using some analysis tools
-from illumine.woodland import score_leaves
-
-def sign_score_function(y_hat, y):
-    return np.sum(np.sign(y_hat) == np.sign(y))
-
-# This is a dictionary of leaf-paths mapped to their
-# scores over the passed data X_df, y
-leaf_scores = score_leaves(
-    lucid_ensemble, X_df, y,
-    score_function=sign_score_function,
-    normalize_score=True)
 ```
