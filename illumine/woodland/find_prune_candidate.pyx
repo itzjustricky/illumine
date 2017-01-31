@@ -40,7 +40,7 @@ def find_prune_candidates(np.ndarray[double, ndim=1] y_true,
     cdef metric_f score_function
 
     cdef list valid_functions = [
-        'mse', 'lad', 'rsquared', 'sign-match'
+        'mse', 'mad', 'rsquared', 'sign-match'
     ]
 
     if metric_name == 'mse':
