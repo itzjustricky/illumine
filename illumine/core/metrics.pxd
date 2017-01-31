@@ -18,7 +18,7 @@ cdef double negative_mse(np.ndarray[double, ndim=1] y_true,
 
 
 # Returns negative least-absolute deviation
-cdef double negative_lad(np.ndarray[double, ndim=1] y_true,
+cdef double negative_mad(np.ndarray[double, ndim=1] y_true,
                          np.ndarray[double, ndim=1] y_pred)
 
 

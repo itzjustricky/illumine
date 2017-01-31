@@ -45,8 +45,8 @@ def find_prune_candidates(np.ndarray[double, ndim=1] y_true,
 
     if metric_name == 'mse':
         score_function = metrics.negative_mse
-    elif metric_name == 'lad':
-        score_function = metrics.negative_lad
+    elif metric_name == 'mad':
+        score_function = metrics.negative_mad
     elif metric_name == 'rsquared':
         score_function = metrics.rsquared
     elif metric_name == 'sign-match':

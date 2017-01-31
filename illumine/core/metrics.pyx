@@ -19,11 +19,11 @@ cdef double negative_mse(np.ndarray[double, ndim=1] y_true,
     cdef np.ndarray[double, ndim=1] err
     err = y_true - y_pred
 
-    return - (err * err).sum()  / y_true.shape[0]
+    return -(err * err).sum()  / y_true.shape[0]
 
 
-# Returns negative least-absolute deviation
-cdef double negative_lad(np.ndarray[double, ndim=1] y_true,
+# Returns negative mean-absolute deviation
+cdef double negative_mad(np.ndarray[double, ndim=1] y_true,
                          np.ndarray[double, ndim=1] y_pred):
     cdef np.ndarray[double, ndim=1] err
     err = y_true - y_pred
@@ -33,7 +33,7 @@ cdef double negative_lad(np.ndarray[double, ndim=1] y_true,
     for ele in err:
         absolute_err_sum += abs(ele)
 
-    return - absolute_err_sum / y_true.shape[0]
+    return -absolute_err_sum / y_true.shape[0]
 
 
 # Returns the R-squared measure
