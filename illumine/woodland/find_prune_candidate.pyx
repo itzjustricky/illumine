@@ -7,20 +7,20 @@
 import logging
 
 cimport cython
-cimport numpy as np
+cimport numpy as cnp
 from numpy.math cimport INFINITY
 
 from ..core cimport metrics
 
 
 # define a function type
-ctypedef double (*metric_f)(np.ndarray[double, ndim=1] y_true,
-                            np.ndarray[double, ndim=1] y_pred)
+ctypedef double (*metric_f)(cnp.ndarray[double, ndim=1] y_true,
+                            cnp.ndarray[double, ndim=1] y_pred)
 
 
-def find_prune_candidates(np.ndarray[double, ndim=1] y_true,
-                          np.ndarray[double, ndim=1] y_pred,
-                          np.ndarray[double, ndim=2] pred_matrix,
+def find_prune_candidates(cnp.ndarray[double, ndim=1] y_true,
+                          cnp.ndarray[double, ndim=1] y_pred,
+                          cnp.ndarray[double, ndim=2] pred_matrix,
                           str metric_name,
                           int n_prunes):
     """ Used to find the columns to prune in the pred_matrix
@@ -64,9 +64,9 @@ def find_prune_candidates(np.ndarray[double, ndim=1] y_true,
         n_prunes)
 
 
-cdef _find_prune_candidates(np.ndarray[double, ndim=1] y_true,
-                            np.ndarray[double, ndim=1] y_pred,
-                            np.ndarray[double, ndim=2] pred_matrix,
+cdef _find_prune_candidates(cnp.ndarray[double, ndim=1] y_true,
+                            cnp.ndarray[double, ndim=1] y_pred,
+                            cnp.ndarray[double, ndim=2] pred_matrix,
                             metric_f score_function,
                             int n_prunes):
     cdef list indices, prune_candidates
@@ -75,7 +75,7 @@ cdef _find_prune_candidates(np.ndarray[double, ndim=1] y_true,
 
     cdef int prune_ind, worst_ind
     cdef double local_best_score, global_best_score, curr_score
-    cdef np.ndarray[double, ndim=1] y_pred_tmp
+    cdef cnp.ndarray[double, ndim=1] y_pred_tmp
 
     global_best_score = score_function(y_true, y_pred)
     for prune_ind in range(n_prunes):

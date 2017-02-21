@@ -10,22 +10,22 @@
 """
 
 cimport cython
-cimport numpy as np
+cimport numpy as cnp
 
 
 # Returns negative mean-squared error
-cdef double negative_mse(np.ndarray[double, ndim=1] y_true,
-                         np.ndarray[double, ndim=1] y_pred):
-    cdef np.ndarray[double, ndim=1] err
+cdef double negative_mse(cnp.ndarray[double, ndim=1] y_true,
+                         cnp.ndarray[double, ndim=1] y_pred):
+    cdef cnp.ndarray[double, ndim=1] err
     err = y_true - y_pred
 
     return -(err * err).sum()  / y_true.shape[0]
 
 
 # Returns negative mean-absolute deviation
-cdef double negative_mad(np.ndarray[double, ndim=1] y_true,
-                         np.ndarray[double, ndim=1] y_pred):
-    cdef np.ndarray[double, ndim=1] err
+cdef double negative_mad(cnp.ndarray[double, ndim=1] y_true,
+                         cnp.ndarray[double, ndim=1] y_pred):
+    cdef cnp.ndarray[double, ndim=1] err
     err = y_true - y_pred
 
     cdef double absolute_err_sum = 0.0
@@ -37,15 +37,15 @@ cdef double negative_mad(np.ndarray[double, ndim=1] y_true,
 
 
 # Returns the R-squared measure
-cdef double rsquared(np.ndarray[double, ndim=1] y_true,
-                     np.ndarray[double, ndim=1] y_pred):
+cdef double rsquared(cnp.ndarray[double, ndim=1] y_true,
+                     cnp.ndarray[double, ndim=1] y_pred):
 
     return 1.0 + negative_mse(y_true, y_pred) / y_true.var()
 
 
 # Returns the % of signs matched between two arrays
-cdef double sign_match(np.ndarray[double, ndim=1] y_true,
-                       np.ndarray[double, ndim=1] y_pred):
-    cdef np.ndarray[double, ndim=1] sign_match
+cdef double sign_match(cnp.ndarray[double, ndim=1] y_true,
+                       cnp.ndarray[double, ndim=1] y_pred):
+    cdef cnp.ndarray[double, ndim=1] sign_match
     sign_match = (y_true.sign() == y_pred.sign())
     return sign_match.sum() / y_true.shape[0]
