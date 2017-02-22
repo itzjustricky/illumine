@@ -9,24 +9,16 @@
 """
 
 cimport cython
-cimport numpy as cnp
 
 
-# Returns negative mean-squared error
-cdef double negative_mse(cnp.ndarray[double, ndim=1] y_true,
-                         cnp.ndarray[double, ndim=1] y_pred)
+cdef double negative_mse(double[:] y_true, double[:] y_pred) nogil
+""" Returns negative mean-squared error """
 
+cdef double negative_mad(double[:] y_true, double[:] y_pred) nogil
+""" Returns negative mean-absolute deviation """
 
-# Returns negative least-absolute deviation
-cdef double negative_mad(cnp.ndarray[double, ndim=1] y_true,
-                         cnp.ndarray[double, ndim=1] y_pred)
+cdef double rsquared(double[:] y_true, double[:] y_pred) nogil
+""" Returns the R-squared measure """
 
-
-# Returns the R-squared measure
-cdef double rsquared(cnp.ndarray[double, ndim=1] y_true,
-                     cnp.ndarray[double, ndim=1] y_pred)
-
-
-# Returns the % of signs matched between two arrays
-cdef double sign_match(cnp.ndarray[double, ndim=1] y_true,
-                       cnp.ndarray[double, ndim=1] y_pred)
+cdef double sign_match(double[:] y_true, double[:] y_pred) nogil
+""" Returns the % of signs matched between two arrays """

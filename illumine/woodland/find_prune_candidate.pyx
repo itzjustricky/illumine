@@ -14,8 +14,7 @@ from ..core cimport metrics
 
 
 # define a function type
-ctypedef double (*metric_f)(cnp.ndarray[double, ndim=1] y_true,
-                            cnp.ndarray[double, ndim=1] y_pred)
+ctypedef double (*metric_f)(double[:] y_true, double[:] y_pred)
 
 
 def find_prune_candidates(cnp.ndarray[double, ndim=1] y_true,
