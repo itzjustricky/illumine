@@ -102,14 +102,14 @@ cdef list _find_prune_candidates(double[:] y_true, double[:] y_pred,
 
         with nogil:
             for i in prange(n_indices):
-                for j in prange(vect_size):
+                for j in range(vect_size):
                     y_pred_tmp[j] = y_pred[j] - pred_matrix[j, cv_indices[i]]
 
                 scores[i] = score_function(
                     y_true=y_true,
                     y_pred=y_pred_tmp)
 
-            # now search for the index of the candidate
+            # search for the index of the candidate
             # whose prune produces the best score
             prune_ind, local_best_score = 0, -INFINITY
             for i in range(n_indices):
@@ -125,9 +125,8 @@ cdef list _find_prune_candidates(double[:] y_true, double[:] y_pred,
                 "There are now {} prune candidate(s)"
                 .format(len(prune_candidates)))
 
-            with nogil:
-                for i in prange(vect_size):
-                    y_pred[i] = y_pred[i] - pred_matrix[i, prune_ind]
+            for i in range(vect_size):
+                y_pred[i] = y_pred[i] - pred_matrix[i, prune_ind]
             py_indices.remove(prune_ind)
 
             global_best_score = local_best_score
