@@ -306,9 +306,6 @@ class LucidSKEnsemble(LeafDictionary):
 
     @property
     def feature_names(self):
-        """ The name of the features that were used
-            to train the scikit-learn model
-        """
         return self._feature_names
 
     def __reduce__(self):
@@ -503,9 +500,6 @@ class CompressedEnsemble(LeafDictionary):
 
     @property
     def feature_names(self):
-        """ The name of the features that were used
-            to train the scikit-learn model
-        """
         return self._feature_names
 
     @property
@@ -518,11 +512,38 @@ class CompressedEnsemble(LeafDictionary):
 
     def __reduce__(self):
         return (self.__class__, (
-            self._seq,
-            self.feature_names,
-            self._init_estimator,
-            self._print_limit)
+            self._seq, self.feature_names,
+            self._init_estimator, self._print_limit)
         )
+
+    def combine_with(self, other, weight=0.5):
+        """ Combine the CompressedEnsemble with another one
+
+        :param other: a CompressedEnsemble object that this one
+            will combine with; the features from other will
+            be weighted with weight
+        :param weight: the weight for how much of the
+            prediction will depend on other. in other words
+            new_pred = (1-weight)*self_pred + weight*other_pred
+        """
+        if not isinstance(other, CompressedEnsemble):
+            raise ValueError("The passed in other argument must be "
+                             "of type CompressedEnsemble.")
+
+        if weight <= 0.0 or weight >= 1.0:
+            raise ValueError(' '.join((
+                "An invalid weight of {} was passed in;".format(weight),
+                "weight must be between 0.0 and 1.0"))
+            )
+
+        self_weight = 1 - weight
+        for leaf_path, leaf_value in self.items():
+            self[leaf_path] = leaf_value * self_weight
+        for leaf_path, leaf_value in other.items():
+            if leaf_path in self:
+                self[leaf_path] += weight * leaf_value
+            else:
+                self[leaf_path] = weight * leaf_value
 
     def predict(self, X_df):
         """ Create predictions from a pandas DataFrame.
@@ -571,9 +592,6 @@ class CompressedEnsemble(LeafDictionary):
         activation_matrix = lil_matrix(
             (X_df.shape[0], len(filtered_leaves)),
             dtype=bool)
-        # Make sure the activation_matrix is initialized
-        # with False boolean values
-        assert(activation_matrix.sum() == 0)
 
         for ind, path in enumerate(filtered_leaves.keys()):
             activated_indices = _find_activated(X, f_map, path)
@@ -585,16 +603,17 @@ class CompressedEnsemble(LeafDictionary):
         """ Prune out estimators from the ensemble over data
             in X_df (feature variables) and y (target variable)
 
-        :param X_df (pandas.DataFrame): the feature matrix over
-            which predictions will be made
-        :param y (1d vector): the vector of target variables
-            used to evaluate the score
-        :param metric_function (str): the function that decides
-            the scoring; by default, the Rsquared is used
-        :param n_prunes: decides the # of prunes to do over the
-            estimators. Defaults to None, if None then it will
-            prune until score of the ensemble does not degrade
-            from taking out an estimator
+        :type X_df: pandas.DataFrame
+        :type y: 1d array-like
+        :type metric_function: str
+        :type n_prunes: int
+        :param X_df : the feature matrix over which predictions will be made
+        :param y : the vector of target variables used to evaluate the score
+        :param metric_function : the function that decides the scoring;
+            by default, the Rsquared is used
+        :param n_prunes: decides the # of prunes to do over the estimators.
+            Defaults to None, if None then it will prune until score of the
+            ensemble does not degrade from taking out a leaf.
         """
         if n_prunes is None:
             n_prunes = self.n_leaves
