@@ -1,23 +1,10 @@
 """
-    Description:
-        The functions in this module are used to create
-        the objects in the leaf_objects.py module.
-
-     make_LucidSKTree : factory method for LucidSKTree;
-     make_LucidSKEnsemble : factory method for LucidSKEnsemble;
-     unique_leaves_per_sample : function
-     get_tree_predictions : function
+    The functions in this module are used to create
+    the objects in the leaf_objects.py module.
 
      Notes:
         The hash of an object depends on the print_precision
         since the hash is of the str of path of the LucidSKTree
-
-    TODO:
-        * The make_LucidSKTree function may be better inside
-            the LucidSKTree __init__ function. As well as for
-            LucidSKEnsemble.
-            - problems .. it makes the __reduce__ process
-                less clean
 
     @author: Ricky
 """
