@@ -82,8 +82,8 @@ class LeafDictionary(object):
         self._print_limit = print_limit
         self._str_cache = None  # reset string cache
 
-    def __contains__(self, item):
-        return self._seq.__contains__(item)
+    def __contains__(self, obj):
+        return self._seq.__contains__(obj)
 
     def __iter__(self):
         return self._seq.__iter__()
