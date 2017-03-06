@@ -21,9 +21,8 @@ def feature_importance_barplot(sk_ensemble, feature_names,
                                n_features_to_display=None):
     """ Plot feature importances with horizontal bars
 
-        All of the credit belongs to Peter Prettenhofer at Scikit-Learn
+        Credit to: Peter Prettenhofer at Scikit-Learn
         License: BSD 3 clause
-
     """
     feature_importances = sk_ensemble.feature_importances_
     n_features = feature_importances.shape[0]
