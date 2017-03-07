@@ -43,20 +43,27 @@ cdef class TreeSplit:
         decision tree split
     """
 
+    cdef int _feature
     cdef str _feature_name
     cdef str _relation
     cdef double _threshold
     cdef int _print_precision
 
     def __cinit__(self,
+                  int feature,
                   str feature_name,
                   str relation,
                   double threshold,
                   int print_precision):
+        self._feature = feature
         self._feature_name = feature_name
         self._relation = relation
         self._threshold = threshold
         self._print_precision = print_precision
+
+    @property
+    def feature(self):
+        return self._feature
 
     @property
     def feature_name(self):
@@ -82,6 +89,7 @@ cdef class TreeSplit:
 
     def __reduce__(self):
         return (self.__class__, (
+            self._feature,
             self._feature_name,
             self._relation,
             self._threshold,
@@ -149,6 +157,7 @@ cdef retrieve_leaf_path(np.ndarray[double, ndim=3] values,
         if features[node_index] != -2:  # visiting inner node
             tracker_stack.append(0)
             tree_split = TreeSplit(
+                feature=features[node_index],
                 feature_name=feature_names[features[node_index]],
                 relation='<=',
                 threshold=thresholds[node_index],
@@ -172,6 +181,7 @@ cdef retrieve_leaf_path(np.ndarray[double, ndim=3] values,
             if len(leaf_path) != 0:
                 tmp_split = leaf_path.pop()
                 new_split = TreeSplit(
+                    feature=tmp_split.feature,
                     feature_name=tmp_split.feature_name,
                     relation='>',
                     threshold=tmp_split.threshold,

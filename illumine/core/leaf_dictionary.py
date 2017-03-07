@@ -92,6 +92,9 @@ class LeafDictionary(object):
         self._str_cache = None  # reset string cache
         return self._seq[key]
 
+    def __setitem__(self, key, value):
+        self._seq[key] = value
+
     def __repr__(self):
         return self.__str__()
 

@@ -15,8 +15,7 @@ import numpy as np
 from .leaf_objects import LeafPath
 from .leaf_objects import CompressedEnsemble
 
-from .predict_methods import _map_features_to_int
-from .predict_methods import _find_activated
+from .predict_methods import find_activated
 
 
 __all__ = ['score_leaves', 'score_leaf_group']
@@ -52,9 +51,7 @@ def score_leaves(compressed_ensemble, X_df, y_true,
             "The passed argument compressed_ensemble should "
             "be an instance of CompressedEnsemble")
 
-    f_map = _map_features_to_int(X_df.columns)
     X = X_df.values
-
     if considered_paths is not None:
         if not all(map(lambda x: isinstance(x, LeafPath), considered_paths)):
             raise ValueError(
@@ -75,7 +72,7 @@ def score_leaves(compressed_ensemble, X_df, y_true,
     for ind, leaf_pair in enumerate(filtered_leaves.items()):
         path, value = leaf_pair
 
-        activated_indices = _find_activated(X, f_map, path)
+        activated_indices = find_activated(X, path)
         n_activated = np.sum(activated_indices)
         if np.sum(activated_indices) < required_threshold:
             scores[path] = -np.inf
@@ -124,8 +121,6 @@ def score_leaf_group(leaf_group, compressed_ensemble,
         raise ValueError(
             "The passed argument compressed_ensemble should "
             "be an instance of CompressedEnsemble")
-
-    f_map = _map_features_to_int(X_df.columns)
     X = X_df.values
 
     filtered_leaves = \
@@ -137,7 +132,7 @@ def score_leaf_group(leaf_group, compressed_ensemble,
     for ind, leaf_pair in enumerate(filtered_leaves.items()):
         path, value = leaf_pair
         accm_value += value
-        activated_indices &= _find_activated(X, f_map, path)
+        activated_indices &= find_activated(X, path)
 
     n_activated = np.sum(activated_indices)
     logging.getLogger(__name__).debug(

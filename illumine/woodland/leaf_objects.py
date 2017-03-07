@@ -27,8 +27,7 @@ from ..core import LeafDictionary
 
 from .predict_methods import create_prediction
 from .predict_methods import create_apply
-from .predict_methods import _map_features_to_int
-from .predict_methods import _find_activated
+from .predict_methods import find_activated
 
 from .find_prune_candidate import find_prune_candidates
 
@@ -36,6 +35,16 @@ from ..utils.array_check import flatten_1darray
 
 __all__ = ['LeafPath', 'SKTreeNode', 'LucidSKTree',
            'LucidSKEnsemble', 'CompressedEnsemble']
+
+
+def _prep_for_prediction(leaf_obj):
+    """ Get the variables needed from a leaf-object to be
+        passed into methods from the predict_methods module
+
+    :param leaf_obj: TODO
+    :returns: TODO
+    """
+    pass
 
 
 @total_ordering
@@ -385,8 +394,8 @@ class LucidSKEnsemble(LeafDictionary):
         """
         if n_prunes is None:
             n_prunes = self.n_estimators
-        elif n_prunes >= self.n_estimators:
-            raise ValueError("The n_prunes cannot be >= # of estimators")
+        elif n_prunes > self.n_estimators:
+            raise ValueError("The n_prunes cannot be > # of estimators")
         y_true = flatten_1darray(y_true)
 
         # pred_matrix is such that the sum of row j is
@@ -472,7 +481,11 @@ class LeafDataStore(LeafDictionary):
 
 class CompressedEnsemble(LeafDictionary):
     """ Compressed Ensemble Tree created from
-        LucidSKEnsemble.compress() method
+        LucidSKEnsemble.compress() method.
+
+        The difference between the two is that LucidSKEnsemble
+        is grouped by estimators while CompressedEnsemble is
+        grouped by the leaf paths.
     """
 
     def __init__(self, tree_leaves, feature_names,
@@ -516,7 +529,7 @@ class CompressedEnsemble(LeafDictionary):
             self._init_estimator, self._print_limit)
         )
 
-    def combine_with(self, other, weight=0.5):
+    def combine_with(self, other, self_weight=0.5, other_weight=0.5):
         """ Combine the CompressedEnsemble with another one
 
         :param other: a CompressedEnsemble object that this one
@@ -530,20 +543,24 @@ class CompressedEnsemble(LeafDictionary):
             raise ValueError("The passed in other argument must be "
                              "of type CompressedEnsemble.")
 
-        if weight <= 0.0 or weight >= 1.0:
+        if self_weight < 0.0 or self_weight > 1.0:
             raise ValueError(' '.join((
-                "An invalid weight of {} was passed in;".format(weight),
-                "weight must be between 0.0 and 1.0"))
+                "An invalid self_weight of {} was passed in;".format(self_weight),
+                "weight must be in [0.0, 1.0]"))
+            )
+        if other_weight < 0.0 or other_weight > 1.0:
+            raise ValueError(' '.join((
+                "An invalid other_weight of {} was passed in;".format(other_weight),
+                "weight must be in [0.0, 1.0]"))
             )
 
-        self_weight = 1 - weight
         for leaf_path, leaf_value in self.items():
             self[leaf_path] = leaf_value * self_weight
         for leaf_path, leaf_value in other.items():
             if leaf_path in self:
-                self[leaf_path] += weight * leaf_value
+                self[leaf_path] += other_weight * leaf_value
             else:
-                self[leaf_path] = weight * leaf_value
+                self[leaf_path] = other_weight * leaf_value
 
     def predict(self, X_df):
         """ Create predictions from a pandas DataFrame.
@@ -554,11 +571,14 @@ class CompressedEnsemble(LeafDictionary):
         if not all(X_df.columns == self.feature_names):
             raise ValueError("The passed dataframe should")
 
-        leaf_path, leaf_values = \
-            zip(*[(leaf_path, self[leaf_path]) for leaf_path in self.leaves])
+        if len(self) > 0:
+            leaf_path, leaf_values = \
+                zip(*[(leaf_path, self[leaf_path]) for leaf_path in self.leaves])
 
-        return create_prediction(X_df, leaf_path, leaf_values) + \
-            self._init_estimator.predict(X_df).ravel()
+            return create_prediction(X_df, leaf_path, leaf_values) + \
+                self._init_estimator.predict(X_df).ravel()
+        else:
+            raise ValueError("The CompressedEnsemble has no leaves to create a prediction")
 
     def compute_activation(self, X_df, considered_paths=None):
         """ Compute an activation matrix, see below for more details.
@@ -576,9 +596,7 @@ class CompressedEnsemble(LeafDictionary):
             raise ValueError("The passed pandas DataFrame columns should equal the "
                              "contain the feature_names attribute of the LucidSKTree")
 
-        f_map = _map_features_to_int(X_df.columns)
-        X = X_df.values
-
+        X = X_df.values.astype(dtype=np.float64, order='F')
         if considered_paths is not None:
             if not all(map(lambda x: isinstance(x, LeafPath), considered_paths)):
                 raise ValueError(
@@ -594,7 +612,7 @@ class CompressedEnsemble(LeafDictionary):
             dtype=bool)
 
         for ind, path in enumerate(filtered_leaves.keys()):
-            activated_indices = _find_activated(X, f_map, path)
+            activated_indices = find_activated(X, path)
             activation_matrix[np.where(activated_indices)[0], ind] = True
 
         return activation_matrix.tocsr()
@@ -617,25 +635,23 @@ class CompressedEnsemble(LeafDictionary):
         """
         if n_prunes is None:
             n_prunes = self.n_leaves
-        elif n_prunes >= self.n_leaves:
-            raise ValueError("The n_prunes cannot be >= # of estimators")
+        elif n_prunes > self.n_leaves:
+            raise ValueError("The n_prunes cannot be > # of leaves")
         y_true = flatten_1darray(y_true)
 
         # pred_matrix is such that the sum of row j is
         # the prediction for jth datapoint
         pred_matrix = np.zeros(
             (X_df.shape[0], self.n_leaves),
-            order='F')
+            order='F')  # make column-major for optimization
         init_pred = self._init_estimator.predict(X_df).ravel()
         logging.getLogger(__name__).debug(
             'The pred_matrix has shape {}'.format(pred_matrix.shape))
 
-        f_map = _map_features_to_int(X_df.columns)
-        X = X_df.values
-
+        X = X_df.values.astype(dtype=np.float64, order='F')
         leaves = list(self.leaves)
         for ind, path in enumerate(leaves):
-            activated_indices = _find_activated(X, f_map, path)
+            activated_indices = find_activated(X, path)
             pred_matrix[:, ind] = activated_indices * self[path]
         y_pred = np.sum(pred_matrix, axis=1).ravel() + init_pred
 

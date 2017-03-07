@@ -15,7 +15,14 @@ extensions = [
     Extension(
         language="c",
         name="illumine.woodland.find_prune_candidate",
-        sources=["illumine/woodland/find_prune_candidate.pyx"])
+        sources=["illumine/woodland/find_prune_candidate.pyx"],
+        # extra_compile_args=['-fopenmp'],
+        # extra_link_args=['-fopenmp']
+    ),
+    Extension(
+        language="c",
+        name="illumine.woodland.predict_methods",
+        sources=["illumine/woodland/predict_methods.pyx"])
 ]
 
 setup(

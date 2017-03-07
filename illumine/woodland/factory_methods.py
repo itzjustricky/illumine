@@ -24,7 +24,7 @@ from ._retrieve_leaf_paths import retrieve_tree_metas
 __all__ = ['make_LucidSKTree', 'make_LucidSKEnsemble']
 
 
-def assemble_lucid_trees(sk_trees, feature_names, print_precision, **tree_kw):
+def assemble_lucid_trees(sk_trees, feature_names, print_precision, **tree_kws):
     """ This function is used to gather the paths to all the
         leaves given some of the Scikit-learn attributes
         of a decision tree.
@@ -43,7 +43,7 @@ def assemble_lucid_trees(sk_trees, feature_names, print_precision, **tree_kw):
             tree_leaves[leaf_ind] = SKTreeNode(*leaf_meta[1:])
 
         lucid_trees.append(
-            LucidSKTree(tree_leaves, feature_names, **tree_kw))
+            LucidSKTree(tree_leaves, feature_names, **tree_kws))
 
     return lucid_trees
 
@@ -70,8 +70,7 @@ def _accumulate_tree_attributes(sk_trees):
     )
 
 
-def make_LucidSKTree(sk_tree, feature_names, print_precision=10,
-                     sort_by_index=True, tree_kw=None):
+def make_LucidSKTree(sk_tree, feature_names, print_precision=5, tree_kws=None):
     """ Breakdown a tree's splits and returns the value of every leaf along
         with the path of splits that led to the leaf
 
@@ -85,23 +84,22 @@ def make_LucidSKTree(sk_tree, feature_names, print_precision=10,
     :param sk_tree: scikit-learn tree object
     :param print_precision (int): to determine what number the node
         values, thresholds are rounded to when printing
-    :param tree_kw (dict): key-word arguments to be passed into
+    :param tree_kws (dict): key-word arguments to be passed into
         LucidSKTree's constructor
 
     :returns: LucidSKTree object indexed by their order in the
         pre-order traversal of the Decision Tree
     """
-    if tree_kw is None:
-        tree_kw = dict()
-    elif not isinstance(tree_kw, dict):
-        raise ValueError("tree_kw should be of type dict")
+    if tree_kws is None:
+        tree_kws = dict()
+    elif not isinstance(tree_kws, dict):
+        raise ValueError("tree_kws should be of type dict")
     return assemble_lucid_trees(
-        sk_tree, feature_names, print_precision, **tree_kw)[0]
+        sk_tree, feature_names, print_precision, **tree_kws)[0]
 
 
-def make_LucidSKEnsemble(sk_ensemble, feature_names, print_precision=10,
-                         init_estimator=None, tree_kw=None,
-                         ensemble_kw=None, **kwargs):
+def make_LucidSKEnsemble(sk_ensemble, feature_names, print_precision=5,
+                         init_estimator=None, tree_kws=None, ensemble_kws=None):
     """ Breakdown a tree's splits and returns the value of every leaf along
         with the path of splits that led to the leaf
 
@@ -117,22 +115,22 @@ def make_LucidSKEnsemble(sk_ensemble, feature_names, print_precision=10,
         defaults to None, if None then equals Scikit-learn tree's initial estimator
     :param print_precision (int): to determine what number the node
         values, thresholds are rounded to when printing
-    :param tree_kw (dict): key-word arguments to be passed into
+    :param tree_kws (dict): key-word arguments to be passed into
         LucidSKTree's constructor
-    :param ensemble_kw (dict): key-word arguments to be passed into
+    :param ensemble_kws (dict): key-word arguments to be passed into
         LucidSKEnsemble's constructor
 
     :returns: dictionary of SKTreeNode objects indexed by their order in the
         pre-order traversal of the Decision Tree
     """
-    if tree_kw is None:
-        tree_kw = dict()
-    elif not isinstance(tree_kw, dict):
-        raise ValueError("tree_kw should be of type dict")
-    if ensemble_kw is None:
-        ensemble_kw = dict()
-    elif not isinstance(ensemble_kw, dict):
-        raise ValueError("tree_kw should be of type dict")
+    if tree_kws is None:
+        tree_kws = dict()
+    elif not isinstance(tree_kws, dict):
+        raise ValueError("tree_kws should be of type dict")
+    if ensemble_kws is None:
+        ensemble_kws = dict()
+    elif not isinstance(ensemble_kws, dict):
+        raise ValueError("tree_kws should be of type dict")
 
     if isinstance(sk_ensemble.estimators_, np.ndarray):
         ensemble_estimators = sk_ensemble.estimators_.ravel()
@@ -141,7 +139,7 @@ def make_LucidSKEnsemble(sk_ensemble, feature_names, print_precision=10,
 
     ensemble_of_leaves = assemble_lucid_trees(
         ensemble_estimators,
-        feature_names, print_precision, **tree_kw)
+        feature_names, print_precision, **tree_kws)
 
     # Retrieve the initial estimator for the ensemble
     if init_estimator is None:
@@ -165,4 +163,4 @@ def make_LucidSKEnsemble(sk_ensemble, feature_names, print_precision=10,
         ensemble_of_leaves, feature_names,
         init_estimator=init_estimator,
         learning_rate=learning_rate,
-        **ensemble_kw)
+        **ensemble_kws)

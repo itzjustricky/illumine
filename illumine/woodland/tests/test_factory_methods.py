@@ -198,8 +198,8 @@ if __name__ == "__main__":
 import bpdb, sys, traceback
 if __name__ == "__main__":
     try:
-        # test_LucidSKTree()
-        # test_LucidGBR()
+        test_LucidSKTree()
+        test_GradientBoost()
         test_RandomForest()
     except:
         type, value, tb = sys.exc_info()

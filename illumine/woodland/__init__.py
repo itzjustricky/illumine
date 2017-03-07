@@ -17,7 +17,15 @@ from .leaf_analysis import get_tree_predictions
 from .leaf_validation import score_leaves
 from .leaf_validation import score_leaf_group
 
+from .nurture import weighted_nurturing
+
+
 __all__ = [
     'factory_methods', 'leaf_analysis',
-    'leaf_objects', 'leaf_validation'
+    'leaf_objects', 'leaf_validation',
+    'SKTreeNode', 'LucidSKEnsemble', 'LucidSKTree', 'LeafDataStore',
+    'make_LucidSKTree', 'make_LucidSKEnsemble',
+    'gather_leaf_values', 'get_tree_predictions',
+    'score_leaves', 'score_leaf_group',
+    'weighted_nurturing'
 ]

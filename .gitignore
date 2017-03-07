@@ -2,6 +2,7 @@
 
 tags
 *.txt
+*.json
 
 # Python cache files
 __pycache__/
