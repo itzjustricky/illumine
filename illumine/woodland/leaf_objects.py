@@ -36,6 +36,8 @@ from ..utils.array_check import flatten_1darray
 __all__ = ['LeafPath', 'SKTreeNode', 'LucidSKTree',
            'LucidSKEnsemble', 'CompressedEnsemble']
 
+logger = logging.getLogger(__name__)
+
 
 def _prep_for_prediction(leaf_obj):
     """ Get the variables needed from a leaf-object to be
@@ -377,56 +379,6 @@ class LucidSKEnsemble(LeafDictionary):
             self._init_estimator,
             **kwargs)
 
-    def prune_by_estimators(self, X_df, y_true, metric_function='mse', n_prunes=None):
-        """ Prune out estimators from the ensemble over data
-            in X_df (feature variables) and y (target variable)
-
-        :param X_df (pandas.DataFrame): the feature matrix over
-            which predictions will be made
-        :param y_true (1d vector): the vector of target variables
-            used to evaluate the score
-        :param metric_function (str): the function that decides
-            the scoring; by default, the Rsquared is used
-        :param n_prunes: decides the # of prunes to do over the
-            estimators. Defaults to None, if None then it will
-            prune until score of the ensemble does not degrade
-            from taking out an estimator
-        """
-        if n_prunes is None:
-            n_prunes = self.n_estimators
-        elif n_prunes > self.n_estimators:
-            raise ValueError("The n_prunes cannot be > # of estimators")
-        y_true = flatten_1darray(y_true)
-
-        # pred_matrix is such that the sum of row j is
-        # the prediction for jth datapoint
-        pred_matrix = np.zeros(
-            (X_df.shape[0], self.n_estimators),
-            order='F')  # make column-major for optimization
-        init_pred = self._init_estimator.predict(X_df).ravel()
-        logging.getLogger(__name__).debug(
-            'The pred_matrix has shape {}'.format(pred_matrix.shape))
-
-        for est_ind, lucid_tree in enumerate(self):
-            pred_matrix[:, est_ind] = lucid_tree.predict(X_df)
-        pred_matrix *= self.learning_rate
-        y_pred = np.sum(pred_matrix, axis=1).ravel() + init_pred
-
-        inds_to_prune = find_prune_candidates(
-            y_true, y_pred, pred_matrix, metric_function, n_prunes)
-        logging.getLogger(__name__).debug(
-            "{} prune candidates were found".format(len(inds_to_prune)))
-
-        # go backwards so indexes are not modified
-        for ind in sorted(inds_to_prune, reverse=True):
-            logging.getLogger(__name__).debug(
-                'Deleting estimator\n{}'.format(self[ind]))
-            self.pop(ind)
-
-        logging.getLogger(__name__).debug(
-            'Finished with {} prunes with {} estimators left'
-            .format(len(inds_to_prune), self.n_estimators))
-
 
 class LeafDataStore(LeafDictionary):
     """ Object representation of unique leaf nodes in an ensemble/tree model mapped
@@ -636,7 +588,9 @@ class CompressedEnsemble(LeafDictionary):
         if n_prunes is None:
             n_prunes = self.n_leaves
         elif n_prunes > self.n_leaves:
-            raise ValueError("The n_prunes cannot be > # of leaves")
+            logger.info('The n_prunes passed was larger than the n_leaves '
+                        'so n_prunes was set to equal the n_leaves')
+            n_prunes = self.n_leaves
         y_true = flatten_1darray(y_true)
 
         # pred_matrix is such that the sum of row j is
@@ -645,8 +599,8 @@ class CompressedEnsemble(LeafDictionary):
             (X_df.shape[0], self.n_leaves),
             order='F')  # make column-major for optimization
         init_pred = self._init_estimator.predict(X_df).ravel()
-        logging.getLogger(__name__).debug(
-            'The pred_matrix has shape {}'.format(pred_matrix.shape))
+        logger.debug('The pred_matrix has shape {}'
+                     .format(pred_matrix.shape))
 
         X = X_df.values.astype(dtype=np.float64, order='F')
         leaves = list(self.leaves)
@@ -660,11 +614,10 @@ class CompressedEnsemble(LeafDictionary):
 
         for ind in sorted(inds_to_prune, reverse=True):
             worst_leaf = leaves[ind]
-            logging.getLogger(__name__).debug(
+            logger.debug(
                 'Deleting leaf {}'.format(worst_leaf))
             self.pop(leaves[ind])
             leaves.pop(ind)
 
-        logging.getLogger(__name__).debug(
-            'Finished with {} prunes with {} leaves left'
-            .format(len(inds_to_prune), self.n_leaves))
+        logger.debug('Finished with {} prunes with {} leaves left'
+                     .format(len(inds_to_prune), self.n_leaves))
