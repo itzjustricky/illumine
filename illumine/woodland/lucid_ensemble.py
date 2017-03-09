@@ -174,57 +174,6 @@ class LucidEnsemble(LeafDictionary):
             **kwargs)
 
 
-class LeafDataStore(LeafDictionary):
-    """ Object representation of unique leaf nodes in an ensemble/tree model mapped
-            to some data associated with the leaf nodes.
-        It is essentially a wrapper around a dict where the ...
-
-        key: the path to the unique leaf node. Example:
-            The list representation might be
-            ['PTRATIO>18.75', 'DIS>1.301', 'AGE>44.9', 'TAX<=368.0'],
-            which will then be represented as a string in the following way
-            'AGE>44.9 & DIS>1.301 & PTRATIO>18.75 & TAX<=368.0'.
-
-            Where PTRATIO, DIS, AGE, & TAX are feature names
-
-        value: Can be anything that describes some characteristics of the leaf node.
-            For example, aggregate_trained_leaves finds all the instances of a certain leaf path
-                of a trained ensemble and aggregates the leaf values. The aggregate_activated_leaves
-                function finds all the "activated" leaf paths over a given dataset and aggregates
-                the leaf values of those activated.
-
-    ..note:
-        This class is similar to LucidTree, but they are given different names to
-            highlight the logical differences. LucidTree is a mapping to TreeNodes
-            while LeafDataStore is a mapping to any attribute of a leaf node.
-        The use of this class is largely for duck typing and for correct use of woodland methods.
-
-        This class is NOT meant to be INHERITED from.
-    """
-
-    def __init__(self, tree_leaves, print_limit=30):
-        """ Construct the LucidTree object using a dictionary object indexed
-            by the leaf's index in the pre-order traversal of the decision tree.
-
-            The leaf's index is in set [0, k-1] where k is the # of nodes
-            (inner & leaf nodes)
-        """
-        if not isinstance(tree_leaves, dict):
-            raise ValueError("The passed tree_leaves needs to be a dict object")
-        str_kw = {"print_format": "path: {}\n{}"}
-
-        super(LeafDataStore, self).__init__(
-            tree_leaves,
-            print_limit=print_limit,
-            str_kw=str_kw)
-
-    def __reduce__(self):
-        return (self.__class__, (
-            self._seq,
-            self._print_limit)
-        )
-
-
 class CompressedEnsemble(LeafDictionary):
     """ Compressed Ensemble Tree created from
         LucidEnsemble.compress() method.
