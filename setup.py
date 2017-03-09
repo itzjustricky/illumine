@@ -6,12 +6,12 @@ from Cython.Build import cythonize
 extensions = [
     Extension(
         language="c",
-        name="illumine.woodland._retrieve_leaf_paths",
-        sources=["illumine/woodland/_retrieve_leaf_paths.pyx"]),
+        name="illumine.tree.leaf_retrieval",
+        sources=["illumine/tree/leaf_retrieval.pyx"]),
     Extension(
         language="c",
-        name="illumine.core.metrics",
-        sources=["illumine/core/metrics.pyx"]),
+        name="illumine.metrics.score_functions",
+        sources=["illumine/metrics/score_functions.pyx"]),
     Extension(
         language="c",
         name="illumine.woodland.find_prune_candidate",
@@ -21,8 +21,8 @@ extensions = [
     ),
     Extension(
         language="c",
-        name="illumine.woodland.predict_methods",
-        sources=["illumine/woodland/predict_methods.pyx"])
+        name="illumine.tree.predict_methods",
+        sources=["illumine/tree/predict_methods.pyx"])
 ]
 
 setup(

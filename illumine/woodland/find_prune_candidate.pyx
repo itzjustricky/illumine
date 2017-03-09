@@ -18,7 +18,7 @@ import numpy as np
 cimport numpy as cnp
 from numpy.math cimport INFINITY
 
-from ..core cimport metrics
+from ..metrics cimport score_functions
 
 
 # define a function type
@@ -51,13 +51,13 @@ def find_prune_candidates(cnp.ndarray[double, ndim=1] y_true,
     ]
 
     if metric_name == 'mse':
-        score_function = metrics.negative_mse
+        score_function = score_functions.negative_mse
     elif metric_name == 'mad':
-        score_function = metrics.negative_mad
+        score_function = score_functions.negative_mad
     elif metric_name == 'rsquared':
-        score_function = metrics.rsquared
+        score_function = score_functions.rsquared
     elif metric_name == 'sign-match':
-        score_function = metrics.sign_match
+        score_function = score_functions.sign_match
     else:
         raise ValueError(
             "Invalid metric_name was passed, metric_name must be in {}"

@@ -6,14 +6,10 @@
     @author: Ricky Chang
 """
 
-from math import ceil
 import numpy as np
 
-from ..woodland.leaf_analysis import get_tree_predictions
 
-
-__all__ = ['feature_importance_barplot', 'active_leaves_boxplot',
-           'step_improvement_plot']
+__all__ = ['feature_importance_barplot', 'step_improvement_plot']
 
 
 def feature_importance_barplot(sk_ensemble, feature_names,
@@ -100,43 +96,3 @@ def step_improvement_plot(sk_ensemble, X, y, error_func=None):
     ax.set_ylabel('Error')
 
     return fig, ax
-
-
-def active_leaves_boxplot(sk_ensemble, X, n_ax_rows=1):
-    """ Use a boxplot to plot the distribution
-
-    :param sk_ensemble: scikit-learn ensemble model object
-    :param X: array_like or sparse matrix, shape = [n_samples, n_features]
-        feature/dependent variables
-    """
-
-    n_samples = X.shape[0]
-    tree_predictions = get_tree_predictions(sk_ensemble, X)
-
-    # Function to create a list of lists into boxplot format
-    def make_boxplot_ready(np_array):
-        formatted_data = [np_array[i, :] for i in range(np_array.shape[0])]
-        return formatted_data
-
-    formatted_predictions = make_boxplot_ready(tree_predictions)
-    import matplotlib.pyplot as plt
-
-    fig, (all_axes) = plt.subplots(n_ax_rows, 1)
-    # this takes care of situation where n_ax_rows=1
-    if not isinstance(all_axes, np.ndarray):
-        all_axes = np.array([all_axes])
-
-    datapts_per_ax = ceil(1.0 * n_samples / n_ax_rows)
-    for ind, ax in enumerate(all_axes):
-        slice_start = datapts_per_ax * ind
-        slice_end = min(datapts_per_ax * (ind + 1), n_samples - 1)
-
-        ax.boxplot(
-            formatted_predictions[slice_start:slice_end],
-            showfliers=False)
-        ax.set_xticks(np.arange(1, datapts_per_ax + 1, datapts_per_ax // 10))
-        ax.set_xticklabels(np.arange(slice_start, slice_end, datapts_per_ax // 10))
-        ax.set_xlabel('Datarow #')
-        ax.set_ylabel('Predictions')
-
-    return fig, all_axes

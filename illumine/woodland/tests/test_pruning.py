@@ -13,12 +13,12 @@ from sklearn.metrics import mean_squared_error
 from sklearn.ensemble import GradientBoostingRegressor
 
 from illumine.utils import StopWatch
-from illumine.woodland import make_LucidSKEnsemble
+from illumine.woodland import make_LucidEnsemble
 
 
 def test_pruning():
     """ Tests the pruning methods on both the objects
-        LucidSKEnsemble and the CompressedEnsemble
+        LucidEnsemble and the CompressedEnsemble
     """
     X1 = np.arange(0, 10, 0.1)
     X2 = np.arange(10, 20, 0.1)
@@ -29,7 +29,7 @@ def test_pruning():
     regr = GradientBoostingRegressor(
         max_depth=3, n_estimators=100, random_state=3)
     regr.fit(X_df, y)
-    lucid_ensemble = make_LucidSKEnsemble(
+    lucid_ensemble = make_LucidEnsemble(
         regr, feature_names=X_df.columns, print_precision=3)
     compressed_ensemble = lucid_ensemble.compress()
 

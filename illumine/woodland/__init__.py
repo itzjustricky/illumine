@@ -1,31 +1,15 @@
 """
-    The woodland package is to handle the
-    illumination of ensemble models.
+    The woodland subpackage is for the
+    code of ensemble models
 """
 
-from .leaf_objects import SKTreeNode
-from .leaf_objects import LucidSKEnsemble
-from .leaf_objects import LucidSKTree
-from .leaf_objects import LeafDataStore
+from .lucid_ensemble import LucidEnsemble
+from .lucid_ensemble import CompressedEnsemble
 
-from .factory_methods import make_LucidSKTree
-from .factory_methods import make_LucidSKEnsemble
-
-from .leaf_analysis import gather_leaf_values
-from .leaf_analysis import get_tree_predictions
-
-from .leaf_validation import score_leaves
-from .leaf_validation import score_leaf_group
+from .ensemble_factory import make_LucidEnsemble
 
 from .nurture import weighted_nurturing
 
-
 __all__ = [
-    'factory_methods', 'leaf_analysis',
-    'leaf_objects', 'leaf_validation',
-    'SKTreeNode', 'LucidSKEnsemble', 'LucidSKTree', 'LeafDataStore',
-    'make_LucidSKTree', 'make_LucidSKEnsemble',
-    'gather_leaf_values', 'get_tree_predictions',
-    'score_leaves', 'score_leaf_group',
-    'weighted_nurturing'
-]
+    'LucidEnsemble', 'CompressedEnsemble',
+    'make_LucidEnsemble', 'weighted_nurturing']

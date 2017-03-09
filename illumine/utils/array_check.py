@@ -1,6 +1,5 @@
 """
-    Description:
-
+    Module with methods to handle arrays
 
 
     @author: Ricky Chang

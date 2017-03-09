@@ -5,9 +5,10 @@
 
 """
 
-from ..woodland.factory_methods import make_LucidSKEnsemble
+from .ensemble_factory import make_LucidEnsemble
 
 
+# TODO: docstring for weighted_nurturing
 def weighted_nurturing(ensemble_class, X_train, y_train,
                        feature_names, n_iterations, n_prunes=None,
                        metric_function='mse', update_weight=0.5,
@@ -33,7 +34,7 @@ def weighted_nurturing(ensemble_class, X_train, y_train,
                 nurtured_model.predict(X_train)
 
         ensemble_model.fit(X_train, new_y_train)
-        compressed_ensemble = make_LucidSKEnsemble(
+        compressed_ensemble = make_LucidEnsemble(
             ensemble_model, feature_names,
             print_precision=print_precision,
             tree_kws=tree_kws, ensemble_kws=ensemble_kws).compress()

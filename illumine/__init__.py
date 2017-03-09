@@ -1,7 +1,7 @@
-
+from . import tree
 from . import woodland
-from . import visual
-from . import feature
+from . import metrics
 from . import utils
+from . import visual
 
-__all__ = ['woodland', 'visual', 'feature', 'utils']
+__all__ = ['tree', 'woodland', 'metrics', 'utils', 'visual']

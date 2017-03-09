@@ -9,7 +9,7 @@
 import types
 import collections
 
-from ..core.printing import print_seq
+from ..utils.printing import print_seq
 
 
 class LeafDictionary(object):
@@ -21,7 +21,7 @@ class LeafDictionary(object):
     """
 
     def __init__(self, tree_leaves, print_limit, str_kw=None):
-        """ Construct the LucidSKTree object using a dictionary object indexed
+        """ Construct the LucidTree object using a dictionary object indexed
             by the leaf's index in the pre-order traversal of the decision tree.
 
             The leaf's index is in set [0, k-1] where k is the # of nodes (inner & leaf nodes)
@@ -31,7 +31,7 @@ class LeafDictionary(object):
 
         self._seq = tree_leaves
         self._str_cache = None              # used to cache the string repr.
-        self._print_limit = print_limit     # limit for how many SKTreeNode objects to print
+        self._print_limit = print_limit     # limit for how many TreeNode objects to print
 
         if str_kw is None:
             self._str_kw = dict()

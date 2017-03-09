@@ -3,7 +3,7 @@
         Methods for analyzing tree nodes following the Scikit-Learn API
 
     TODO:
-        * add more to compress the LucidSKEnsemble;
+        * add more to compress the LucidEnsemble;
             there is a lot of inefficiency there
             - compress by identical trees instead of
                 by unique nodes?
@@ -17,24 +17,21 @@ import logging
 from copy import deepcopy
 from collections import Iterable
 from collections import OrderedDict
-from functools import total_ordering
 
 import numpy as np
 from scipy.sparse import lil_matrix
 from pandas import DataFrame
 
-from ..core import LeafDictionary
-
-from .predict_methods import create_prediction
-from .predict_methods import create_apply
-from .predict_methods import find_activated
+from ..tree.leaf_dictionary import LeafDictionary
+from ..tree.lucid_tree import LucidTree
+from ..tree.lucid_tree import LeafPath
+from ..tree.predict_methods import create_prediction
+from ..tree.predict_methods import find_activated
 
 from .find_prune_candidate import find_prune_candidates
-
 from ..utils.array_check import flatten_1darray
 
-__all__ = ['LeafPath', 'SKTreeNode', 'LucidSKTree',
-           'LucidSKEnsemble', 'CompressedEnsemble']
+__all__ = ['LucidEnsemble', 'CompressedEnsemble']
 
 logger = logging.getLogger(__name__)
 
@@ -49,216 +46,13 @@ def _prep_for_prediction(leaf_obj):
     pass
 
 
-@total_ordering
-class LeafPath(object):
-    """ Object representation of the path to a leaf node """
-
-    def __init__(self, path):
-        """ The initializer for LeafPath
-
-        :param path (list): a list of TreeSplit objects which
-            is defined in a Cython module.
-
-            A TreeSplit represent a single split in feature data X.
-        """
-        self._path = path
-        self._key = None
-
-    @property
-    def path(self):
-        return self._path
-
-    def __iter__(self):
-        return self.path.__iter__()
-
-    def __str__(self):
-        return self.path.__str__()
-
-    def __repr__(self):
-        return self.__str__()
-
-    @property
-    def key(self):
-        """ The key attribute is used for sorting and
-            defining the hash of the LeafPath object
-        """
-        if self._key is None:
-            self._key = ''
-            # let the key be composed of the feature_names then
-            # the numbers this allows more informative sorting
-            for split in self.path:
-                self._key += split.feature_name
-            for split in self.path:
-                self._key += split.relation
-                self._key += str(round(
-                    split.threshold, split.print_precision))
-
-        return self._key
-
-    def __hash__(self):
-        return hash(self.key)
-
-    def __eq__(self, other):
-        return self.key == other.key
-
-    def __lt__(self, other):
-        return self.key < other.key
-
-
-class SKTreeNode(object):
-    """ Object representation a single node of a decision tree
-
-    ..note: a big reason I decided to store path, value, n_samples in a
-         dictionary is so I have a nice and easy loop to return a representation
-    """
-
-    def __init__(self, path, value, n_samples):
-        """
-        :param path (list): the decision path to the node
-        :param value (numeric): the value associated with the node
-        :param n_samples (int): the number of samples that reach the node
-        """
-        self._path = LeafPath(path)
-        self._value = value
-        self._n_samples = n_samples
-
-        self._str_cache = None  # used to cache the string representation later
-
-    def __str__(self):
-        if self._str_cache is None:
-            node_strings = []
-            keys = ["path", "value", "n_samples"]
-            values = [self.path, self.value, self.n_samples]
-
-            for key, val in zip(keys, values):
-                node_strings.append("{}: {}".format(key, val))
-            self._str_cache = "({})".format(', '.join(node_strings))
-
-        return self._str_cache
-
-    def __repr__(self):
-        return self.__str__()
-
-    @property
-    def path(self):
-        return self._path
-
-    @property
-    def value(self):
-        return self._value
-
-    @property
-    def n_samples(self):
-        return self._n_samples
-
-
-class LucidSKTree(LeafDictionary):
-    """ Object representation of the unraveled leaf nodes of a decision tree
-        It is essentially a wrapper around a dictionary where the ...
-
-        key: The index of the leaf in the passed dictionary (tree_leaves) should be the index of
-             the leaf in the pre-order traversal of the decision tree.
-             The leaf's index is in set [0, k-1] where k is the # of nodes (inner & leaf nodes)
-        value: The value is an SKTreeNode object
-
-    ..note:
-        This object is intended to be created through make_LucidSKTree only.
-        This class is NOT meant to be INHERITED from.
-    """
-
-    def __init__(self, tree_leaves, feature_names, print_limit=30):
-        """ Construct the LucidSKTree object using a dictionary object indexed
-            by the leaf's index in the pre-order traversal of the decision tree.
-
-            The leaf's index is in set [0, k-1] where k is the # of nodes (inner & leaf nodes)
-
-        :param tree_leaves (dict): a dictionary of representations of the leaves from the
-            Scikit-learn tree models, the keys are the index of the leaves in the pre-order
-            traversal of the decision tree
-        :param feature_names (list): list of names (strings) of the features that
-            were used to split the tree
-        :param print_limit (int): configuration for how to print the LucidSKEnsemble
-            out to the console
-        """
-        if not isinstance(tree_leaves, dict):
-            raise ValueError("A dictionary object with keys mapped to SKTreeNodes should ",
-                             "be passed into the constructor.")
-        # Check all the values mapped are SKTreeNodes
-        assert all(map(lambda x: isinstance(x, SKTreeNode), tree_leaves.values()))
-
-        if not isinstance(feature_names, Iterable):
-            raise ValueError(
-                "feature_names should be an iterable object containing the "
-                "feature names that the tree was trained on")
-        self._feature_names = feature_names
-
-        super(LucidSKTree, self).__init__(
-            tree_leaves,
-            print_limit=print_limit)
-
-    @property
-    def feature_names(self):
-        return self._feature_names
-
-    def apply(self, X_df):
-        """ Apply trees in Tree to a pandas DataFrame.
-            The DataFrame columns should be the same as
-            the feature_names attribute.
-        """
-        activated_indices = np.zeros(X_df.shape[0], dtype=int)
-        # this indicates the trained tree had no splits
-        # this is possible in Scikit-learn
-        if len(self) == 1:
-            return activated_indices
-
-        if not isinstance(X_df, DataFrame):
-            raise ValueError("Predictions must be done on a Pandas dataframe")
-        if not all(X_df.columns == self.feature_names):
-            raise ValueError("The passed pandas DataFrame columns should equal the "
-                             "contain the feature_names attribute of the LucidSKTree")
-
-        leaf_paths, leaf_indices = \
-            zip(*[(leaf.path, leaf_ind) for leaf_ind, leaf in self.items()])
-
-        return create_apply(X_df, leaf_paths, leaf_indices)
-
-    def predict(self, X_df):
-        """ Create predictions from a pandas DataFrame.
-            The DataFrame columns should be the same as
-            the feature_names attribute.
-        """
-        y_pred = np.zeros(X_df.shape[0])
-        # this indicates the trained tree had no splits
-        # this is possible in Scikit-learn
-        if len(self) == 1:
-            return y_pred
-
-        if not isinstance(X_df, DataFrame):
-            raise ValueError("Predictions must be done on a Pandas dataframe")
-        if not all(X_df.columns == self.feature_names):
-            raise ValueError("The passed pandas DataFrame columns should equal the "
-                             "contain the feature_names attribute of the LucidSKTree")
-
-        leaf_paths, leaf_values = \
-            zip(*[(leaf.path, leaf.value) for leaf in self.values()])
-
-        return create_prediction(X_df, leaf_paths, leaf_values)
-
-    def __reduce__(self):
-        return (self.__class__, (
-            self._seq,
-            self._feature_names,
-            self._print_limit)
-        )
-
-
-class LucidSKEnsemble(LeafDictionary):
+class LucidEnsemble(LeafDictionary):
     """ Object representation of an ensemble of unraveled decision trees
         It is essentially a wrapper around a list where the ...
 
         index: The index of a tree model in its order of the additive process
             of an ensemble.
-        value: The value is LucidSKTree object
+        value: The value is LucidTree object
 
     ..note:
         This object is intended to be created through unravel_ensemble only.
@@ -267,16 +61,16 @@ class LucidSKEnsemble(LeafDictionary):
 
     def __init__(self, tree_ensemble, feature_names, init_estimator,
                  learning_rate, print_limit=5):
-        """ Construct the LucidSKTree object using a dictionary object indexed
+        """ Construct the LucidTree object using a dictionary object indexed
             by the leaf's index in the pre-order traversal of the decision tree.
 
             The leaf's index is in set [0, k-1] where k is the # of nodes (inner & leaf nodes)
 
-        :param tree_ensemble (list): a list of the LucidSKTree objects
+        :param tree_ensemble (list): a list of the LucidTree objects
         :param feature_names (list): list of names (strings) of the features that
             were used to split the tree
         :param init_estimator (function): function that is the initial estimator of the ensemble
-        :param print_limit (int): configuration for how to print the LucidSKEnsemble
+        :param print_limit (int): configuration for how to print the LucidEnsemble
             out to the console
         :param create_deepcopy (bool): indicates whether or not to make a deepcopy of
             the tree_ensemble argument passed into the __init__ function
@@ -284,8 +78,8 @@ class LucidSKEnsemble(LeafDictionary):
         if not isinstance(tree_ensemble, list):
             raise ValueError("A list object with index (by order of Boosts) mapped to Tree Estimators ",
                              "should be passed into the constructor.")
-        # Check all the values mapped are LucidSKTrees
-        assert all(map(lambda x: isinstance(x, LucidSKTree), tree_ensemble))
+        # Check all the values mapped are LucidTrees
+        assert all(map(lambda x: isinstance(x, LucidTree), tree_ensemble))
         self._feature_names = feature_names
         self._learning_rate = learning_rate
         self._unique_leaves_count = None
@@ -301,7 +95,7 @@ class LucidSKEnsemble(LeafDictionary):
 
         str_kw = {"print_format": "Estimator {}\n{}"}
 
-        super(LucidSKEnsemble, self).__init__(
+        super(LucidEnsemble, self).__init__(
             tree_ensemble,
             print_limit=print_limit,
             str_kw=str_kw)
@@ -400,8 +194,8 @@ class LeafDataStore(LeafDictionary):
                 the leaf values of those activated.
 
     ..note:
-        This class is similar to LucidSKTree, but they are given different names to
-            highlight the logical differences. LucidSKTree is a mapping to SKTreeNodes
+        This class is similar to LucidTree, but they are given different names to
+            highlight the logical differences. LucidTree is a mapping to TreeNodes
             while LeafDataStore is a mapping to any attribute of a leaf node.
         The use of this class is largely for duck typing and for correct use of woodland methods.
 
@@ -409,7 +203,7 @@ class LeafDataStore(LeafDictionary):
     """
 
     def __init__(self, tree_leaves, print_limit=30):
-        """ Construct the LucidSKTree object using a dictionary object indexed
+        """ Construct the LucidTree object using a dictionary object indexed
             by the leaf's index in the pre-order traversal of the decision tree.
 
             The leaf's index is in set [0, k-1] where k is the # of nodes
@@ -433,20 +227,20 @@ class LeafDataStore(LeafDictionary):
 
 class CompressedEnsemble(LeafDictionary):
     """ Compressed Ensemble Tree created from
-        LucidSKEnsemble.compress() method.
+        LucidEnsemble.compress() method.
 
-        The difference between the two is that LucidSKEnsemble
+        The difference between the two is that LucidEnsemble
         is grouped by estimators while CompressedEnsemble is
         grouped by the leaf paths.
     """
 
     def __init__(self, tree_leaves, feature_names,
                  init_estimator, print_limit=30):
-        """ Construct the LucidSKTree object using a dictionary object indexed
+        """ Construct the LucidTree object using a dictionary object indexed
             by the leaf's index in the pre-order traversal of the decision tree.
 
             The leaf's index is in set [0, k-1] where k is the # of nodes (inner & leaf nodes)
-            This object should be constructed using LucidSKEnsemble.compress() method
+            This object should be constructed using LucidEnsemble.compress() method
         """
         if not isinstance(tree_leaves, OrderedDict):
             raise ValueError("An OrderedDict object with keys mapped to LeafPath objects "
@@ -546,7 +340,7 @@ class CompressedEnsemble(LeafDictionary):
             raise ValueError("Predictions must be done on a Pandas dataframe")
         if not all(X_df.columns == self.feature_names):
             raise ValueError("The passed pandas DataFrame columns should equal the "
-                             "contain the feature_names attribute of the LucidSKTree")
+                             "contain the feature_names attribute of the LucidTree")
 
         X = X_df.values.astype(dtype=np.float64, order='F')
         if considered_paths is not None:

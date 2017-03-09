@@ -68,7 +68,6 @@ def create_prediction(X_df, tuple leaf_paths, tuple leaf_values):
     :param leaf_values: list of floats representing the values
         of the leaf nodes
     """
-
     # features integer representation
     X_matrix = X_df.values.astype(dtype=np.float64, order='F')
 

@@ -1,10 +1,9 @@
 
 """
-    Description:
-        Cython metric functions so they
-        can be called in Cython modules.
+    Cython metric functions so they
+    can be called in Cython modules.
 
-        Created for optimization purposes.
+    Created for optimization purposes.
 
     @author: Ricky
 """

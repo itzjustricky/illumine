@@ -3,6 +3,6 @@
 
 """
 
-from .time_manager import StopWatch
+from .timetools import StopWatch
 
-__all__ = ['time_manager']
+__all__ = ['StopWatch']

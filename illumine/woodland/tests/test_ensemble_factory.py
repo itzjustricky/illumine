@@ -12,37 +12,11 @@ import pickle
 import numpy as np
 import pandas as pd
 
-from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.ensemble import RandomForestRegressor
 
-from illumine.woodland import make_LucidSKTree
-from illumine.woodland import make_LucidSKEnsemble
+from illumine.woodland import make_LucidEnsemble
 from illumine.utils import StopWatch
-
-
-def test_LucidSKTree():
-
-    X1 = np.arange(0, 10, 0.1) + np.random.rand(100)
-    X2 = np.arange(10, 20, 0.1) + np.random.rand(100)
-
-    y = np.sin(X1).ravel() + np.cos(X2).ravel()
-    X_df = pd.DataFrame(np.array([X1, X2]).T, columns=['x1', 'x2'])
-
-    # try a range of depths
-    max_depths = [1, 2, 3, 10]
-
-    for max_depth in max_depths:
-        regr = DecisionTreeRegressor(max_depth=max_depth)
-        regr.fit(X_df, y)
-
-        lucid_tree = make_LucidSKTree(
-            regr, feature_names=X_df.columns, print_precision=3)
-        lucid_pred = lucid_tree.predict(X_df)
-        sk_pred = regr.predict(X_df)
-
-        # test prediction outputted from LucidSKTree
-        np.testing.assert_almost_equal(lucid_pred, sk_pred)
 
 
 def test_GradientBoost():
@@ -55,8 +29,8 @@ def test_GradientBoost():
 
     gbr_regr = GradientBoostingRegressor(n_estimators=5000, max_depth=3)
     gbr_regr.fit(X_df, y)
-    with StopWatch("LucidSKEnsemble Gradient Boost construction"):
-        lucid_gbr = make_LucidSKEnsemble(
+    with StopWatch("LucidEnsemble Gradient Boost construction"):
+        lucid_gbr = make_LucidEnsemble(
             gbr_regr, feature_names=X_df.columns, print_precision=3)
 
     with StopWatch("Scikit-learn Gradient Boost prediction"):
@@ -66,7 +40,7 @@ def test_GradientBoost():
         lucid_gbr_pred = lucid_gbr.predict(X_df)
 
     ######################################################
-    # test prediction outputted from LucidSKEnsemble
+    # test prediction outputted from LucidEnsemble
     np.testing.assert_almost_equal(lucid_gbr_pred, gbr_pred)
     assert(np.all(gbr_regr.apply(X_df) == lucid_gbr.apply(X_df)))
 
@@ -84,8 +58,8 @@ def test_GradientBoost():
     np.testing.assert_almost_equal(cgbr_pred, gbr_pred)
 
     # test comparison, compare the leaves of two
-    # LucidSKEnsembles made from the the same arguments
-    lucid_gbr2 = make_LucidSKEnsemble(
+    # LucidEnsembles made from the the same arguments
+    lucid_gbr2 = make_LucidEnsemble(
         gbr_regr, feature_names=X_df.columns, print_precision=3)
     compressed_lucid_gbr2 = lucid_gbr2.compress()
 
@@ -125,8 +99,8 @@ def test_RandomForest():
 
     rf_regr = RandomForestRegressor(n_estimators=1000, max_depth=5, bootstrap=False)
     rf_regr.fit(X_df, y)
-    with StopWatch("LucidSKEnsemble Random Forest construction"):
-        lucid_rf = make_LucidSKEnsemble(
+    with StopWatch("LucidEnsemble Random Forest construction"):
+        lucid_rf = make_LucidEnsemble(
             rf_regr, feature_names=X_df.columns, print_precision=5)
 
     # If this is not float32 there are precision errors
@@ -141,7 +115,7 @@ def test_RandomForest():
         lucid_rf_pred = lucid_rf.predict(X_df)
 
     ######################################################
-    # test prediction outputted from LucidSKEnsemble
+    # test prediction outputted from LucidEnsemble
     np.testing.assert_almost_equal(lucid_rf_pred, rf_pred)
     assert(np.all(rf_regr.apply(X_df) == lucid_rf.apply(X_df)))
 
@@ -157,8 +131,8 @@ def test_RandomForest():
 
     ######################################################
     # test comparison, compare the leaves of two
-    # LucidSKEnsembles made from the the same arguments
-    lucid_rf2 = make_LucidSKEnsemble(
+    # LucidEnsembles made from the the same arguments
+    lucid_rf2 = make_LucidEnsemble(
         rf_regr, feature_names=X_df.columns, print_precision=3)
     compressed_lucid_rf2 = lucid_rf2.compress()
 
@@ -189,7 +163,6 @@ def test_RandomForest():
 
 
 if __name__ == "__main__":
-    test_LucidSKTree()
     test_GradientBoost()
     test_RandomForest()
 
@@ -198,7 +171,7 @@ if __name__ == "__main__":
 import bpdb, sys, traceback
 if __name__ == "__main__":
     try:
-        test_LucidSKTree()
+        test_LucidTree()
         test_GradientBoost()
         test_RandomForest()
     except:
