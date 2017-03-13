@@ -10,33 +10,6 @@ import numpy as np
 cimport numpy as np
 
 
-@cython.cdivision(True)
-def retrieve_tree_metas(list accm_values,
-                        list accm_node_samples,
-                        list accm_features,
-                        list accm_thresholds,
-                        list feature_names,
-                        int print_precision):
-    cdef list tree_metas = []
-
-    cdef tuple tup
-    for tup in zip(accm_values,
-                   accm_node_samples,
-                   accm_features,
-                   accm_thresholds):
-
-        tree_metas.append(retrieve_leaf_path(
-            values=tup[0],
-            node_samples=tup[1],
-            features=tup[2],
-            thresholds=tup[3],
-            feature_names=feature_names,
-            print_precision=print_precision)
-        )
-    return tree_metas
-
-
-# maybe push out to a separate module
 cdef class TreeSplit:
     """ Representation of TreeSplit which contains
         feature_name, relation, threshold of a
@@ -120,12 +93,38 @@ cdef class TreeSplit:
             return str(x) >= str(y)
 
 
-cdef retrieve_leaf_path(np.ndarray[double, ndim=3] values,
-                        np.ndarray[long, ndim=1] node_samples,
-                        np.ndarray[long, ndim=1] features,
-                        np.ndarray[double, ndim=1] thresholds,
+@cython.cdivision(True)
+def retrieve_tree_metas(list accm_values,
+                        list accm_node_samples,
+                        list accm_features,
+                        list accm_thresholds,
                         list feature_names,
                         int print_precision):
+    cdef list tree_metas = []
+
+    cdef tuple tup
+    for tup in zip(accm_values,
+                   accm_node_samples,
+                   accm_features,
+                   accm_thresholds):
+
+        tree_metas.append(retrieve_leaf_path(
+            values=tup[0],
+            node_samples=tup[1],
+            features=tup[2],
+            thresholds=tup[3],
+            feature_names=feature_names,
+            print_precision=print_precision)
+        )
+    return tree_metas
+
+
+cdef list retrieve_leaf_path(np.ndarray[double, ndim=3] values,
+                             np.ndarray[long, ndim=1] node_samples,
+                             np.ndarray[long, ndim=1] features,
+                             np.ndarray[double, ndim=1] thresholds,
+                             list feature_names,
+                             int print_precision):
     """ Gather all the leaves of a tree and keep track of the
         paths that define the leaf.
 

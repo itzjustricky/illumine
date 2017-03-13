@@ -10,6 +10,10 @@ extensions = [
         sources=["illumine/tree/leaf_retrieval.pyx"]),
     Extension(
         language="c",
+        name="illumine.tree.predict_methods",
+        sources=["illumine/tree/predict_methods.pyx"]),
+    Extension(
+        language="c",
         name="illumine.metrics.score_functions",
         sources=["illumine/metrics/score_functions.pyx"]),
     Extension(
@@ -21,8 +25,8 @@ extensions = [
     ),
     Extension(
         language="c",
-        name="illumine.tree.predict_methods",
-        sources=["illumine/tree/predict_methods.pyx"])
+        name="illumine.woodland.leaf_tuning",
+        sources=["illumine/woodland/leaf_tuning.pyx"])
 ]
 
 setup(

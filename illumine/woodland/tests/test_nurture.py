@@ -6,15 +6,15 @@
     @author: Ricky Chang
 """
 
-import numpy as np
+# import numpy as np
 import pandas as pd
 
 from sklearn.metrics import mean_squared_error
-# from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split
 
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import GradientBoostingRegressor
-# from sklearn.datasets.california_housing import fetch_california_housing
+from sklearn.datasets.california_housing import fetch_california_housing
 
 from illumine.utils import StopWatch
 from illumine.woodland import weighted_nurturing
@@ -23,18 +23,17 @@ __test__ = False
 
 
 def test_weighted_nurturing():
-    X1 = np.arange(0, 10, 0.1)
-    X2 = np.arange(10, 20, 0.1)
-    y_train = np.sin(X1).ravel() + np.cos(X2).ravel()
-    X_train = pd.DataFrame(np.array([X1, X2]).T, columns=['x1', 'x2'])
-    X_test, y_test = X_train, y_train
-
-    # cal_housing = fetch_california_housing()
-    # X_train, X_test, y_train, y_test = \
-    #     train_test_split(cal_housing.data, cal_housing.target,
-    #                      test_size=0.3, random_state=5)
-    # X_train = pd.DataFrame(X_train, columns=cal_housing.feature_names)
-    # X_test = pd.DataFrame(X_test, columns=cal_housing.feature_names)
+    # X1 = np.arange(0, 10, 0.1)
+    # X2 = np.arange(10, 20, 0.1)
+    # y_train = np.sin(X1).ravel() + np.cos(X2).ravel()
+    # X_train = pd.DataFrame(np.array([X1, X2]).T, columns=['x1', 'x2'])
+    # X_test, y_test = X_train, y_train
+    cal_housing = fetch_california_housing()
+    X_train, X_test, y_train, y_test = \
+        train_test_split(cal_housing.data, cal_housing.target,
+                         test_size=0.3, random_state=5)
+    X_train = pd.DataFrame(X_train, columns=cal_housing.feature_names)
+    X_test = pd.DataFrame(X_test, columns=cal_housing.feature_names)
 
     model_params = {
         'max_depth': 10, 'n_estimators': 200, 'random_state': 5,
@@ -45,7 +44,7 @@ def test_weighted_nurturing():
             RandomForestRegressor, X_train, y_train,
             feature_names=X_train.columns,
             n_iterations=20, metric_function='mse',
-            n_prunes=50, update_weight=0.3,
+            n_tunes=50, update_weight=0.3,
             model_params=model_params)
 
     print("The mean-squared error for nurtured ensemble prediction: {}".format(
@@ -69,6 +68,7 @@ def test_weighted_nurturing():
     # assert(mean_squared_error(y, ypred_after_lprune) <= mean_squared_error(y, ypred))
 
 
+"""
 if __name__ == "__main__":
     test_weighted_nurturing()
 
@@ -82,4 +82,3 @@ if __name__ == "__main__":
         type, value, tb = sys.exc_info()
         traceback.print_exc()
         bpdb.post_mortem(tb)
-"""

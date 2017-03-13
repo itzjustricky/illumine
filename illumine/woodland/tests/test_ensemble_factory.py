@@ -162,6 +162,7 @@ def test_RandomForest():
     os.remove(pickle_path)
 
 
+"""
 if __name__ == "__main__":
     test_GradientBoost()
     test_RandomForest()
@@ -171,11 +172,9 @@ if __name__ == "__main__":
 import bpdb, sys, traceback
 if __name__ == "__main__":
     try:
-        test_LucidTree()
         test_GradientBoost()
         test_RandomForest()
     except:
         type, value, tb = sys.exc_info()
         traceback.print_exc()
         bpdb.post_mortem(tb)
-"""

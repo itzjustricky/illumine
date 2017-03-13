@@ -20,15 +20,17 @@ from collections import OrderedDict
 
 import numpy as np
 from scipy.sparse import lil_matrix
+# from scipy.sparse import diags
 from pandas import DataFrame
 
 from ..tree.leaf_dictionary import LeafDictionary
 from ..tree.lucid_tree import LucidTree
-from ..tree.lucid_tree import LeafPath
+# from ..tree.lucid_tree import LeafPath
 from ..tree.predict_methods import create_prediction
 from ..tree.predict_methods import find_activated
 
 from .find_prune_candidate import find_prune_candidates
+from .leaf_tuning import finetune_ensemble
 from ..utils.array_check import flatten_1darray
 
 __all__ = ['LucidEnsemble', 'CompressedEnsemble']
@@ -60,7 +62,7 @@ class LucidEnsemble(LeafDictionary):
     """
 
     def __init__(self, tree_ensemble, feature_names, init_estimator,
-                 learning_rate, print_limit=5):
+                 learning_rate, print_limit=30):
         """ Construct the LucidTree object using a dictionary object indexed
             by the leaf's index in the pre-order traversal of the decision tree.
 
@@ -122,30 +124,30 @@ class LucidEnsemble(LeafDictionary):
             self._print_limit)
         )
 
-    def apply(self, X_df):
+    def apply(self, X):
         """ Apply estimators in Tree to a pandas DataFrame.
             The DataFrame columns should be the same as
             the feature_names attribute.
         """
         activated_indices = np.zeros(
-            (X_df.shape[0], self.n_estimators),
+            (X.shape[0], self.n_estimators),
             dtype=int)
         for ind, lucid_tree in enumerate(self):
-            activated_indices[:, ind] = lucid_tree.apply(X_df)
+            activated_indices[:, ind] = lucid_tree.apply(X)
 
         return activated_indices
 
-    def predict(self, X_df):
+    def predict(self, X):
         """ Create predictions from a pandas DataFrame.
             The DataFrame columns should be the same as
             the feature_names attribute.
         """
-        y_pred = np.zeros(X_df.shape[0])
+        y_pred = np.zeros(X.shape[0])
         for lucid_tree in self:
-            y_pred += lucid_tree.predict(X_df)
+            y_pred += lucid_tree.predict(X)
 
         return y_pred * self.learning_rate + \
-            self._init_estimator.predict(X_df).ravel()
+            self._init_estimator.predict(X).ravel()
 
     def compress(self, **kwargs):
         """ Output a CompressedEnsemble object which aggregates all
@@ -156,7 +158,6 @@ class LucidEnsemble(LeafDictionary):
         """
         unique_leaves = OrderedDict()
         for lucid_tree in self:
-
             # this indicates the trained tree had no splits
             # this is possible in Scikit-learn
             if len(lucid_tree) == 1:
@@ -257,45 +258,46 @@ class CompressedEnsemble(LeafDictionary):
             else:
                 self[leaf_path] = other_weight * leaf_value
 
-    def predict(self, X_df):
+    def predict(self, X):
         """ Create predictions from a pandas DataFrame.
             The DataFrame should have the same.
         """
-        if not isinstance(X_df, DataFrame):
-            raise ValueError("Predictions must be done on a Pandas dataframe")
-        if not all(X_df.columns == self.feature_names):
-            raise ValueError("The passed dataframe should")
+        if isinstance(X, DataFrame):
+            X = X.values.astype(dtype=np.float64, order='F')
+
+        # if len(self) > 0:
+        #     leaf_preds = diags(list(self.values()))
+
+        #     return np.array(
+        #         self.compute_activation(X).dot(leaf_preds).sum(axis=1)).ravel() + \
+        #         self._init_estimator.predict(X).ravel()
 
         if len(self) > 0:
             leaf_path, leaf_values = \
                 zip(*[(leaf_path, self[leaf_path]) for leaf_path in self.leaves])
 
-            return create_prediction(X_df, leaf_path, leaf_values) + \
-                self._init_estimator.predict(X_df).ravel()
+            return create_prediction(X, leaf_path, leaf_values) + \
+                self._init_estimator.predict(X).ravel()
         else:
             raise ValueError("The CompressedEnsemble has no leaves to create a prediction")
 
-    def compute_activation(self, X_df, considered_paths=None):
+    def compute_activation(self, X, considered_paths=None):
         """ Compute an activation matrix, see below for more details.
 
         :returns: a scipy sparse csr_matrix with shape (n, m)
-            where n is the # of rows for X_df, m is the # of unique leaves.
+            where n is the # of rows for X, m is the # of unique leaves.
 
             It is a binary matrix with values in {0, 1}.
             A value of 1 in entry row i, column j indicates that leaf is
             activated for datapoint i, leaf j.
         """
-        if not isinstance(X_df, DataFrame):
-            raise ValueError("Predictions must be done on a Pandas dataframe")
-        if not all(X_df.columns == self.feature_names):
-            raise ValueError("The passed pandas DataFrame columns should equal the "
-                             "contain the feature_names attribute of the LucidTree")
+        if isinstance(X, DataFrame):
+            X = X.values.astype(dtype=np.float64, order='F')
 
-        X = X_df.values.astype(dtype=np.float64, order='F')
         if considered_paths is not None:
-            if not all(map(lambda x: isinstance(x, LeafPath), considered_paths)):
-                raise ValueError(
-                    "All elements of considered_paths should be of type LeafPath.")
+            # if not all(map(lambda x: isinstance(x, LeafPath), considered_paths)):
+            #     raise ValueError(
+            #         "All elements of considered_paths should be of type LeafPath.")
             filtered_leaves = \
                 dict([(path, self[path])
                      for path in considered_paths])
@@ -303,8 +305,7 @@ class CompressedEnsemble(LeafDictionary):
             filtered_leaves = self
 
         activation_matrix = lil_matrix(
-            (X_df.shape[0], len(filtered_leaves)),
-            dtype=bool)
+            (X.shape[0], len(filtered_leaves)), dtype=bool)
 
         for ind, path in enumerate(filtered_leaves.keys()):
             activated_indices = find_activated(X, path)
@@ -312,15 +313,15 @@ class CompressedEnsemble(LeafDictionary):
 
         return activation_matrix.tocsr()
 
-    def prune_by_leaves(self, X_df, y_true, metric_function='mse', n_prunes=None):
+    def prune_by_leaves(self, X, y_true, metric_function='mse', n_prunes=None):
         """ Prune out estimators from the ensemble over data
-            in X_df (feature variables) and y (target variable)
+            in X (feature variables) and y (target variable)
 
-        :type X_df: pandas.DataFrame
+        :type X: 2d matrix
         :type y: 1d array-like
         :type metric_function: str
         :type n_prunes: int
-        :param X_df : the feature matrix over which predictions will be made
+        :param X : the feature matrix over which predictions will be made
         :param y : the vector of target variables used to evaluate the score
         :param metric_function : the function that decides the scoring;
             by default, the Rsquared is used
@@ -339,13 +340,12 @@ class CompressedEnsemble(LeafDictionary):
         # pred_matrix is such that the sum of row j is
         # the prediction for jth datapoint
         pred_matrix = np.zeros(
-            (X_df.shape[0], self.n_leaves),
+            (X.shape[0], self.n_leaves),
             order='F')  # make column-major for optimization
-        init_pred = self._init_estimator.predict(X_df).ravel()
+        init_pred = self._init_estimator.predict(X).ravel()
         logger.debug('The pred_matrix has shape {}'
                      .format(pred_matrix.shape))
 
-        X = X_df.values.astype(dtype=np.float64, order='F')
         leaves = list(self.leaves)
         for ind, path in enumerate(leaves):
             activated_indices = find_activated(X, path)
@@ -364,3 +364,19 @@ class CompressedEnsemble(LeafDictionary):
 
         logger.debug('Finished with {} prunes with {} leaves left'
                      .format(len(inds_to_prune), self.n_leaves))
+
+    def finetune(self, X, y, n_iterations, chunk_size=10, metric_name='mse',
+                 zero_bounds=0.001, l2_coef=0.0):
+        """ Finetune the leaves
+
+        :param X : the feature matrix over which predictions will be made
+        """
+        if isinstance(X, DataFrame):
+            X = X.values.astype(dtype=np.float64, order='F')
+        y_pred = self.predict(X)
+
+        finetune_ensemble(
+            self, X, y,
+            y_pred, n_iterations=n_iterations,
+            chunk_size=chunk_size, metric_name=metric_name,
+            zero_bounds=zero_bounds, l2_coef=l2_coef)
