@@ -26,7 +26,11 @@ extensions = [
     Extension(
         language="c",
         name="illumine.woodland.leaf_tuning",
-        sources=["illumine/woodland/leaf_tuning.pyx"])
+        sources=["illumine/woodland/leaf_tuning.pyx"]),
+    Extension(
+        language="c",
+        name="illumine.tree._tree",
+        sources=["illumine/tree/_tree.pyx"])
 ]
 
 setup(

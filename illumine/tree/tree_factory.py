@@ -1,14 +1,15 @@
 """
-
+    Module containing functions to create
+    LucidTree objects
 
 """
 
 from collections import Iterable
-from collections import OrderedDict
+# from collections import OrderedDict
 
-from .leaf_retrieval import retrieve_tree_metas
+from .leaf_retrieval import deconstruct_trees
 
-from .lucid_tree import TreeNode
+from .lucid_tree import TreeLeaf
 from .lucid_tree import LucidTree
 
 __all__ = ['make_LucidTree']
@@ -19,21 +20,23 @@ def assemble_lucid_trees(sk_trees, feature_names, print_precision, **tree_kws):
         leaves given some of the Scikit-learn attributes
         of a decision tree.
     """
-    tree_metas = retrieve_tree_metas(
+    tree_data = deconstruct_trees(
         *_accumulate_tree_attributes(sk_trees),
         # must be changed to strings to be passed into Cython function
         feature_names=list(map(str, feature_names)),
         print_precision=print_precision)
 
     lucid_trees = []
-    for tree_meta in tree_metas:
-        tree_leaves = OrderedDict()
-        for leaf_meta in tree_meta:
+    for tree_datum in tree_data:
+        tree_leaves = dict()
+
+        tree_struct, leaf_metas = tree_datum
+        for leaf_meta in leaf_metas:
             leaf_ind = leaf_meta[0]
-            tree_leaves[leaf_ind] = TreeNode(*leaf_meta[1:])
+            tree_leaves[leaf_ind] = TreeLeaf(*leaf_meta[1:])
 
         lucid_trees.append(
-            LucidTree(tree_leaves, feature_names, **tree_kws))
+            LucidTree(tree_struct, tree_leaves, feature_names, **tree_kws))
 
     return lucid_trees
 

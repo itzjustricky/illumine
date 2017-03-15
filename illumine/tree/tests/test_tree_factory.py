@@ -12,6 +12,7 @@ import pandas as pd
 
 from illumine.tree import make_LucidTree
 from sklearn.tree import DecisionTreeRegressor
+from illumine.utils import StopWatch
 
 
 def test_LucidTree():
@@ -31,12 +32,25 @@ def test_LucidTree():
 
         lucid_tree = make_LucidTree(
             regr, feature_names=X_df.columns, print_precision=3)
-        lucid_pred = lucid_tree.predict(X_df)
+        with StopWatch("Lucid prediction for depth {}".format(max_depth)):
+            lucid_pred = lucid_tree.predict(X_df)
         sk_pred = regr.predict(X_df)
 
         # test prediction outputted from LucidTree
         np.testing.assert_almost_equal(lucid_pred, sk_pred)
 
 
+"""
 if __name__ == "__main__":
     test_LucidTree()
+
+"""
+# Set main function for debugging if error
+import bpdb, sys, traceback
+if __name__ == "__main__":
+    try:
+        test_LucidTree()
+    except:
+        type, value, tb = sys.exc_info()
+        traceback.print_exc()
+        bpdb.post_mortem(tb)

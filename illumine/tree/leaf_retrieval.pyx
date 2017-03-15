@@ -6,101 +6,20 @@
 
 cimport cython
 
-import numpy as np
-cimport numpy as np
+cimport numpy as cnp
 
-
-cdef class TreeSplit:
-    """ Representation of TreeSplit which contains
-        feature_name, relation, threshold of a
-        decision tree split
-    """
-
-    cdef int _feature
-    cdef str _feature_name
-    cdef str _relation
-    cdef double _threshold
-    cdef int _print_precision
-
-    def __cinit__(self,
-                  int feature,
-                  str feature_name,
-                  str relation,
-                  double threshold,
-                  int print_precision):
-        self._feature = feature
-        self._feature_name = feature_name
-        self._relation = relation
-        self._threshold = threshold
-        self._print_precision = print_precision
-
-    @property
-    def feature(self):
-        return self._feature
-
-    @property
-    def feature_name(self):
-        return self._feature_name
-
-    @property
-    def relation(self):
-        return self._relation
-
-    @property
-    def threshold(self):
-        return self._threshold
-
-    @property
-    def print_precision(self):
-        return self._print_precision
-
-    def __str__(self):
-        return "{}{}{}".format(
-            self.feature_name,
-            self.relation,
-            round(self.threshold, self._print_precision))
-
-    def __reduce__(self):
-        return (self.__class__, (
-            self._feature,
-            self._feature_name,
-            self._relation,
-            self._threshold,
-            self._print_precision)
-        )
-
-    def __repr__(self):
-        return self.__str__()
-
-    def __copy__(self):
-        return self
-
-    def __deepcopy__(self, memo):
-        return self
-
-    def __richcmp__(x, y, int op):
-        if op == 0:
-            return str(x) < str(y)
-        if op == 2:
-            return str(x) == str(y)
-        if op == 4:
-            return str(x) > str(y)
-        if op == 1:
-            return str(x) <= str(y)
-        if op == 3:
-            return str(x) != str(y)
-        if op == 5:
-            return str(x) >= str(y)
+from . cimport _tree
+from . import _tree
 
 
 @cython.cdivision(True)
-def retrieve_tree_metas(list accm_values,
-                        list accm_node_samples,
-                        list accm_features,
-                        list accm_thresholds,
-                        list feature_names,
-                        int print_precision):
-    cdef list tree_metas = []
+def deconstruct_trees(list accm_values,
+                      list accm_node_samples,
+                      list accm_features,
+                      list accm_thresholds,
+                      list feature_names,
+                      int print_precision):
+    cdef list tree_data = []
 
     cdef tuple tup
     for tup in zip(accm_values,
@@ -108,7 +27,7 @@ def retrieve_tree_metas(list accm_values,
                    accm_features,
                    accm_thresholds):
 
-        tree_metas.append(retrieve_leaf_path(
+        tree_data.append(_deconstruct_tree(
             values=tup[0],
             node_samples=tup[1],
             features=tup[2],
@@ -116,13 +35,13 @@ def retrieve_tree_metas(list accm_values,
             feature_names=feature_names,
             print_precision=print_precision)
         )
-    return tree_metas
+    return tree_data
 
 
-cdef list retrieve_leaf_path(np.ndarray[double, ndim=3] values,
-                             np.ndarray[long, ndim=1] node_samples,
-                             np.ndarray[long, ndim=1] features,
-                             np.ndarray[double, ndim=1] thresholds,
+cdef tuple _deconstruct_tree(cnp.ndarray[double, ndim=3] values,
+                             cnp.ndarray[long, ndim=1] node_samples,
+                             cnp.ndarray[long, ndim=1] features,
+                             cnp.ndarray[double, ndim=1] thresholds,
                              list feature_names,
                              int print_precision):
     """ Gather all the leaves of a tree and keep track of the
@@ -145,17 +64,39 @@ cdef list retrieve_leaf_path(np.ndarray[double, ndim=3] values,
         raise ValueError("The passed tree is empty!")
 
     cdef list tree_meta = []
-    cdef list tracker_stack = []  # a stack to track if all the children of a node is visited
+    # tracker_stack latest value will be
+    cdef list tracker_stack = []  # a stack to track if all children of node is visited
     cdef list leaf_path = []      # ptr_stack keeps track of nodes
+
+    # Set up variables for storing tree structure
+    cdef _tree.TreeNode root_node, node_ptr
+    cdef _tree.TreeStructure tree_struct
+    root_node = _tree.TreeNode(0, features[0], thresholds[0], 0.0)
+    tree_struct = _tree.TreeStructure(root_node)
+    node_ptr = root_node
 
     cdef int node_index
     for node_index in xrange(n_splits):
         if len(tracker_stack) != 0:
-            tracker_stack[-1] += 1  # visiting the child of the latest node
+            # the last element of the tracker stack
+            # refers to the parent of the current node
+            tracker_stack[-1] += 1  # keep track # of children visited
+
+            # build tree structure here
+            if tracker_stack[-1] == 1:      # visiting left node of parent
+                node_ptr.set_left_child(
+                        _tree.TreeNode(node_index, features[node_index],
+                                       thresholds[node_index], values[node_index]))
+                node_ptr = node_ptr.left_child
+            elif tracker_stack[-1] == 2:    # visiting right node of parent
+                node_ptr.set_right_child(
+                        _tree.TreeNode(node_index, features[node_index],
+                                       thresholds[node_index], values[node_index]))
+                node_ptr = node_ptr.right_child
 
         if features[node_index] != -2:  # visiting inner node
             tracker_stack.append(0)
-            tree_split = TreeSplit(
+            tree_split = _tree.TreeSplit(
                 feature=features[node_index],
                 feature_name=feature_names[features[node_index]],
                 relation='<=',
@@ -164,22 +105,25 @@ cdef list retrieve_leaf_path(np.ndarray[double, ndim=3] values,
             )
             leaf_path.append(tree_split)
 
-        else:  # visiting leaf
+        else:  # visiting leaf/terminal node
             tree_meta.append((
                 node_index,                 # leaf's index in pre-order traversal
                 leaf_path.copy(),           # path to the leaf
                 values[node_index][0][0],   # leaf value
                 node_samples[node_index]    # number of samples at leaf
             ))
+            node_ptr.is_leaf = True
 
             if len(tracker_stack) > 0 and tracker_stack[-1] == 2:
                 # pop out nodes that I am completely done with
                 while(len(tracker_stack) > 0 and tracker_stack[-1] == 2):
                     leaf_path.pop()
                     tracker_stack.pop()
+                    node_ptr = node_ptr.parent
+
             if len(leaf_path) != 0:
                 tmp_split = leaf_path.pop()
-                new_split = TreeSplit(
+                new_split = _tree.TreeSplit(
                     feature=tmp_split.feature,
                     feature_name=tmp_split.feature_name,
                     relation='>',
@@ -187,5 +131,6 @@ cdef list retrieve_leaf_path(np.ndarray[double, ndim=3] values,
                     print_precision=print_precision
                 )
                 leaf_path.append(new_split)
+                node_ptr = node_ptr.parent
 
-    return tree_meta
+    return tree_struct, tree_meta

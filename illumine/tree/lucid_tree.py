@@ -14,39 +14,39 @@ from .predict_methods import create_prediction
 
 from functools import total_ordering
 
-__all__ = ['LeafPath', 'TreeNode', 'LucidTree']
+__all__ = ['LeafPath', 'TreeLeaf', 'LucidTree']
 
 
 @total_ordering
 class LeafPath(object):
     """ Object representation of the path to a leaf node """
 
-    def __init__(self, path):
+    def __init__(self, tree_splits):
         """ The initializer for LeafPath
 
-        :param path (list): a list of TreeSplit objects which
+        :param tree_splits (list): a list of TreeSplit objects which
             is defined in the Cython module leaf_retrieval
 
             A TreeSplit represent a single split in feature data X.
         """
-        self._path = path
+        self._tree_splits = tree_splits
         self._key = None
 
     @property
-    def path(self):
-        return self._path
+    def tree_splits(self):
+        return self._tree_splits
 
     def __iter__(self):
-        return self.path.__iter__()
+        return self.tree_splits.__iter__()
 
     def __str__(self):
-        return self.path.__str__()
+        return self.tree_splits.__str__()
 
     def __repr__(self):
         return self.__str__()
 
     def __len__(self):
-        return len(self.path)
+        return len(self.tree_splits)
 
     @property
     def key(self):
@@ -57,9 +57,9 @@ class LeafPath(object):
             self._key = ''
             # let the key be composed of the feature_names then
             # the numbers this allows more informative sorting
-            for split in self.path:
+            for split in self.tree_splits:
                 self._key += split.feature_name
-            for split in self.path:
+            for split in self.tree_splits:
                 self._key += split.relation
                 self._key += str(round(
                     split.threshold, split.print_precision))
@@ -76,11 +76,9 @@ class LeafPath(object):
         return self.key < other.key
 
 
-class TreeNode(object):
-    """ Object representation a single node of a decision tree
-
-    ..note: a big reason I decided to store path, value, n_samples in a
-         dictionary is so I have a nice and easy loop to return a representation
+class TreeLeaf(object):
+    """ Object representation a leaf (terminal node) of a decision tree.
+        Stores the path to the leaf and the value associated with the leaf.
     """
 
     def __init__(self, path, value, n_samples):
@@ -131,14 +129,14 @@ class LucidTree(LeafDictionary):
         key: The index of the leaf in the passed dictionary (tree_leaves) should be the index of
              the leaf in the pre-order traversal of the decision tree.
              The leaf's index is in set [0, k-1] where k is the # of nodes (inner & leaf nodes)
-        value: The value is an TreeNode object
+        value: The value is an TreeLeaf object
 
     ..note:
         This object is intended to be created through make_LucidTree only.
         This class is NOT meant to be INHERITED from.
     """
 
-    def __init__(self, tree_leaves, feature_names, print_limit=30):
+    def __init__(self, tree_structure, tree_leaves, feature_names, print_limit=30):
         """ Construct the LucidTree object using a dictionary object indexed
             by the leaf's index in the pre-order traversal of the decision tree.
 
@@ -153,16 +151,17 @@ class LucidTree(LeafDictionary):
             out to the console
         """
         if not isinstance(tree_leaves, dict):
-            raise ValueError("A dictionary object with keys mapped to TreeNodes should ",
-                             "be passed into the constructor.")
-        # Check all the values mapped are TreeNodes
-        assert all(map(lambda x: isinstance(x, TreeNode), tree_leaves.values()))
+            raise ValueError("A dictionary object with keys mapped to TreeLeafs ",
+                             "should be passed into the constructor.")
+        # Check all the values mapped are TreeLeafs
+        assert all(map(lambda x: isinstance(x, TreeLeaf), tree_leaves.values()))
 
         if not isinstance(feature_names, Iterable):
             raise ValueError(
                 "feature_names should be an iterable object containing the "
                 "feature names that the tree was trained on")
         self._feature_names = feature_names
+        self._tree_structure = tree_structure
 
         super(LucidTree, self).__init__(
             tree_leaves,
@@ -206,11 +205,15 @@ class LucidTree(LeafDictionary):
             X = X.values.astype(dtype=np.float64, order='F')
         leaf_paths, leaf_values = \
             zip(*[(leaf.path, leaf.value) for leaf in self.values()])
-
         return create_prediction(X, leaf_paths, leaf_values)
+        # activated_inds = self._tree_structure.decision_path(X)
+        # for leaf_ind in self.keys():
+        #     y_pred[np.where(activated_inds == leaf_ind)[0]] = self[leaf_ind].value
+        # return y_pred
 
     def __reduce__(self):
         return (self.__class__, (
+            self._tree_structure,
             self._seq,
             self._feature_names,
             self._print_limit)

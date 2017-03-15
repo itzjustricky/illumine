@@ -31,7 +31,7 @@ class LeafDictionary(object):
 
         self._seq = tree_leaves
         self._str_cache = None              # used to cache the string repr.
-        self._print_limit = print_limit     # limit for how many TreeNode objects to print
+        self._print_limit = print_limit     # limit for how many TreeLeaf objects to print
 
         if str_kw is None:
             self._str_kw = dict()
