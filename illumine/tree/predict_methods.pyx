@@ -9,12 +9,12 @@ cimport cython
 
 import numpy as np
 cimport numpy as cnp
-from pandas import DataFrame
 
 
-cdef _find_activated_for_split(cnp.ndarray[double, ndim=1] x_array,
-                               str relation,
-                               float threshold):
+cdef cnp.ndarray[bint, ndim=1] _find_activated_for_split(
+        cnp.ndarray[double, ndim=1] x_array,
+        str relation,
+        float threshold):
     """ Return a numpy.ndarray of booleans that
         indicate whether or not X satisfies
 

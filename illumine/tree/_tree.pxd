@@ -43,3 +43,12 @@ cdef class TreeStructure:
     """
 
     cdef TreeNode _root
+
+    cpdef cnp.ndarray[double, ndim=1] decision_path(
+             TreeStructure self,
+             cnp.ndarray[double, ndim=2] X)
+
+    cdef void _set_leaves(TreeStructure self, TreeNode tree_node,
+                          double[:, :] X,
+                          double[:] active_leaves,
+                          int[:] indices)

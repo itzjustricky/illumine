@@ -4,7 +4,7 @@
 """
 
 import numpy as np
-from pandas import DataFrame
+import pandas as pd
 
 from collections import Iterable
 
@@ -182,7 +182,7 @@ class LucidTree(LeafDictionary):
         if len(self) == 1:
             return activated_indices
 
-        if isinstance(X, DataFrame):
+        if isinstance(X, pd.DataFrame):
             # X = X.values
             X = X.values.astype(dtype=np.float64, order='F')
         leaf_paths, leaf_indices = \
@@ -196,17 +196,18 @@ class LucidTree(LeafDictionary):
             the feature_names attribute.
         """
         y_pred = np.zeros(X.shape[0])
-        # this indicates the trained tree had no splits
-        # this is possible in Scikit-learn
+        # this indicates the trained tree had no splits;
+        # possible via building LucidTree from sklearn model
         if len(self) == 1:
             return y_pred
-
-        if isinstance(X, DataFrame):
+        if isinstance(X, pd.DataFrame):
             X = X.values.astype(dtype=np.float64, order='F')
-        leaf_paths, leaf_values = \
-            zip(*[(leaf.path, leaf.value) for leaf in self.values()])
-        return create_prediction(X, leaf_paths, leaf_values)
-        # activated_inds = self._tree_structure.decision_path(X)
+
+        # leaf_paths, leaf_values = \
+        #     zip(*[(leaf.path, leaf.value) for leaf in self.values()])
+        # return create_prediction(X, leaf_paths, leaf_values)
+
+        return self._tree_structure.decision_path(X)
         # for leaf_ind in self.keys():
         #     y_pred[np.where(activated_inds == leaf_ind)[0]] = self[leaf_ind].value
         # return y_pred

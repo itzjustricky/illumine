@@ -3,6 +3,8 @@
 
 """
 
+cimport cython
+
 import numpy as np
 cimport numpy as cnp
 
@@ -91,13 +93,12 @@ cdef class TreeNode:
         value nor relation.
     """
 
-    def __cinit__(self, int index, int feature, double threshold,
-                  double value, bint leaf_flag=False):
+    def __cinit__(self, int index=0, int feature=0,
+                  double threshold=0.0, double value=0.0):
         self._index = index      # pre-order traversal index
         self._feature = feature
         self._threshold = threshold
         self._value = value
-        self._is_leaf = leaf_flag
 
     def set_left_child(self, TreeNode left_child):
         self.left_child = left_child
@@ -133,14 +134,40 @@ cdef class TreeNode:
             raise ValueError("Argument leaf_flag should be of type boolean")
         self._is_leaf = leaf_flag
 
-    def __reduce__(self):
-        return (self.__class__, (
+    # def __reduce__(self):
+    #     return (self.__class__, (
+    #         self._index,
+    #         self._feature,
+    #         self._threshold,
+    #         self._value)
+    #     )
+
+    def __getstate__(self):
+        return (
             self._index,
             self._feature,
             self._threshold,
             self._value,
-            self._is_leaf)
+            self._is_leaf,
+            self.parent,
+            self.left_child,
+            self.right_child,
         )
+
+    def __setstate__(self, state_tuple):
+        # print("Loading from dictionary: {}".format(attr_dict))
+        self._index, self._feature, self._threshold, \
+        self._value, self._is_leaf, self.parent, \
+        self.left_child, self.right_child = state_tuple
+
+        # self._index = attr_dict['_index']
+        # self._feature = attr_dict['_feature']
+        # self._threshold = attr_dict['_threshold']
+        # self._value = attr_dict['_value']
+        # self._is_leaf = attr_dict['_is_leaf']
+        # self.parent = attr_dict['parent']
+        # self.left_child = attr_dict['left_child']
+        # self.right_child = attr_dict['right_child']
 
 
 cdef class TreeStructure:
@@ -151,32 +178,57 @@ cdef class TreeStructure:
     def __cinit__(self, TreeNode root):
         self._root = root
 
-    def decision_path(self, cnp.ndarray[double, ndim=2] X):
-        """ Find the leafs activated for each row in
-            the 2d input matrix X
+    @cython.cdivision(True)
+    cpdef cnp.ndarray[double, ndim=1] decision_path(
+        TreeStructure self,
+        cnp.ndarray[double, ndim=2] X):
+        """ Find the leafs activated for each
+            row in the 2d input matrix X
         """
-        cdef list indices = list(range(X.shape[0]))
+        cdef cnp.ndarray[int, ndim=1] indices = np.arange(X.shape[0], dtype=np.int32)
         cdef cnp.ndarray[double, ndim=1] active_leaves = \
             np.zeros(X.shape[0], dtype=np.float64)
         self._set_leaves(self._root, X, active_leaves, indices)
 
         return active_leaves
 
-    def _set_leaves(self, TreeNode tree_node,
-                    cnp.ndarray[double, ndim=2] X,
-                    cnp.ndarray[double, ndim=1] active_leaves,
-                    list indices):
+    cdef void _set_leaves(TreeStructure self, TreeNode tree_node,
+                          double[:, :] X,
+                          double[:] active_leaves,
+                          int[:] indices):
+                          # cnp.ndarray[double, ndim=2] X,
+                          # cnp.ndarray[double, ndim=1] active_leaves,
+                          # cnp.ndarray[int, ndim=1] indices):
         """ Recursively set the indices for the active_leaves 1darray """
+        cdef int i, n_rows
+        n_rows = X.shape[0]
+
+        cdef int node_feature = tree_node.feature
+        cdef double node_value = tree_node.value
+        cdef double node_threshold = tree_node.threshold
+        # cdef cnp.ndarray[int, ndim=1] tmp_left_inds, tmp_right_inds
+        cdef int[:] left_inds, right_inds
 
         if tree_node.is_leaf:
-            active_leaves[indices] = tree_node.value
+            with nogil:
+                for i in range(n_rows):
+                    if indices[i] != -1:
+                        active_leaves[i] = node_value
         else:
-            left_inds = [indices[i] for i in \
-                         np.where(X[indices, tree_node.feature] <= tree_node.threshold)[0]]
-            self._set_leaves(tree_node.left_child, X, active_leaves, left_inds)
+            left_inds = np.full(n_rows, -1, dtype=np.int32)
+            right_inds = np.full(n_rows, -1, dtype=np.int32)
 
-            right_inds = list(np.setdiff1d(indices, left_inds))
+            with nogil:
+                for i in range(n_rows):
+                    if indices[i] != -1:
+                        if X[i, node_feature] <= node_threshold:
+                            left_inds[i] = i
+                        else:
+                            right_inds[i] = i
+
+            self._set_leaves(tree_node.left_child, X, active_leaves, left_inds)
             self._set_leaves(tree_node.right_child, X, active_leaves, right_inds)
+
 
     def __reduce__(self):
         return (self.__class__, tuple((self._root,)))
