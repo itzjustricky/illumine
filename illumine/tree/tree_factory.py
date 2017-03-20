@@ -4,12 +4,13 @@
 
 """
 
-from collections import Iterable
+# from collections import Iterable
 # from collections import OrderedDict
 
-from .leaf_retrieval import deconstruct_trees
+# from .leaf_retrieval import deconstruct_trees
+from .leaf_retrieval import construct_leaf_tables
 
-from .lucid_tree import TreeLeaf
+# from .lucid_tree import TreeLeaf
 from .lucid_tree import LucidTree
 
 __all__ = ['make_LucidTree']
@@ -20,47 +21,7 @@ def assemble_lucid_trees(sk_trees, feature_names, print_precision, **tree_kws):
         leaves given some of the Scikit-learn attributes
         of a decision tree.
     """
-    tree_data = deconstruct_trees(
-        *_accumulate_tree_attributes(sk_trees),
-        # must be changed to strings to be passed into Cython function
-        feature_names=list(map(str, feature_names)),
-        print_precision=print_precision)
-
-    lucid_trees = []
-    for tree_datum in tree_data:
-        tree_leaves = dict()
-
-        tree_struct, leaf_metas = tree_datum
-        for leaf_meta in leaf_metas:
-            leaf_ind = leaf_meta[0]
-            tree_leaves[leaf_ind] = TreeLeaf(*leaf_meta[1:])
-
-        lucid_trees.append(
-            LucidTree(tree_struct, tree_leaves, feature_names, **tree_kws))
-
-    return lucid_trees
-
-
-def _accumulate_tree_attributes(sk_trees):
-    if not isinstance(sk_trees, Iterable):
-        sk_trees = [sk_trees]
-
-    accm_values = []
-    accm_node_samples = []
-    accm_features = []
-    accm_thresholds = []
-
-    for sk_tree in sk_trees:
-        accm_values.append(sk_tree.tree_.value)
-        accm_node_samples.append(sk_tree.tree_.n_node_samples)
-        accm_features.append(sk_tree.tree_.feature)
-        accm_thresholds.append(sk_tree.tree_.threshold)
-    return (
-        accm_values,
-        accm_node_samples,
-        accm_features,
-        accm_thresholds,
-    )
+    pass
 
 
 def make_LucidTree(sk_tree, feature_names, print_precision=5, tree_kws=None):
@@ -87,5 +48,5 @@ def make_LucidTree(sk_tree, feature_names, print_precision=5, tree_kws=None):
         tree_kws = dict()
     elif not isinstance(tree_kws, dict):
         raise ValueError("tree_kws should be of type dict")
-    return assemble_lucid_trees(
-        sk_tree, feature_names, print_precision, **tree_kws)[0]
+    return LucidTree(construct_leaf_tables(
+        sk_tree, list(feature_names), print_precision, **tree_kws)[0])

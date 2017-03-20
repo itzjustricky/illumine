@@ -6,10 +6,61 @@
 
 cimport cython
 
+import numpy as np
 cimport numpy as cnp
+from collections import Iterable
 
-from . cimport _tree
-from . import _tree
+from .leaf cimport TreeSplit
+# from .leaf cimport DecisionPath
+from .leaf cimport TreeLeaf
+from .leaftable import LeafTable
+
+
+cpdef _accumulate_tree_attributes(sk_trees):
+    if not isinstance(sk_trees, Iterable):
+        sk_trees = [sk_trees]
+
+    cdef object sk_tree
+    cdef list accm_values = []
+    cdef list accm_node_samples = []
+    cdef list accm_features = []
+    cdef list accm_thresholds = []
+
+    for sk_tree in sk_trees:
+        accm_values.append(sk_tree.tree_.value)
+        accm_node_samples.append(sk_tree.tree_.n_node_samples)
+        accm_features.append(sk_tree.tree_.feature)
+        accm_thresholds.append(sk_tree.tree_.threshold)
+    return (
+        accm_values,
+        accm_node_samples,
+        accm_features,
+        accm_thresholds,
+    )
+
+
+@cython.cdivision(True)
+def construct_leaf_tables(sk_trees, list feature_names, int print_precision=5):
+    cdef list tree_data
+    tree_data = deconstruct_trees(
+        *_accumulate_tree_attributes(sk_trees),
+        # must be changed to strings to be passed into Cython function
+        feature_names=list(map(str, feature_names)),
+        print_precision=print_precision)
+
+    cdef int leaf_ind
+    cdef list tree_datum, tree_leaves
+    cdef list leaftables = []
+    for tree_datum in tree_data:
+        tree_leaves = []
+
+        for leaf_meta in tree_datum:
+            leaf_ind = leaf_meta[0]
+            tree_leaves.append(TreeLeaf(*leaf_meta[1:]))
+
+        leaftables.append(LeafTable(tree_leaves))
+
+    return leaftables
 
 
 @cython.cdivision(True)
@@ -19,9 +70,12 @@ def deconstruct_trees(list accm_values,
                       list accm_thresholds,
                       list feature_names,
                       int print_precision):
+    """ Deconstruct several trees using the data
+        gathered by _accumulate_tree_attributes
+    """
     cdef list tree_data = []
-
     cdef tuple tup
+
     for tup in zip(accm_values,
                    accm_node_samples,
                    accm_features,
@@ -38,7 +92,7 @@ def deconstruct_trees(list accm_values,
     return tree_data
 
 
-cdef tuple _deconstruct_tree(cnp.ndarray[double, ndim=3] values,
+cdef list _deconstruct_tree(cnp.ndarray[double, ndim=3] values,
                              cnp.ndarray[long, ndim=1] node_samples,
                              cnp.ndarray[long, ndim=1] features,
                              cnp.ndarray[double, ndim=1] thresholds,
@@ -57,23 +111,14 @@ cdef tuple _deconstruct_tree(cnp.ndarray[double, ndim=3] values,
         node_samples - # of samples that enter the leaf node from
             the training data
     """
-    cdef int n_splits
-    n_splits = len(features)
+    cdef int n_splits = len(features)
 
     if n_splits == 0:
         raise ValueError("The passed tree is empty!")
 
     cdef list tree_meta = []
-    # tracker_stack latest value will be
     cdef list tracker_stack = []  # a stack to track if all children of node is visited
     cdef list leaf_path = []      # ptr_stack keeps track of nodes
-
-    # Set up variables for storing tree structure
-    cdef _tree.TreeNode root_node, node_ptr
-    cdef _tree.TreeStructure tree_struct
-    root_node = _tree.TreeNode(0, features[0], thresholds[0], 0.0)
-    tree_struct = _tree.TreeStructure(root_node)
-    node_ptr = root_node
 
     cdef int node_index
     for node_index in xrange(n_splits):
@@ -82,21 +127,9 @@ cdef tuple _deconstruct_tree(cnp.ndarray[double, ndim=3] values,
             # refers to the parent of the current node
             tracker_stack[-1] += 1  # keep track # of children visited
 
-            # build tree structure here
-            if tracker_stack[-1] == 1:      # visiting left node of parent
-                node_ptr.set_left_child(
-                        _tree.TreeNode(node_index, features[node_index],
-                                       thresholds[node_index], values[node_index]))
-                node_ptr = node_ptr.left_child
-            elif tracker_stack[-1] == 2:    # visiting right node of parent
-                node_ptr.set_right_child(
-                        _tree.TreeNode(node_index, features[node_index],
-                                       thresholds[node_index], values[node_index]))
-                node_ptr = node_ptr.right_child
-
         if features[node_index] != -2:  # visiting inner node
             tracker_stack.append(0)
-            tree_split = _tree.TreeSplit(
+            tree_split = TreeSplit(
                 feature=features[node_index],
                 feature_name=feature_names[features[node_index]],
                 relation='<=',
@@ -112,18 +145,16 @@ cdef tuple _deconstruct_tree(cnp.ndarray[double, ndim=3] values,
                 values[node_index][0][0],   # leaf value
                 node_samples[node_index]    # number of samples at leaf
             ))
-            node_ptr.is_leaf = True
 
             if len(tracker_stack) > 0 and tracker_stack[-1] == 2:
                 # pop out nodes that I am completely done with
                 while(len(tracker_stack) > 0 and tracker_stack[-1] == 2):
                     leaf_path.pop()
                     tracker_stack.pop()
-                    node_ptr = node_ptr.parent
 
             if len(leaf_path) != 0:
                 tmp_split = leaf_path.pop()
-                new_split = _tree.TreeSplit(
+                new_split = TreeSplit(
                     feature=tmp_split.feature,
                     feature_name=tmp_split.feature_name,
                     relation='>',
@@ -131,6 +162,5 @@ cdef tuple _deconstruct_tree(cnp.ndarray[double, ndim=3] values,
                     print_precision=print_precision
                 )
                 leaf_path.append(new_split)
-                node_ptr = node_ptr.parent
 
-    return tree_struct, tree_meta
+    return tree_meta
