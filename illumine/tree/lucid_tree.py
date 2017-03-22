@@ -50,8 +50,7 @@ class LucidTree(object):
         #     print_limit=print_limit)
 
     def predict(self, X):
-        """ Create predictions from a pandas DataFrame.
-        """
+        """ Create predictions from a matrix of the feature variables """
         y_pred = np.zeros(X.shape[0])
         # this indicates the trained tree had no splits;
         # possible via building LucidTree from sklearn model

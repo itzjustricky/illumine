@@ -8,7 +8,7 @@
 # from collections import OrderedDict
 
 # from .leaf_retrieval import deconstruct_trees
-from .leaf_retrieval import construct_leaf_tables
+from .leaf_retrieval import build_leaf_tables
 
 # from .lucid_tree import TreeLeaf
 from .lucid_tree import LucidTree
@@ -48,5 +48,5 @@ def make_LucidTree(sk_tree, feature_names, print_precision=5, tree_kws=None):
         tree_kws = dict()
     elif not isinstance(tree_kws, dict):
         raise ValueError("tree_kws should be of type dict")
-    return LucidTree(construct_leaf_tables(
+    return LucidTree(build_leaf_tables(
         sk_tree, list(feature_names), print_precision, **tree_kws)[0])

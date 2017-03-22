@@ -4,10 +4,20 @@ from distutils.core import setup, Extension
 from Cython.Build import cythonize
 
 extensions = [
+    # leaf modules
     Extension(
         language="c",
         name="illumine.tree.leaf_retrieval",
         sources=["illumine/tree/leaf_retrieval.pyx"]),
+    Extension(
+        language="c",
+        name="illumine.tree.leaf",
+        sources=["illumine/tree/leaf.pyx"]),
+    Extension(
+        language="c",
+        name="illumine.tree.leaftable",
+        sources=["illumine/tree/leaftable.pyx"]),
+    # TODO
     Extension(
         language="c",
         name="illumine.tree.predict_methods",
@@ -27,14 +37,6 @@ extensions = [
         language="c",
         name="illumine.woodland.leaf_tuning",
         sources=["illumine/woodland/leaf_tuning.pyx"]),
-    Extension(
-        language="c",
-        name="illumine.tree.leaf",
-        sources=["illumine/tree/leaf.pyx"]),
-    Extension(
-        language="c",
-        name="illumine.tree.leaftable",
-        sources=["illumine/tree/leaftable.pyx"])
 ]
 
 setup(

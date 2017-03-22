@@ -2,21 +2,49 @@
     Cython module for the retrieve_leaf_path
     function used to build lucid-tree objects
 
+    TODO:
+        currently feature_names and
+        print_precision are not being used
 """
 
 cimport cython
 
 import numpy as np
 cimport numpy as cnp
+
 from collections import Iterable
 
 from .leaf cimport TreeSplit
-# from .leaf cimport DecisionPath
 from .leaf cimport TreeLeaf
 from .leaftable import LeafTable
 
 
-cpdef _accumulate_tree_attributes(sk_trees):
+@cython.cdivision(True)
+def build_leaf_tables(sk_trees, list feature_names, int print_precision=5):
+    """ """
+    cdef list tree_data
+    tree_data = build_tree_leaves(
+        *_accumulate_tree_attributes(sk_trees),
+        # must be changed to strings to be passed into Cython function
+        feature_names=list(map(str, feature_names)),
+        print_precision=print_precision)
+
+    cdef list tree_leaves
+    cdef list leaftables = []
+
+    for tree_leaves in tree_data:
+        leaftables.append(
+            LeafTable(tree_leaves))
+
+    return leaftables
+
+
+def _accumulate_tree_attributes(sk_trees):
+    """ Gather the necessary data from Scikit-learn trees
+        to construct TreeLeaf objects
+
+    :param sk_trees: list of Scikit-learn decision trees
+    """
     if not isinstance(sk_trees, Iterable):
         sk_trees = [sk_trees]
 
@@ -40,38 +68,15 @@ cpdef _accumulate_tree_attributes(sk_trees):
 
 
 @cython.cdivision(True)
-def construct_leaf_tables(sk_trees, list feature_names, int print_precision=5):
-    cdef list tree_data
-    tree_data = deconstruct_trees(
-        *_accumulate_tree_attributes(sk_trees),
-        # must be changed to strings to be passed into Cython function
-        feature_names=list(map(str, feature_names)),
-        print_precision=print_precision)
-
-    cdef int leaf_ind
-    cdef list tree_datum, tree_leaves
-    cdef list leaftables = []
-    for tree_datum in tree_data:
-        tree_leaves = []
-
-        for leaf_meta in tree_datum:
-            leaf_ind = leaf_meta[0]
-            tree_leaves.append(TreeLeaf(*leaf_meta[1:]))
-
-        leaftables.append(LeafTable(tree_leaves))
-
-    return leaftables
-
-
-@cython.cdivision(True)
-def deconstruct_trees(list accm_values,
-                      list accm_node_samples,
-                      list accm_features,
-                      list accm_thresholds,
-                      list feature_names,
-                      int print_precision):
+cpdef list build_tree_leaves(list accm_values,
+                             list accm_node_samples,
+                             list accm_features,
+                             list accm_thresholds,
+                             list feature_names,
+                             int print_precision):
     """ Deconstruct several trees using the data
-        gathered by _accumulate_tree_attributes
+        gathered by _accumulate_tree_attributes and
+        build TreeLeaves out of them.
     """
     cdef list tree_data = []
     cdef tuple tup
@@ -81,7 +86,7 @@ def deconstruct_trees(list accm_values,
                    accm_features,
                    accm_thresholds):
 
-        tree_data.append(_deconstruct_tree(
+        tree_data.append(_build_tree_leaves(
             values=tup[0],
             node_samples=tup[1],
             features=tup[2],
@@ -92,59 +97,49 @@ def deconstruct_trees(list accm_values,
     return tree_data
 
 
-cdef list _deconstruct_tree(cnp.ndarray[double, ndim=3] values,
-                             cnp.ndarray[long, ndim=1] node_samples,
-                             cnp.ndarray[long, ndim=1] features,
-                             cnp.ndarray[double, ndim=1] thresholds,
-                             list feature_names,
-                             int print_precision):
-    """ Gather all the leaves of a tree and keep track of the
-        paths that define the leaf.
-
-    :returns (list): tree_meta a list of meta-data of a leaf node
-        of a tree. The meta-data is as ordered:
-        index - index of leaf in pre-order traversal of tree
-        tree_split - meta-data of the leaf-path of tree consists of
-            * feature_name
-            * relation
-            * threshold
-        node_samples - # of samples that enter the leaf node from
-            the training data
+cdef list _build_tree_leaves(
+    cnp.ndarray[double, ndim=3] values,
+    cnp.ndarray[long, ndim=1] node_samples,
+    cnp.ndarray[long, ndim=1] features,
+    cnp.ndarray[double, ndim=1] thresholds,
+    list feature_names,
+    int print_precision):
+    """ This function does most of the work in building TreeLeaf objects.
+        Does a pre-order traversal over the tree attributes passed
+        and creates TreeLeaf objects along the way.
     """
-    cdef int n_splits = len(features)
-
+    cdef int n_splits = features.shape[0]
     if n_splits == 0:
         raise ValueError("The passed tree is empty!")
 
-    cdef list tree_meta = []
-    cdef list tracker_stack = []  # a stack to track if all children of node is visited
-    cdef list leaf_path = []      # ptr_stack keeps track of nodes
+    cdef list tree_leaves = []
+    cdef list tracker_stack = []        # used to track of child node's visited
+    cdef list leaf_path = []
+    cdef TreeSplit treesplit_tmp
 
     cdef int node_index
     for node_index in xrange(n_splits):
         if len(tracker_stack) != 0:
             # the last element of the tracker stack
             # refers to the parent of the current node
-            tracker_stack[-1] += 1  # keep track # of children visited
+            tracker_stack[-1] += 1       # keep track # of children visited
 
-        if features[node_index] != -2:  # visiting inner node
+        if features[node_index] != -2:      # visiting inner node
             tracker_stack.append(0)
-            tree_split = TreeSplit(
-                feature=features[node_index],
-                feature_name=feature_names[features[node_index]],
-                relation='<=',
-                threshold=thresholds[node_index],
-                print_precision=print_precision
+            leaf_path.append(
+                TreeSplit(
+                    features[node_index],
+                    thresholds[node_index],
+                    feature_names[features[node_index]],
+                    '<=')
             )
-            leaf_path.append(tree_split)
 
         else:  # visiting leaf/terminal node
-            tree_meta.append((
-                node_index,                 # leaf's index in pre-order traversal
-                leaf_path.copy(),           # path to the leaf
-                values[node_index][0][0],   # leaf value
-                node_samples[node_index]    # number of samples at leaf
-            ))
+            tree_leaves.append(
+                TreeLeaf(leaf_path.copy(),
+                         values[node_index][0][0],
+                         node_samples[node_index])
+            )
 
             if len(tracker_stack) > 0 and tracker_stack[-1] == 2:
                 # pop out nodes that I am completely done with
@@ -153,14 +148,15 @@ cdef list _deconstruct_tree(cnp.ndarray[double, ndim=3] values,
                     tracker_stack.pop()
 
             if len(leaf_path) != 0:
-                tmp_split = leaf_path.pop()
-                new_split = TreeSplit(
-                    feature=tmp_split.feature,
-                    feature_name=tmp_split.feature_name,
-                    relation='>',
-                    threshold=tmp_split.threshold,
-                    print_precision=print_precision
+                treesplit_tmp = leaf_path.pop()
+                # switching to the right child of parent
+                leaf_path.append(
+                    TreeSplit(
+                        treesplit_tmp.feature,
+                        treesplit_tmp.threshold,
+                        feature_names[treesplit_tmp.feature],
+                        '>')
                 )
-                leaf_path.append(new_split)
 
-    return tree_meta
+
+    return tree_leaves
