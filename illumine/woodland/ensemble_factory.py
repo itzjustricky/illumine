@@ -15,14 +15,16 @@ import numpy as np
 from sklearn.dummy import DummyRegressor
 
 from .lucid_ensemble import LucidEnsemble
-from ..tree.tree_factory import assemble_lucid_trees
+from ..tree.tree_factory import make_many_LucidTrees
+# from ..tree.lucid_tree import LucidTree
+# from ..tree.tree_factory import assemble_lucid_trees
 
 
 __all__ = ['make_LucidEnsemble']
 
 
 def make_LucidEnsemble(sk_ensemble, feature_names, print_precision=5,
-                       init_estimator=None, tree_kws=None, ensemble_kws=None):
+                       init_estimator=None, ensemble_kws=None):
     """ Breakdown a tree's splits and returns the value of every leaf along
         with the path of splits that led to the leaf
 
@@ -46,10 +48,6 @@ def make_LucidEnsemble(sk_ensemble, feature_names, print_precision=5,
     :returns: dictionary of TreeNode objects indexed by their order in the
         pre-order traversal of the Decision Tree
     """
-    if tree_kws is None:
-        tree_kws = dict()
-    elif not isinstance(tree_kws, dict):
-        raise ValueError("tree_kws should be of type dict")
     if ensemble_kws is None:
         ensemble_kws = dict()
     elif not isinstance(ensemble_kws, dict):
@@ -60,9 +58,8 @@ def make_LucidEnsemble(sk_ensemble, feature_names, print_precision=5,
     elif isinstance(sk_ensemble.estimators_, Iterable):
         ensemble_estimators = sk_ensemble.estimators_
 
-    ensemble_of_leaves = assemble_lucid_trees(
-        ensemble_estimators,
-        feature_names, print_precision, **tree_kws)
+    lucid_trees = make_many_LucidTrees(
+        ensemble_estimators, feature_names, print_precision)
 
     # Retrieve the initial estimator for the ensemble
     if init_estimator is None:
@@ -83,7 +80,7 @@ def make_LucidEnsemble(sk_ensemble, feature_names, print_precision=5,
         learning_rate = 1.0 / sk_ensemble.n_estimators
 
     return LucidEnsemble(
-        ensemble_of_leaves, feature_names,
+        lucid_trees,
         init_estimator=init_estimator,
         learning_rate=learning_rate,
         **ensemble_kws)

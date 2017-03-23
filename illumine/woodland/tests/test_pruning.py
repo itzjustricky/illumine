@@ -15,6 +15,8 @@ from sklearn.ensemble import GradientBoostingRegressor
 from illumine.utils import StopWatch
 from illumine.woodland import make_LucidEnsemble
 
+__test__ = False
+
 
 def test_pruning():
     """ Tests the pruning methods on both the objects

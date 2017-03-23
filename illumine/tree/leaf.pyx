@@ -8,8 +8,6 @@
 import numpy as np
 cimport numpy as cnp
 
-from cpython cimport Py_INCREF, PyObject
-
 
 cdef bint le_relation(double value, double threshold) nogil:
     """ Less than or equal to relation function """
@@ -22,11 +20,14 @@ cdef bint gt_relation(double value, double threshold) nogil:
 
 cdef class TreeSplit:
 
-    def __cinit__(self, int feature, double threshold, str feature_name, str relation):
+    def __cinit__(self, int feature, double threshold,
+                  str feature_name, str relation, int print_precision):
         self.feature = feature
         self.threshold = threshold
         self.relation = relation
         self.feature_name = feature_name
+        self.print_precision = print_precision
+        self.float_formatter = '{{:.{}f}}'.format(print_precision)
 
         if relation == '<=':
             self.relate = le_relation
@@ -41,10 +42,20 @@ cdef class TreeSplit:
 
     def __str__(self):
         return "{{{}{}{}}}".format(
-            self.feature_name, self.relation, self.threshold)
+            self.feature_name, self.relation,
+            self.float_formatter.format(self.threshold))
 
     def __repr__(self):
         return str(self)
+
+    def __reduce__(self):
+        return (self.__class__, (
+            self.feature,
+            self.threshold,
+            self.feature_name,
+            self.relation,
+            self.print_precision)
+        )
 
 
 cdef class TreeLeaf:
@@ -52,46 +63,48 @@ cdef class TreeLeaf:
         Stores the path to the leaf and the value associated with the leaf.
     """
 
-    def __cinit__(self, list tree_splits,
-                  double value, int n_samples):
+    def __cinit__(self, list tree_splits, double value):
         """
         :param tree_splits: the decision path to the node
         :param value: the value associated with the node
-        :param n_samples: the number of samples that reach the node
         """
         self.value = value
-        self.n_samples = n_samples
         self.tree_splits = tree_splits
         self.f_to_split_map = {}
 
-        cdef int i, curr_feature, n_splits
-        cdef TreeSplit tree_split
+        cdef set split_set = set()              # temp var to make hash id for leaf
+        cdef int i, curr_feature, n_splits      # temp var to store value in loop
+        cdef TreeSplit tree_split               # temp var to store value in loop
         n_splits = len(tree_splits)
 
         for i, tree_split in enumerate(tree_splits):
+            split_set.add(str(tree_split))
             curr_feature = tree_split.feature
             if curr_feature not in self.f_to_split_map.keys():
                 self.f_to_split_map[curr_feature] = []
 
             self.f_to_split_map[curr_feature].append(i)
 
-        # convert all the lists into vectors
+        # store the hash id for the leaf
+        self.leaf_hash = hash(frozenset(split_set))
+
+        # convert all the lists in f_to_split_map into np.ndarrays
+        # allows faster prediction since views can be used on np.ndarrays
         cdef int key
         cdef list v
         for key, v in self.f_to_split_map.items():
             self.f_to_split_map[key] = np.array(v, dtype=np.int32)
 
-    cdef void apply(self, double[:, :] X, int[:] b):
-        """ Return a vector of size n (where n is the # of rows/samples in X)
-            TODO: may add a sparse apply in future?
+    cdef void apply(self, double[:, :] X, unsigned char[:] b_vector):
+        """ Return a vector of size n (where n is # of rows/samples in X)
 
         :param X: 2d matrix of the NxK
         :param feature: the index of the feature
         """
-        self._dense_apply(X, b)
+        self._dense_apply(X, b_vector)
 
     cdef void _apply_to_feature(self, int feature, int[:] split_inds,
-                                double[:, :] X, int[:] b_vector):
+                                double[:, :] X, unsigned char[:] b_vector):
         """ This function iterates along the rows of X[:, feature]
             and does an & operation over all the tree splits to see if
             the value satisfies all relevant splits
@@ -107,9 +120,9 @@ cdef class TreeLeaf:
             split = self.tree_splits[split_inds[j]]
             with nogil:
                 for i in range(n_samples):
-                    b_vector[i] *= split.apply(X[i, feature])
+                    b_vector[i] &= split.apply(X[i, feature])
 
-    cdef void _dense_apply(self, double[:, :] X, int[:] b_vector):
+    cdef void _dense_apply(self, double[:, :] X, unsigned char[:] b_vector):
         cdef int i, feature                         # ints used to iterate
         cdef cnp.ndarray[int, ndim=1] split_inds    # stores splits indices relevant to a feature
 
@@ -119,3 +132,16 @@ cdef class TreeLeaf:
                 feature,
                 split_inds,
                 X, b_vector)
+
+    def __str__(self):
+        return '\n'.format(self.tree_splits)
+
+    def __repr__(self):
+        return str(self)
+
+    def __hash__(self):
+        return self.leaf_hash
+
+    def __reduce__(self):
+        return (self.__class__,
+            self.tree_splits, self.value)

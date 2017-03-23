@@ -25,8 +25,9 @@ cdef class LeafTable:
     cdef readonly int n_leaves
     cdef public list tree_leaves
 
-    cdef void _apply(self, double[:, :] X, int[:, :] B)
-    cdef void _predict(self, double[:, :] X, double[:] y_pred)
+    cdef cnp.ndarray _dense_apply(self, double[:, :] X)
+    cdef object _sparse_apply(self, double[:, :] X)
+    cdef cnp.ndarray _dense_predict(self, double[:, :] X)
 
-    cpdef cnp.ndarray apply(self, cnp.ndarray[double, ndim=2] X)
-    cpdef cnp.ndarray[double, ndim=1] predict(self, cnp.ndarray[double, ndim=2] X)
+    cpdef object apply(self, cnp.ndarray[double, ndim=2] X, bint sparse=?)
+    cpdef cnp.ndarray predict(self, cnp.ndarray[double, ndim=2] X)

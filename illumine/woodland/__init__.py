@@ -4,12 +4,12 @@
 """
 
 from .lucid_ensemble import LucidEnsemble
-from .lucid_ensemble import CompressedEnsemble
+# from .lucid_ensemble import CompressedEnsemble
 
 from .ensemble_factory import make_LucidEnsemble
 
 from .nurture import weighted_nurturing
 
 __all__ = [
-    'LucidEnsemble', 'CompressedEnsemble',
+    'LucidEnsemble',
     'make_LucidEnsemble', 'weighted_nurturing']

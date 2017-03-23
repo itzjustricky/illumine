@@ -2,9 +2,6 @@
     Cython module for the retrieve_leaf_path
     function used to build lucid-tree objects
 
-    TODO:
-        currently feature_names and
-        print_precision are not being used
 """
 
 cimport cython
@@ -39,7 +36,7 @@ def build_leaf_tables(sk_trees, list feature_names, int print_precision=5):
     return leaftables
 
 
-def _accumulate_tree_attributes(sk_trees):
+cpdef tuple _accumulate_tree_attributes(sk_trees):
     """ Gather the necessary data from Scikit-learn trees
         to construct TreeLeaf objects
 
@@ -131,15 +128,12 @@ cdef list _build_tree_leaves(
                     features[node_index],
                     thresholds[node_index],
                     feature_names[features[node_index]],
-                    '<=')
+                    '<=', print_precision)
             )
 
         else:  # visiting leaf/terminal node
             tree_leaves.append(
-                TreeLeaf(leaf_path.copy(),
-                         values[node_index][0][0],
-                         node_samples[node_index])
-            )
+                TreeLeaf(leaf_path.copy(), values[node_index][0][0]))
 
             if len(tracker_stack) > 0 and tracker_stack[-1] == 2:
                 # pop out nodes that I am completely done with
@@ -155,8 +149,7 @@ cdef list _build_tree_leaves(
                         treesplit_tmp.feature,
                         treesplit_tmp.threshold,
                         feature_names[treesplit_tmp.feature],
-                        '>')
+                        '>', print_precision)
                 )
-
 
     return tree_leaves

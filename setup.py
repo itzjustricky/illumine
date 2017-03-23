@@ -8,35 +8,37 @@ extensions = [
     Extension(
         language="c",
         name="illumine.tree.leaf_retrieval",
-        sources=["illumine/tree/leaf_retrieval.pyx"]),
+        sources=["illumine/tree/leaf_retrieval.pyx"],
+        extra_compile_args=["-O3"]),
     Extension(
         language="c",
         name="illumine.tree.leaf",
-        sources=["illumine/tree/leaf.pyx"]),
+        sources=["illumine/tree/leaf.pyx"],
+        extra_compile_args=["-O3"]),
     Extension(
         language="c",
         name="illumine.tree.leaftable",
-        sources=["illumine/tree/leaftable.pyx"]),
-    # TODO
+        sources=["illumine/tree/leaftable.pyx"],
+        extra_compile_args=["-O3"]),
+
+    # woodland modules
     Extension(
         language="c",
-        name="illumine.tree.predict_methods",
-        sources=["illumine/tree/predict_methods.pyx"]),
-    Extension(
-        language="c",
-        name="illumine.metrics.score_functions",
-        sources=["illumine/metrics/score_functions.pyx"]),
-    Extension(
-        language="c",
-        name="illumine.woodland.find_prune_candidate",
-        sources=["illumine/woodland/find_prune_candidate.pyx"],
-        # extra_compile_args=['-fopenmp'],
-        # extra_link_args=['-fopenmp']
-    ),
+        name="illumine.woodland.compression",
+        sources=["illumine/woodland/compression.pyx"],
+        extra_compile_args=["-O3"]),
     Extension(
         language="c",
         name="illumine.woodland.leaf_tuning",
-        sources=["illumine/woodland/leaf_tuning.pyx"]),
+        sources=["illumine/woodland/leaf_tuning.pyx"],
+        extra_compile_args=["-O3"]),
+
+    # metrics modules
+    Extension(
+        language="c",
+        name="illumine.metrics.score_functions",
+        sources=["illumine/metrics/score_functions.pyx"],
+        extra_compile_args=["-O3"]),
 ]
 
 setup(

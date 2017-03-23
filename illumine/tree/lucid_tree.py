@@ -32,7 +32,7 @@ class LucidTree(object):
         This class is NOT meant to be INHERITED from.
     """
 
-    def __init__(self, leaf_table, print_limit=30):
+    def __init__(self, leaf_table):
         """ Construct the LucidTree object using a dictionary object indexed
             by the leaf's index in the pre-order traversal of the decision tree.
 
@@ -45,17 +45,23 @@ class LucidTree(object):
             out to the console
         """
         self._leaf_table = leaf_table
-        # super(LucidTree, self).__init__(
-        #     tree_leaves,
-        #     print_limit=print_limit)
+
+    def apply(self, X):
+        """ Apply leaves in the tree to X, return leaf indices """
+        if len(self) == 1:
+            return np.zeros(X.shape[0], dtype=np.int32)
+        if isinstance(X, pd.DataFrame):
+            X = X.values.astype(dtype=np.float64, order='F')
+
+        return np.where(self._leaf_table.apply(X))[1]
 
     def predict(self, X):
         """ Create predictions from a matrix of the feature variables """
-        y_pred = np.zeros(X.shape[0])
+
         # this indicates the trained tree had no splits;
         # possible via building LucidTree from sklearn model
         if len(self) == 1:
-            return y_pred
+            return np.zeros(X.shape[0])
         if isinstance(X, pd.DataFrame):
             X = X.values.astype(dtype=np.float64, order='F')
 
@@ -64,9 +70,7 @@ class LucidTree(object):
     def __len__(self):
         return len(self._leaf_table)
 
-    # def __reduce__(self):
-    #     return (self.__class__, (
-    #         self._tree_structure,
-    #         self._seq,
-    #         self._print_limit)
-    #     )
+    def __reduce__(self):
+        return (self.__class__, (
+            tuple((self._leaf_table,))
+        ))
